@@ -21,6 +21,7 @@
         <swaggerspringmvc.version>0.5.2</swaggerspringmvc.version>
         <springfox.version>2.2.2</springfox.version>
         <springmvcui.version>0.4</springmvcui.version>
+        <joda.version>2.8.1</joda.version>
         <warname>event-service</warname>
     </properties>
 
@@ -122,6 +123,14 @@
             <artifactId>springfox-spring-web</artifactId>
             <version>${springfox.version}</version>
         </dependency>
+        
+        <!--  date/Time -->
+        
+        <dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>${joda.version}</version>
+		</dependency>
 
     </dependencies>
 
