@@ -45,7 +45,7 @@ public class EventServiceController  {
 	@RequestMapping(value="/events", method = RequestMethod.POST)
 	public String setEvents(List<Event> evts){
 		
-		log.debug("getEvent request received");
+		log.debug("setEvents request received");
 		return null;
 	}
 	
@@ -63,9 +63,9 @@ public class EventServiceController  {
         
     }
     
-    @RequestMapping(value="/event/{id}", method = RequestMethod.GET)
+    @RequestMapping(value="/events", method = RequestMethod.GET)
     public List<Event> getEvents(EventsRequest req){
-    	
+    	log.debug("getEvents request received");
     	return null;
     }
 
