@@ -1,9 +1,10 @@
 package com.alliancefoundry.model;
 
-import com.wordnik.swagger.annotations.Api;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.joda.time.DateTime;
 
 
 
@@ -13,36 +14,36 @@ import java.util.Map;
 public class Event {
 
     // Headers
-    private String m_eventId;
-    private String m_parentId;
-    private String m_eventName;
-    private String m_objectId;
-    private String m_correlationId;
-    private String m_SequenceNumber;
-    private String m_messageType;
-    private String m_dataType;
-    private String m_source;
-    private String m_destination;
-    private String m_subdestination;
-    private boolean m_replayIndicator;
-    private String m_publishedTimeStamp;
-    private String m_receivedTimeStamp;
-    private String m_expirationTimeStamp;
+    private long eventId;
+    private String parentId;
+    private String eventName;
+    private String objectId;
+    private String correlationId;
+    private String sequenceNumber;
+    private String messageType;
+    private String dataType;
+    private String source;
+    private String destination;
+    private String subdestination;
+    private boolean replayIndicator;
+    private DateTime publishedTimeStamp;
+    private DateTime receivedTimeStamp;
+    private DateTime expirationTimeStamp;
 
     // other
-    private Map<String, String> m_customHeaders = new HashMap<String, String>();
-    private Map<String, String> m_payload = new HashMap<String, String>();
-    private String m_preEventState;
-    private String m_postEventState;
-    private boolean m_isPublishable;
-    private String m_insertTimeStamp;
+    private Map<String, String> customHeaders = new HashMap<String, String>();
+    private Map<String, String> payload = new HashMap<String, String>();
+    private String preEventState;
+    private String postEventState;
+    private boolean isPublishable;
+    private DateTime insertTimeStamp;
 
-    public void setEventId(String id){
-        m_eventId = id;
+    public void setEventId(long id){
+        eventId = id;
     }
 
-    public String getEventId(){
-        return m_eventId;
+    public long getEventId(){
+        return eventId;
     }
 
 

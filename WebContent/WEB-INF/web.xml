@@ -26,6 +26,9 @@
     <listener-class>com.alliancefoundry.servlet.utils.ESFilterContextListener</listener-class>
   </listener>
   <listener>
+  	<listener-class>com.alliancefoundry.servlet.utils.LoggingContextListener</listener-class>
+  </listener>
+  <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
   <welcome-file-list>
