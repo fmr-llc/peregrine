@@ -15,7 +15,6 @@ import com.alliancefoundry.model.Event;
 
 public class JDBCDAOtest {
 	
-	//variables to be used for tests
 	JDBCDAOimpl dao;
 	Event event;
 	Event eventFromDb;
@@ -28,7 +27,7 @@ public class JDBCDAOtest {
 
 	@Test
 	public void getFromDbTest() {
-		eventId = 1037;
+		eventId = 1049;
 		eventFromDb = dao.getEvent(eventId);
 		long expected = eventId;
 		long actual = eventFromDb.getEventId();
