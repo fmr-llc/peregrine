@@ -65,8 +65,6 @@ public class EventServiceController  {
     @RequestMapping(value="/event/{id}", method = RequestMethod.GET)
     public Event getEvent(@PathVariable long id){
     	Event eventFromDb = dao.getEvent(id);
-        //log.debug("getEvent request received");
-    	//log.debug("retrieved event with event id " + eventFromDb.getEventId());
         log.debug("retrieved event with event id " + eventFromDb.getEventId());
         return eventFromDb;
     }

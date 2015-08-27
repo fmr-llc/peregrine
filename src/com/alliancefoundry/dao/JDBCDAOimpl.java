@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.joda.time.DateTime;
+
 import com.alliancefoundry.model.Event;
 import com.mysql.jdbc.PreparedStatement;
 
@@ -103,11 +105,28 @@ static Connection conn;
 			//get to start of resultSet
 			rs.next();
 			
+			//event.setEventId(rs.getLong("eventId"));
+			event = new Event(
+					rs.getString("parentId"),
+					rs.getString("eventName"),
+					rs.getString("objectId"),
+					rs.getString("correlationId"),
+					rs.getString("sequenceNumber"),
+					rs.getString("messageType"),
+					rs.getString("dataType"),
+					rs.getString("source"),
+					rs.getString("destination"),
+					rs.getString("subdestination"),
+					rs.getBoolean("replayIndicator"),
+					new DateTime(rs.getLong("publishedTimeStamp")),
+					new DateTime(rs.getLong("receivedTimeStamp")),
+					new DateTime(rs.getLong("expirationTimeStamp")),
+					rs.getString("preEventState"),
+					rs.getString("postEventState"),
+					rs.getBoolean("isPublishable"),
+					new DateTime(rs.getLong("insertTimeStamp"))
+				);
 			event.setEventId(rs.getLong("eventId"));
-			/*Event event = new Event(
-						
-					);
-			*/
 			return event;
 		} catch (SQLException e) {
 			//event couldn't be retrieved
