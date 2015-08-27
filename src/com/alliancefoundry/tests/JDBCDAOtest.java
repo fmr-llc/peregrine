@@ -15,6 +15,7 @@ import com.alliancefoundry.model.Event;
 
 public class JDBCDAOtest {
 	
+	//variables to be used for tests
 	JDBCDAOimpl dao;
 	Event event;
 	Event eventFromDb;
