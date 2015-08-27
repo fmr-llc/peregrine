@@ -60,6 +60,21 @@
             <artifactId>spring-webmvc</artifactId>
             <version>${spring.version}</version>
         </dependency>
+        
+        <!--  database dependencies -->
+        
+        <dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${mysqlclient.version}</version>
+		</dependency>
+
+		<!-- message broker dependencies -->
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-client</artifactId>
+			<version>${activemqclient.version}</version>
+		</dependency>
 
         <!-- metrics and logging -->
         <dependency>
@@ -131,6 +146,7 @@
 			<artifactId>joda-time</artifactId>
 			<version>${joda.version}</version>
 		</dependency>
+		
 
     </dependencies>
 
