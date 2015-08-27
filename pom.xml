@@ -24,6 +24,8 @@
         <joda.version>2.8.1</joda.version>
         <servletapi.version>3.1.0</servletapi.version>
         <warname>event-service</warname>
+        <mysqlclient.version>5.1.36</mysqlclient.version>
+        <activemqclient.version>5.12.0</activemqclient.version>
     </properties>
 
     <dependencies>
@@ -60,6 +62,21 @@
             <artifactId>spring-webmvc</artifactId>
             <version>${spring.version}</version>
         </dependency>
+        
+        <!--  database dependencies -->
+        
+        <dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${mysqlclient.version}</version>
+		</dependency>
+
+		<!-- message broker dependencies -->
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-client</artifactId>
+			<version>${activemqclient.version}</version>
+		</dependency>
 
         <!-- metrics and logging -->
         <dependency>
@@ -131,6 +148,7 @@
 			<artifactId>joda-time</artifactId>
 			<version>${joda.version}</version>
 		</dependency>
+		
 
     </dependencies>
 
