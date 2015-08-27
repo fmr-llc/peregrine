@@ -23,7 +23,7 @@ public class JDBCDAOtest {
 	@Before
 	public void setUp() throws Exception {
 		dao = new JDBCDAOimpl();
-	}
+	} 
 
 	@Test
 	public void getFromDbTest() {
