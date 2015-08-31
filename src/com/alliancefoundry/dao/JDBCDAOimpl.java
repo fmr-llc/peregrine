@@ -4,10 +4,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.joda.time.DateTime;
 
 import com.alliancefoundry.model.Event;
+import com.alliancefoundry.model.EventsRequest;
 import com.mysql.jdbc.PreparedStatement;
 
 public class JDBCDAOimpl {
@@ -105,7 +108,6 @@ static Connection conn;
 			//get to start of resultSet
 			rs.next();
 			
-			//event.setEventId(rs.getLong("eventId"));
 			event = new Event(
 					rs.getString("parentId"),
 					rs.getString("eventName"),
@@ -132,6 +134,54 @@ static Connection conn;
 			//event couldn't be retrieved
 			return null;
 		} finally{
+			endConnection();
+		}
+	}
+	
+	// Retrieve multiple events from the database based off of an EventsRequest object
+	//into a list of Event objects that is returned.
+	public List<Event> getEvents(EventsRequest req) {
+		List<Event> eventList = new ArrayList<Event>();
+		getConnection();
+		String sql = "SELECT * FROM events "
+				+ "WHERE publishedTimeStamp > ? "
+				//+ "AND publishedTimeStamp < ? "
+				+ "AND source = ? "
+				+ "AND objectId = ? "
+				+ "AND correlationId = ? "
+				+ "AND eventName = ? ";
+		try {
+			PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
+
+			// set the value being checked for equality
+			ps.setLong(1, 0);
+			//ps.setLong(2, );
+			ps.setString(2, req.getSource());
+			ps.setString(3, req.getObjectId());
+			ps.setString(4, req.getCorrelationId());
+			ps.setString(5, req.getName());
+			
+
+			ResultSet rs = ps.executeQuery();
+
+			// get to start of resultSet
+			while (rs.next()) {
+				Event e = new Event(rs.getString("parentId"), rs.getString("eventName"), rs.getString("objectId"),
+						rs.getString("correlationId"), rs.getString("sequenceNumber"), rs.getString("messageType"),
+						rs.getString("dataType"), rs.getString("source"), rs.getString("destination"),
+						rs.getString("subdestination"), rs.getBoolean("replayIndicator"),
+						new DateTime(rs.getLong("publishedTimeStamp")), new DateTime(rs.getLong("receivedTimeStamp")),
+						new DateTime(rs.getLong("expirationTimeStamp")), rs.getString("preEventState"),
+						rs.getString("postEventState"), rs.getBoolean("isPublishable"),
+						new DateTime(rs.getLong("insertTimeStamp")));
+				e.setEventId(rs.getLong("eventId"));
+				eventList.add(e);
+			}
+			return eventList;
+		} catch (SQLException e) {
+			// all events couldn't be retrieved so return ones that could
+			return eventList;
+		} finally {
 			endConnection();
 		}
 	}

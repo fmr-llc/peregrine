@@ -1,5 +1,6 @@
 package com.alliancefoundry.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -40,7 +41,9 @@ public class EventServiceController  {
 	@Consumes("application/json")
 	public String setEvent(@RequestBody Event evt){
 		long eventId = dao.insertEvent(evt);
-		return null;
+		String eventIdStr = Long.toString(eventId);
+		log.debug("created event with event id " + eventIdStr);
+		return eventIdStr;
 	}
 	
 	/**
@@ -50,10 +53,18 @@ public class EventServiceController  {
 	 * @return
 	 */
 	@RequestMapping(value="/events", method = RequestMethod.POST)
-	public String setEvents(List<Event> evts){
-		
-		log.debug("setEvents request received");
-		return null;
+	public String setEvents(@RequestBody List<Event> evts){
+		List<Long> eventIds = new ArrayList<Long>();
+		for(Event e : evts){
+			eventIds.add(dao.insertEvent(e));
+		}
+		String eventIdStr = "";
+		for(Long l : eventIds){
+			eventIdStr += Long.toString(l) + " ";
+		}
+		log.debug("created events with event id[s] " + eventIdStr);
+		//log.debug("setEvents request received");
+		return eventIdStr;
 	}
 	
 	/**

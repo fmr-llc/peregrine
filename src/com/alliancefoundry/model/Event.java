@@ -6,11 +6,18 @@ import java.util.Map;
 
 import org.joda.time.DateTime;
 
+import com.alliancefoundry.serializer.CustomJsonDateDeserializer;
+import com.alliancefoundry.serializer.MyDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 
 
 /**
  * Created by Paul Bernard
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Event {
 
     // Headers
@@ -26,8 +33,14 @@ public class Event {
     private String destination;
     private String subdestination;
     private boolean replayIndicator;
+    @JsonSerialize(using = MyDateTimeSerializer.class)
+    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     private DateTime publishedTimeStamp;
+    @JsonSerialize(using = MyDateTimeSerializer.class)
+    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     private DateTime receivedTimeStamp;
+    @JsonSerialize(using = MyDateTimeSerializer.class)
+    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     private DateTime expirationTimeStamp;
 
     // other
@@ -36,6 +49,8 @@ public class Event {
     private String preEventState;
     private String postEventState;
     private boolean isPublishable;
+    @JsonSerialize(using = MyDateTimeSerializer.class)
+    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     private DateTime insertTimeStamp;
 
     public Event(){
