@@ -54,12 +54,12 @@ public class Event {
     private DateTime insertTimeStamp;
 
     public Event(){
-    	publishTimeStamp = new DateTime();
-    	receivedTimeStamp = new DateTime();
-    	expirationTimeStamp = new DateTime();
+    	publishTimeStamp = new DateTime(0);
+    	receivedTimeStamp = DateTime.now();
+    	expirationTimeStamp = new DateTime(0);
     	customHeaders = new HashMap<String, String>();
     	customPayload = new HashMap<String, DataItem>();
-    	insertTimeStamp = new DateTime();
+    	insertTimeStamp = DateTime.now();
     }
 	
 	/**
