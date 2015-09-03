@@ -1,8 +1,12 @@
 package com.alliancefoundry.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.Consumes;
+
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alliancefoundry.dao.JDBCDAOimpl;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
 
@@ -24,6 +29,7 @@ import com.alliancefoundry.model.EventsRequest;
 public class EventServiceController  {
 	
 	static final Logger log = LoggerFactory.getLogger(EventServiceController.class);
+	JDBCDAOimpl dao = new JDBCDAOimpl();
 
 	/**
 	 * Creates a new event
@@ -32,8 +38,12 @@ public class EventServiceController  {
 	 * @return
 	 */
 	@RequestMapping(value="/event", method = RequestMethod.POST)
-	public String setEvent(Event evt){
-		return null;
+	@Consumes("application/json")
+	public String setEvent(@RequestBody Event evt){
+		long eventId = dao.insertEvent(evt);
+		String eventIdStr = Long.toString(eventId);
+		log.debug("created event with event id " + eventIdStr);
+		return eventIdStr;
 	}
 	
 	/**
@@ -43,10 +53,18 @@ public class EventServiceController  {
 	 * @return
 	 */
 	@RequestMapping(value="/events", method = RequestMethod.POST)
-	public String setEvents(List<Event> evts){
-		
-		log.debug("setEvents request received");
-		return null;
+	public String setEvents(@RequestBody List<Event> evts){
+		List<Long> eventIds = new ArrayList<Long>();
+		for(Event e : evts){
+			eventIds.add(dao.insertEvent(e));
+		}
+		String eventIdStr = "";
+		for(Long l : eventIds){
+			eventIdStr += Long.toString(l) + " ";
+		}
+		log.debug("created events with event id[s] " + eventIdStr);
+		//log.debug("setEvents request received");
+		return eventIdStr;
 	}
 	
 	/**
@@ -57,10 +75,9 @@ public class EventServiceController  {
 	 */
     @RequestMapping(value="/event/{id}", method = RequestMethod.GET)
     public Event getEvent(@PathVariable long id){
-        
-        log.debug("getEvent request received");
-        return null;
-        
+    	Event eventFromDb = dao.getEvent(id);
+        log.debug("retrieved event with event id " + eventFromDb.getEventId());
+        return eventFromDb;
     }
     
     @RequestMapping(value="/events", method = RequestMethod.GET)
