@@ -2,17 +2,17 @@ package com.alliancefoundry.tests;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.alliancefoundry.dao.JDBCDAOimpl;
+import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
 
@@ -21,7 +21,7 @@ public class JDBCDAOtest {
 	JDBCDAOimpl dao;
 	Event event;
 	Event eventFromDb;
-	long eventId;
+	String eventId;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -30,45 +30,98 @@ public class JDBCDAOtest {
 
 	@Test
 	public void getFromDbTest() {
-		eventId = 1738;
+		//run insert first, in order to find out a valid eventId
+		eventId = "4413df38-53a2-44df-bb89-10ad79f01f2e";
+		
 		eventFromDb = dao.getEvent(eventId);
-		long expected = eventId;
-		long actual = eventFromDb.getEventId();
-		assertEquals(expected, actual);
+		String expected = eventId;
+		String actual = eventFromDb.getEventId();
+		assertEquals(expected,actual);
 	}
 	
-	@Test
-	public void getMultipleEventsFromDbTest() {
+	/*@Test
+	public void getMultipleEventsFromDbNoParamsTest() {
 		EventsRequest req = new EventsRequest();
-		req.setCreatedAfter(new DateTime(0));
-		req.setCreatedBefore(DateTime.now());
-		req.setSource("c");
-		req.setObjectId("c");
-		req.setCorrelationId("c");
-		req.setName("c");
-		req.setGenerations(0);
 		List<Event> eventList = new ArrayList<Event>();
 		eventList = dao.getEvents(req);
-		//eventId = 1738;
-		//eventFromDb = dao.getEvent(eventId);
-		/*long expected = eventId;
-		long actual = eventFromDb.getEventId();
-		assertEquals(expected, actual);*/
-		boolean exists = true;
 		if(eventList.size() == 0){
-			assert(false);
+			fail();
+		} else {
+			int count = 1;
+			for(Event e : eventList){
+				if(e.getEventId() != count) fail();
+				count++;
+			}
+			assert(true);
+		}
+	}*/
+	
+	/*@Test
+	public void getMultipleEventsFromDbOneParamTest() {
+		EventsRequest req = new EventsRequest();
+		req.setSource("a");
+		List<Event> eventList = new ArrayList<Event>();
+		eventList = dao.getEvents(req);
+		if(eventList.size() == 0){
+			fail();
 		} else {
 			for(Event e : eventList){
-				if(e.getSource() != "c") exists = false;
+				if(!e.getSource().equals("a")) fail();
 			}
-			assert(exists);
+			assert(true);
 		}
 	}
 	
 	@Test
+	public void getMultipleEventsFromDbMultipleParamTest() {
+		EventsRequest req = new EventsRequest();
+		req.setObjectId("a");
+		req.setName("a");
+		List<Event> eventList = new ArrayList<Event>();
+		eventList = dao.getEvents(req);
+		if(eventList.size() == 0){
+			fail();
+		} else {
+			for(Event e : eventList){
+				if(!e.getObjectId().equals("a")) fail();
+				if(!e.getEventName().equals("a")) fail();
+			}
+			assert(true);
+		}
+	}
+	
+	@Test
+	public void getMultipleEventsFromDbAllParamTest() {
+		EventsRequest req = new EventsRequest();
+		DateTime currentTime = DateTime.now();
+		req.setCreatedAfter(new DateTime(0));
+		req.setCreatedBefore(currentTime);
+		req.setSource("a");
+		req.setObjectId("a");
+		req.setCorrelationId("a");
+		req.setName("a");
+		req.setGenerations(0);
+		List<Event> eventList = new ArrayList<Event>();
+		eventList = dao.getEvents(req);
+		if(eventList.size() == 0){
+			fail();
+		} else {
+			for(Event e : eventList){
+				if(!(e.getPublishTimeStamp().getMillis() > 0)) fail();
+				if(!(e.getPublishTimeStamp().getMillis() < currentTime.getMillis())) fail();
+				if(!e.getSource().equals("a")) fail();
+				if(!e.getObjectId().equals("a")) fail();
+				if(!e.getCorrelationId().equals("a")) fail();
+				if(!e.getEventName().equals("a")) fail();
+			}
+			assert(true);
+		}
+	}*/
+	
+	@Test
 	public void EventNotFoundInDbTest() {
-		//there shouldn't be an event with eventId of -1
-		eventId = -1;
+		//there shouldn't be an event with eventId of ""
+		eventId = "";
 		
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = null;
@@ -83,7 +136,7 @@ public class JDBCDAOtest {
 					"a",
 					"a",
 					"a",
-					"a",
+					3,
 					"a",
 					"a",
 					"a",
@@ -98,21 +151,32 @@ public class JDBCDAOtest {
 					true,
 					DateTime.now()
 				);
+		Map<String,String> headers = new HashMap<String,String>();
+		Map<String,DataItem> payload = new HashMap<String,DataItem>();
+		
+		headers.put("some key", "some value");
+		payload.put("some key", new DataItem("some data type","some value"));
+		headers.put("some other key", "some other value");
+		payload.put("some other key", new DataItem("some other data type","some other value"));
+		
+		event.setCustomHeaders(headers);
+		event.setCustomPayload(payload);
+		
 		eventId = dao.insertEvent(event);
 		eventFromDb = dao.getEvent(eventId);
-		long expected = eventId;
-		long actual = eventFromDb.getEventId();
-		assertEquals(expected, actual);
+		String expected = eventId;
+		String actual = eventFromDb.getEventId();
+		assertEquals(expected,actual);	
 	}
 	
-	@Test
+	/*@Test
 	public void insertMultipleEventsToDbTest() {
 		event = new Event(
 			"c",
 			"c",
 			"c",
 			"c",
-			"c",
+			3,
 			"c",
 			"c",
 			"c",
@@ -132,7 +196,7 @@ public class JDBCDAOtest {
 			"b",
 			"b",
 			"b",
-			"b",
+			3,
 			"b",
 			"b",
 			"b",
@@ -147,15 +211,15 @@ public class JDBCDAOtest {
 			true,
 			DateTime.now()
 		);
-		List<Long> expected = new ArrayList<Long>();
+		List<String> expected = new ArrayList<String>();
 		expected.add(dao.insertEvent(event));
 		expected.add(dao.insertEvent(event2));
-		List<Long> actual = new ArrayList<Long>();
-		for(long id : expected){
+		List<String> actual = new ArrayList<String>();
+		for(String id : expected){
 			actual.add((dao.getEvent(id)).getEventId());
 		}
 		assertEquals(expected, actual);
-	}
+	}*/
 	
 	@Test
 	public void insertToAndRetrieveFromDbDateTimeTest() {
@@ -165,7 +229,7 @@ public class JDBCDAOtest {
 					"a",
 					"a",
 					"a",
-					"a",
+					3,
 					"a",
 					"a",
 					"a",
@@ -185,41 +249,7 @@ public class JDBCDAOtest {
 		//datetime before insert into one of the DateTime fields
 		String expected = datetime.toString();
 		//datetime 
-		String actual = eventFromDb.getPublishedTimeStamp().toString();
+		String actual = eventFromDb.getPublishTimeStamp().toString();
 		assertEquals(expected, actual);
 	}
-	
-	@Test
-	public void persistEventWithoutPublishTimeStampOrExpirationTimeStampTest() {
-		Event event = new Event(
-				null,
-				"NewObject",
-				"2041501939154893",
-				"785213",
-				"1",
-				"newObject",
-				"Object",
-				"TestSource",
-				"TestDestination",
-				"TestSubdestination",
-				false,
-				new DateTime(),
-				DateTime.now(),
-				new DateTime(),
-				null,
-				null,
-				true,
-				DateTime.now()
-			);
-		long eventId = dao.insertEvent(event);
-		Event eventFromDb = dao.getEvent(eventId);
-		DateTime expectedPTS = event.getPublishedTimeStamp();
-		DateTime actualPTS = eventFromDb.getPublishedTimeStamp();
-		DateTime expectedETS = event.getExpirationTimeStamp();
-		DateTime actualETS = eventFromDb.getExpirationTimeStamp();
-		System.out.println("expectedPTS: " + expectedPTS + "\nactualPTS: " + actualPTS + "\nexpectedETS: " + expectedETS + "\nactualETS: " + actualETS);
-		assertEquals(expectedPTS.toString(), actualPTS.toString());
-		assertEquals(expectedETS.toString(), actualETS.toString());
-	}
-	
 }

@@ -21,12 +21,12 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public class Event {
 
     // Headers
-    private long eventId;
+    private String eventId;
     private String parentId;
     private String eventName;
     private String objectId;
     private String correlationId;
-    private String sequenceNumber;
+    private int sequenceNumber;
     private String messageType;
     private String dataType;
     private String source;
@@ -35,7 +35,7 @@ public class Event {
     private boolean replayIndicator;
     @JsonSerialize(using = MyDateTimeSerializer.class)
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)
-    private DateTime publishedTimeStamp;
+    private DateTime publishTimeStamp;
     @JsonSerialize(using = MyDateTimeSerializer.class)
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     private DateTime receivedTimeStamp;
@@ -44,8 +44,8 @@ public class Event {
     private DateTime expirationTimeStamp;
 
     // other
-    private Map<String, String> customHeaders = new HashMap<String, String>();
-    private Map<String, String> payload = new HashMap<String, String>();
+    private Map<String, String> customHeaders;
+    private Map<String, DataItem> customPayload;
     private String preEventState;
     private String postEventState;
     private boolean isPublishable;
@@ -54,10 +54,15 @@ public class Event {
     private DateTime insertTimeStamp;
 
     public Event(){
-    	
+    	publishTimeStamp = new DateTime();
+    	receivedTimeStamp = new DateTime();
+    	expirationTimeStamp = new DateTime();
+    	customHeaders = new HashMap<String, String>();
+    	customPayload = new HashMap<String, DataItem>();
+    	insertTimeStamp = new DateTime();
     }
-    
-    /**
+	
+	/**
 	 * @param parentId
 	 * @param eventName
 	 * @param objectId
@@ -69,23 +74,23 @@ public class Event {
 	 * @param destination
 	 * @param subdestination
 	 * @param replayIndicator
-	 * @param publishedTimeStamp
+	 * @param publishTimeStamp
 	 * @param receivedTimeStamp
 	 * @param expirationTimeStamp
 	 * @param preEventState
 	 * @param postEventState
 	 * @param isPublishable
 	 * @param insertTimeStamp
-	 * 
-	 * Should probably remove after testing.  Event won't need to be created by
-	 * the system.
-	 * 
 	 */
-	public Event(String parentId, String eventName, String objectId, String correlationId, String sequenceNumber,
-			String messageType, String dataType, String source, String destination, String subdestination,
-			boolean replayIndicator, DateTime publishedTimeStamp, DateTime receivedTimeStamp,
+	public Event(String parentId, String eventName, String objectId, String correlationId,
+			int sequenceNumber, String messageType, String dataType, String source, String destination,
+			String subdestination, boolean replayIndicator, DateTime publishTimeStamp, DateTime receivedTimeStamp,
 			DateTime expirationTimeStamp, String preEventState, String postEventState, boolean isPublishable,
 			DateTime insertTimeStamp) {
+		
+		//call empty constructor to initialize hash maps
+		this();
+		
 		this.parentId = parentId;
 		this.eventName = eventName;
 		this.objectId = objectId;
@@ -97,7 +102,7 @@ public class Event {
 		this.destination = destination;
 		this.subdestination = subdestination;
 		this.replayIndicator = replayIndicator;
-		this.publishedTimeStamp = publishedTimeStamp;
+		this.publishTimeStamp = publishTimeStamp;
 		this.receivedTimeStamp = receivedTimeStamp;
 		this.expirationTimeStamp = expirationTimeStamp;
 		this.preEventState = preEventState;
@@ -105,10 +110,8 @@ public class Event {
 		this.isPublishable = isPublishable;
 		this.insertTimeStamp = insertTimeStamp;
 	}
-    
 	
-	
-    public Map<String, String> getCustomHeaders() {
+	public Map<String, String> getCustomHeaders() {
 		return customHeaders;
 	}
 
@@ -116,12 +119,12 @@ public class Event {
 		this.customHeaders = customHeaders;
 	}
 
-	public Map<String, String> getPayload() {
-		return payload;
+	public Map<String, DataItem> getCustomPayload() {
+		return customPayload;
 	}
 
-	public void setPayload(Map<String, String> payload) {
-		this.payload = payload;
+	public void setCustomPayload(Map<String, DataItem> customPayload) {
+		this.customPayload = customPayload;
 	}
 
 	public void setParentId(String parentId) {
@@ -140,7 +143,7 @@ public class Event {
 		this.correlationId = correlationId;
 	}
 
-	public void setSequenceNumber(String sequenceNumber) {
+	public void setSequenceNumber(int sequenceNumber) {
 		this.sequenceNumber = sequenceNumber;
 	}
 
@@ -168,8 +171,8 @@ public class Event {
 		this.replayIndicator = replayIndicator;
 	}
 
-	public void setPublishedTimeStamp(DateTime publishedTimeStamp) {
-		this.publishedTimeStamp = publishedTimeStamp;
+	public void setPublishTimeStamp(DateTime publishTimeStamp) {
+		this.publishTimeStamp = publishTimeStamp;
 	}
 
 	public void setReceivedTimeStamp(DateTime receivedTimeStamp) {
@@ -196,11 +199,11 @@ public class Event {
 		this.insertTimeStamp = insertTimeStamp;
 	}
 
-	public void setEventId(long id){
+	public void setEventId(String id){
         eventId = id;
     }
 
-    public long getEventId(){
+    public String getEventId(){
         return eventId;
     }
 
@@ -220,7 +223,7 @@ public class Event {
 		return correlationId;
 	}
 
-	public String getSequenceNumber() {
+	public int getSequenceNumber() {
 		return sequenceNumber;
 	}
 
@@ -248,8 +251,8 @@ public class Event {
 		return replayIndicator;
 	}
 
-	public DateTime getPublishedTimeStamp() {
-		return publishedTimeStamp;
+	public DateTime getPublishTimeStamp() {
+		return publishTimeStamp;
 	}
 
 	public DateTime getReceivedTimeStamp() {

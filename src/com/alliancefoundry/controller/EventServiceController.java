@@ -40,10 +40,9 @@ public class EventServiceController  {
 	@RequestMapping(value="/event", method = RequestMethod.POST)
 	@Consumes("application/json")
 	public String setEvent(@RequestBody Event evt){
-		long eventId = dao.insertEvent(evt);
-		String eventIdStr = Long.toString(eventId);
-		log.debug("created event with event id " + eventIdStr);
-		return eventIdStr;
+		String eventId = dao.insertEvent(evt);
+		log.debug("created event with event id " + eventId);
+		return eventId;
 	}
 	
 	/**
@@ -54,13 +53,13 @@ public class EventServiceController  {
 	 */
 	@RequestMapping(value="/events", method = RequestMethod.POST)
 	public String setEvents(@RequestBody List<Event> evts){
-		List<Long> eventIds = new ArrayList<Long>();
+		List<String> eventIds = new ArrayList<String>();
 		for(Event e : evts){
 			eventIds.add(dao.insertEvent(e));
 		}
 		String eventIdStr = "";
-		for(Long l : eventIds){
-			eventIdStr += Long.toString(l) + " ";
+		for(String l : eventIds){
+			eventIdStr += l + " ";
 		}
 		log.debug("created events with event id[s] " + eventIdStr);
 		//log.debug("setEvents request received");
@@ -74,7 +73,7 @@ public class EventServiceController  {
 	 * @return
 	 */
     @RequestMapping(value="/event/{id}", method = RequestMethod.GET)
-    public Event getEvent(@PathVariable long id){
+    public Event getEvent(@PathVariable String id){
     	Event eventFromDb = dao.getEvent(id);
         log.debug("retrieved event with event id " + eventFromDb.getEventId());
         return eventFromDb;
