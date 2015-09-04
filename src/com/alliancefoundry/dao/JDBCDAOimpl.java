@@ -73,11 +73,12 @@ static Connection conn;
 			} else {
 				ps.setNull(13, 0);
 			}
-			if(!event.getReceivedTimeStamp().equals(new DateTime(0))){
+			ps.setLong(14, event.getReceivedTimeStamp().getMillis());
+			/*if(!event.getReceivedTimeStamp().equals(new DateTime(0))){
 				ps.setLong(14, event.getReceivedTimeStamp().getMillis());
 			} else {
 				ps.setNull(14, 0);
-			}
+			}*/
 			if(!event.getExpirationTimeStamp().equals(new DateTime(0))){
 				ps.setLong(15, event.getExpirationTimeStamp().getMillis());
 			} else {
@@ -86,11 +87,12 @@ static Connection conn;
 			ps.setString(16, event.getPreEventState());
 			ps.setString(17, event.getPostEventState());
 			ps.setBoolean(18, event.isPublishable());
-			if(!event.getInsertTimeStamp().equals(new DateTime(0))){
+			ps.setLong(19, event.getInsertTimeStamp().getMillis());
+			/*if(!event.getInsertTimeStamp().equals(new DateTime(0))){
 				ps.setLong(19, event.getInsertTimeStamp().getMillis());
 			} else {
 				ps.setNull(19, 0);
-			}
+			}*/
 			
 			ps.executeUpdate();
 			
