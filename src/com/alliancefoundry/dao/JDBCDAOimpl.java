@@ -61,13 +61,22 @@ static Connection conn;
 			ps.setString(3, event.getEventName());
 			ps.setString(4, event.getObjectId());
 			ps.setString(5, event.getCorrelationId());
-			ps.setInt(6, event.getSequenceNumber());
+			try{
+				ps.setInt(6, event.getSequenceNumber());
+			} catch(NullPointerException e){
+				ps.setNull(6, 0);
+			}
+			//ps.setInt(6, event.getSequenceNumber());
 			ps.setString(7, event.getMessageType());
 			ps.setString(8, event.getDataType());
 			ps.setString(9, event.getSource());
 			ps.setString(10, event.getDestination());
 			ps.setString(11, event.getSubdestination());
-			ps.setBoolean(12, event.isReplayIndicator());
+			try{
+				ps.setBoolean(12, event.isReplayIndicator());
+			} catch(NullPointerException e){
+				ps.setNull(12, 0);
+			}
 			if(!event.getPublishTimeStamp().equals(new DateTime(0))){
 				ps.setLong(13, event.getPublishTimeStamp().getMillis());
 			} else {
@@ -86,7 +95,11 @@ static Connection conn;
 			}
 			ps.setString(16, event.getPreEventState());
 			ps.setString(17, event.getPostEventState());
-			ps.setBoolean(18, event.isPublishable());
+			try{
+				ps.setBoolean(18, event.isPublishable());
+			}catch(NullPointerException e){
+				ps.setNull(18, 0);
+			}
 			ps.setLong(19, event.getInsertTimeStamp().getMillis());
 			/*if(!event.getInsertTimeStamp().equals(new DateTime(0))){
 				ps.setLong(19, event.getInsertTimeStamp().getMillis());

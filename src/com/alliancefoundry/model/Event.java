@@ -26,13 +26,13 @@ public class Event {
     private String eventName;
     private String objectId;
     private String correlationId;
-    private int sequenceNumber;
+    private Integer sequenceNumber = null;
     private String messageType;
     private String dataType;
     private String source;
     private String destination;
     private String subdestination;
-    private boolean replayIndicator;
+    private Boolean replayIndicator;
     @JsonSerialize(using = MyDateTimeSerializer.class)
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     private DateTime publishTimeStamp;
@@ -48,7 +48,7 @@ public class Event {
     private Map<String, DataItem> customPayload;
     private String preEventState;
     private String postEventState;
-    private boolean isPublishable;
+    private Boolean isPublishable;
     @JsonSerialize(using = MyDateTimeSerializer.class)
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     private DateTime insertTimeStamp;
@@ -83,7 +83,7 @@ public class Event {
 	 * @param insertTimeStamp
 	 */
 	public Event(String parentId, String eventName, String objectId, String correlationId,
-			int sequenceNumber, String messageType, String dataType, String source, String destination,
+			Integer sequenceNumber, String messageType, String dataType, String source, String destination,
 			String subdestination, boolean replayIndicator, DateTime publishTimeStamp, DateTime receivedTimeStamp,
 			DateTime expirationTimeStamp, String preEventState, String postEventState, boolean isPublishable,
 			DateTime insertTimeStamp) {
