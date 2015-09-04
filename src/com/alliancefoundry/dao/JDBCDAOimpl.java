@@ -68,13 +68,31 @@ static Connection conn;
 			ps.setString(10, event.getDestination());
 			ps.setString(11, event.getSubdestination());
 			ps.setBoolean(12, event.isReplayIndicator());
-			ps.setLong(13, event.getPublishTimeStamp().getMillis());
+			if(!event.getPublishTimeStamp().equals(new DateTime(0))){
+				ps.setLong(13, event.getPublishTimeStamp().getMillis());
+			} else {
+				ps.setNull(13, 0);
+			}
 			ps.setLong(14, event.getReceivedTimeStamp().getMillis());
-			ps.setLong(15, event.getExpirationTimeStamp().getMillis());
+			/*if(!event.getReceivedTimeStamp().equals(new DateTime(0))){
+				ps.setLong(14, event.getReceivedTimeStamp().getMillis());
+			} else {
+				ps.setNull(14, 0);
+			}*/
+			if(!event.getExpirationTimeStamp().equals(new DateTime(0))){
+				ps.setLong(15, event.getExpirationTimeStamp().getMillis());
+			} else {
+				ps.setNull(15, 0);
+			}
 			ps.setString(16, event.getPreEventState());
 			ps.setString(17, event.getPostEventState());
 			ps.setBoolean(18, event.isPublishable());
 			ps.setLong(19, event.getInsertTimeStamp().getMillis());
+			/*if(!event.getInsertTimeStamp().equals(new DateTime(0))){
+				ps.setLong(19, event.getInsertTimeStamp().getMillis());
+			} else {
+				ps.setNull(19, 0);
+			}*/
 			
 			ps.executeUpdate();
 			
@@ -128,6 +146,11 @@ static Connection conn;
 			//get to start of resultSet
 			rs.next();
 			
+			DateTime publish = new DateTime(rs.getLong("publishTimeStamp"));
+			if (rs.wasNull()) publish = null;
+			DateTime expiration = new DateTime(rs.getLong("expirationTimeStamp"));
+			if (rs.wasNull()) expiration = null;
+			
 			event = new Event(
 					rs.getString("parentId"),
 					rs.getString("eventName"),
@@ -140,9 +163,9 @@ static Connection conn;
 					rs.getString("destination"),
 					rs.getString("subdestination"),
 					rs.getBoolean("replayIndicator"),
-					new DateTime(rs.getLong("publishTimeStamp")),
+					publish,
 					new DateTime(rs.getLong("receivedTimeStamp")),
-					new DateTime(rs.getLong("expirationTimeStamp")),
+					expiration,
 					rs.getString("preEventState"),
 					rs.getString("postEventState"),
 					rs.getBoolean("isPublishable"),
@@ -194,6 +217,9 @@ static Connection conn;
 	//into a list of Event objects that is returned.
 	public List<Event> getEvents(EventsRequest req) {
 		List<Event> eventList = new ArrayList<Event>();
+		if( req.getCreatedAfter() == null || req.getCreatedAfter().equals("")){
+    		throw new IllegalArgumentException("A createdAfter date must be specified.");
+    	}
 		getConnection();
 		String reqCreatedAfter = "AND publishTimeStamp > ? ";
 		String reqCreatedBefore = "AND publishTimeStamp < ? ";

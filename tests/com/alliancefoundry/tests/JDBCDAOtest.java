@@ -169,7 +169,7 @@ public class JDBCDAOtest {
 		assertEquals(expected,actual);	
 	}
 	
-	/*@Test
+	@Test
 	public void insertMultipleEventsToDbTest() {
 		event = new Event(
 			"c",
@@ -219,7 +219,7 @@ public class JDBCDAOtest {
 			actual.add((dao.getEvent(id)).getEventId());
 		}
 		assertEquals(expected, actual);
-	}*/
+	}
 	
 	@Test
 	public void insertToAndRetrieveFromDbDateTimeTest() {
