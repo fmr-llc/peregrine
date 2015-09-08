@@ -1,5 +1,6 @@
 package com.alliancefoundry.controller;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +41,13 @@ public class EventServiceController  {
 	@RequestMapping(value="/event", method = RequestMethod.POST)
 	@Consumes("application/json")
 	public String setEvent(@RequestBody Event evt){
-		String eventId = dao.insertEvent(evt);
-		log.debug("created event with event id " + eventId);
+		String eventId = "";
+		try {
+			eventId = dao.insertEvent(evt);
+			log.debug("created event with event id " + eventId);
+		} catch (SQLException e) {
+			log.debug("Event could not be created.");
+		}
 		return eventId;
 	}
 	
@@ -55,14 +61,17 @@ public class EventServiceController  {
 	public String setEvents(@RequestBody List<Event> evts){
 		List<String> eventIds = new ArrayList<String>();
 		for(Event e : evts){
-			eventIds.add(dao.insertEvent(e));
+			try {
+				eventIds.add(dao.insertEvent(e));
+			} catch (SQLException eSQL) {
+				//TODO: Get log.debug message to show up when this exception is reached
+			}
 		}
 		String eventIdStr = "";
 		for(String l : eventIds){
 			eventIdStr += l + " ";
 		}
 		log.debug("created events with event id[s] " + eventIdStr);
-		//log.debug("setEvents request received");
 		return eventIdStr;
 	}
 	

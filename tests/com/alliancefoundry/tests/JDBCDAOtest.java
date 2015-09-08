@@ -2,6 +2,7 @@ package com.alliancefoundry.tests;
 
 import static org.junit.Assert.*;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -162,7 +163,12 @@ public class JDBCDAOtest {
 		event.setCustomHeaders(headers);
 		event.setCustomPayload(payload);
 		
-		eventId = dao.insertEvent(event);
+		try {
+			eventId = dao.insertEvent(event);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		eventFromDb = dao.getEvent(eventId);
 		String expected = eventId;
 		String actual = eventFromDb.getEventId();
@@ -212,8 +218,18 @@ public class JDBCDAOtest {
 			DateTime.now()
 		);
 		List<String> expected = new ArrayList<String>();
-		expected.add(dao.insertEvent(event));
-		expected.add(dao.insertEvent(event2));
+		try {
+			expected.add(dao.insertEvent(event));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			expected.add(dao.insertEvent(event2));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		List<String> actual = new ArrayList<String>();
 		for(String id : expected){
 			actual.add((dao.getEvent(id)).getEventId());
@@ -244,7 +260,12 @@ public class JDBCDAOtest {
 					true,
 					datetime
 				);
-		eventId = dao.insertEvent(event);
+		try {
+			eventId = dao.insertEvent(event);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		eventFromDb = dao.getEvent(eventId);
 		//datetime before insert into one of the DateTime fields
 		String expected = datetime.toString();
