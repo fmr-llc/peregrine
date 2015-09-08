@@ -5,6 +5,7 @@ package com.alliancefoundry.tests;
 
 import static org.junit.Assert.*;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,9 +41,10 @@ public class PersistEventTests {
 
 	/**
 	 * Test to persist an event for a new object within database.
+	 * @throws SQLException 
 	 */
 	@Test
-	public void persistEventTest() {
+	public void persistEventTest() throws SQLException {
 		Event event = new Event(
 				null,
 				"NewObject",
@@ -73,9 +75,10 @@ public class PersistEventTests {
 	
 	/**
 	 * Test to persist an event that updates an object within database.
+	 * @throws SQLException 
 	 */
 	@Test
-	public void persistSecondEventTest() {
+	public void persistSecondEventTest() throws SQLException {
 		Event event = new Event(
 				storedEventId + "",
 				"ObjectUpdate",
@@ -106,9 +109,10 @@ public class PersistEventTests {
 	
 	/**
 	 * Test to persist an event that updates an object within database.
+	 * @throws SQLException 
 	 */
 	@Test
-	public void persistThirdEventTest() {
+	public void persistThirdEventTest() throws SQLException {
 		Event event = new Event(
 				storedEventId + "",
 				"ObjectUpdate",
@@ -139,9 +143,10 @@ public class PersistEventTests {
 	/**
 	 * Test to persist an event that tries to update an event which has already been updated.
 	 * This event should be persisted to database.
+	 * @throws SQLException 
 	 */
 	@Test
-	public void persistEventUpdateToPreviouslyUpdatedEventTest() {
+	public void persistEventUpdateToPreviouslyUpdatedEventTest() throws SQLException {
 		Event event = new Event(
 				"1062",
 				"ObjectUpdate",
@@ -199,12 +204,19 @@ public class PersistEventTests {
 		event.setPublishTimeStamp(null);
 		event.setExpirationTimeStamp(null);
 		System.out.println("1: " + event.getPublishTimeStamp() + " - " + event.getExpirationTimeStamp());
-		String eventId = dao.insertEvent(event);
-		System.out.println("2: " + eventId);
-		Event eventFromDb = dao.getEvent(eventId);
-		Event expected = event;
-		Event actual = eventFromDb;
-		assertEquals(expected, actual);
+		String eventId;
+		try {
+			eventId = dao.insertEvent(event);
+			System.out.println("2: " + eventId);
+			Event eventFromDb = dao.getEvent(eventId);
+			Event expected = event;
+			Event actual = eventFromDb;
+			assertEquals(expected.getPublishTimeStamp(), actual.getPublishTimeStamp());
+			assertEquals(expected.getExpirationTimeStamp(), actual.getExpirationTimeStamp());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 //		DateTime expectedPTS = event.getPublishTimeStamp();
 //		DateTime actualPTS = eventFromDb.getPublishTimeStamp();
 //		DateTime expectedETS = event.getExpirationTimeStamp();
@@ -240,22 +252,29 @@ public class PersistEventTests {
 				true,
 				DateTime.now()
 			);
-		String eventId = dao.insertEvent(event);
-		Event eventFromDb = dao.getEvent(eventId);
-		String expectedD = event.getDestination();
-		String actualD = eventFromDb.getDestination();
-		String expectedS = event.getSubdestination();
-		String actualS = event.getSubdestination();
-		assertEquals(expectedD, actualD);
-		assertEquals(expectedS, actualS);
+		String eventId;
+		try {
+			eventId = dao.insertEvent(event);
+			Event eventFromDb = dao.getEvent(eventId);
+			String expectedD = event.getDestination();
+			String actualD = eventFromDb.getDestination();
+			String expectedS = event.getSubdestination();
+			String actualS = event.getSubdestination();
+			assertEquals(expectedD, actualD);
+			assertEquals(expectedS, actualS);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
 	 * Test to try to persist an event that does not have receivedTimeStamp or insertTimeStamp specified.
 	 * Event should not be stored in database.
+	 * @throws SQLException 
 	 */
 	@Test
-	public void persistEventWithoutReceivedTimeStampOrInsertTimeStampTest() {
+	public void persistEventWithoutReceivedTimeStampOrInsertTimeStampTest() throws SQLException {
 		Event event = new Event(
 				null,
 				"NewObject",
@@ -276,30 +295,26 @@ public class PersistEventTests {
 				true,
 				new DateTime()
 			);
-		event.setReceivedTimeStamp(null);
-		event.setInsertTimeStamp(null);
-		System.out.println(event.getReceivedTimeStamp());
-		String eventId = dao.insertEvent(event);
-		System.out.println(eventId);
-		Event eventFromDb = dao.getEvent(eventId);
-//		DateTime expectedRTS = null;
-//		DateTime actualRTS = eventFromDb.getReceivedTimeStamp();
-//		DateTime expectedITS = null;
-//		DateTime actualITS = event.getInsertTimeStamp();
-		Event expected = null;
-		Event actual = eventFromDb;
-		System.out.println(expected + " : " + actual);
-//		assertEquals(expectedRTS, actualRTS);
-//		assertEquals(expectedITS, actualITS);
-		assertEquals(expected, actual);
+		try {
+			event.setReceivedTimeStamp(null);
+			event.setInsertTimeStamp(null);
+			String eventId = dao.insertEvent(event);
+			Event eventFromDb = dao.getEvent(eventId);
+			Event expected = null;
+			Event actual = eventFromDb;
+			assertEquals(expected, actual);
+		} catch (NullPointerException e) {
+			assertTrue(true);
+		}
 	}
 	
 	/**
 	 * Test to try to persist an event that does not have an objectId specified.
 	 * Event should not be stored in database.
+	 * @throws SQLException 
 	 */
 	@Test
-	public void persistEventWithoutObjectIdTest() {
+	public void persistEventWithoutObjectIdTest() throws SQLException {
 		Event event = new Event(
 				null,
 				"NewObject",
@@ -320,19 +335,24 @@ public class PersistEventTests {
 				true,
 				DateTime.now()
 			);
-		String eventId = dao.insertEvent(event);
-		Event eventFromDb = dao.getEvent(eventId);
-		Event expected = null;
-		Event actual = eventFromDb;
-		assertEquals(expected, actual);
+		try {
+			String eventId = dao.insertEvent(event);
+			Event eventFromDb = dao.getEvent(eventId);
+			Event expected = null;
+			Event actual = eventFromDb;
+			assertEquals(expected, actual);
+		} catch (SQLException e) {
+			assertTrue(true);
+		}
 	}
 	
 	/**
 	 * Test to try to persist an event that does not have a messageType specified.
 	 * Event should not be stored in database.
+	 * @throws SQLException 
 	 */
 	@Test
-	public void persistEventWithoutMessageTypeTest() {
+	public void persistEventWithoutMessageTypeTest() throws SQLException {
 		Event event = new Event(
 				null,
 				"NewObject",
@@ -353,19 +373,24 @@ public class PersistEventTests {
 				true,
 				DateTime.now()
 			);
-		String eventId = dao.insertEvent(event);
-		Event eventFromDb = dao.getEvent(eventId);
-		Event expected = null;
-		Event actual = eventFromDb;
-		assertEquals(expected, actual);
+		try {
+			String eventId = dao.insertEvent(event);
+			Event eventFromDb = dao.getEvent(eventId);
+			Event expected = null;
+			Event actual = eventFromDb;
+			assertEquals(expected, actual);
+		} catch (SQLException e) {
+			assertTrue(true);
+		}
 	}
 	
 	/**
 	 * Test to try to persist an event that does not have a dataType specified.
 	 * Event should be stored in database.
+	 * @throws SQLException 
 	 */
 	@Test
-	public void persistEventWithoutDataTypeTest() {
+	public void persistEventWithoutDataTypeTest() throws SQLException {
 		Event event = new Event(
 				null,
 				"NewObject",
@@ -396,9 +421,10 @@ public class PersistEventTests {
 	/**
 	 * Test to try to persist an event that does not have CustomeHeaders identified.
 	 * Event should be stored in database.
+	 * @throws SQLException 
 	 */
 	@Test
-	public void persistEventWithoutHeaders() {
+	public void persistEventWithoutHeaders() throws SQLException {
 		Event event = new Event(
 				null,
 				"NewObject",
@@ -430,9 +456,10 @@ public class PersistEventTests {
 	/**
 	 * Test to try to persist event that does not have a CustomPayload identified.
 	 * Event should be stored in database.
+	 * @throws SQLException 
 	 */
 	@Test
-	public void persistEventWithoutPayload() {
+	public void persistEventWithoutPayload() throws SQLException {
 		Event event = new Event(
 				null,
 				"NewObject",

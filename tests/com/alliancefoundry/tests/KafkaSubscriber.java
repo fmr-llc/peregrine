@@ -19,7 +19,7 @@ public class KafkaSubscriber {
 	 
 	 public KafkaSubscriber() {
 		 
-		 this.topic = "test";
+		 this.topic = "test2";
 		 this.zookeeper="127.0.0.1:2181";
 		 this.groupId= "testgroup";
 		 

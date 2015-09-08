@@ -3,6 +3,7 @@ package com.alliancefoundry.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.joda.time.DateTime;
 
@@ -54,6 +55,9 @@ public class Event {
     private DateTime insertTimeStamp;
 
     public Event(){
+    	UUID uuid = UUID.randomUUID();
+		eventId = uuid.toString();
+    	
     	receivedTimeStamp = DateTime.now();
     	customHeaders = new HashMap<String, String>();
     	customPayload = new HashMap<String, DataItem>();
