@@ -45,7 +45,7 @@ static Connection conn;
 	//Insert an Event object into the database using a prepared statement
 	//and return the event id of the Event object that was inserted.
 	//Returns null if insert failed.
-	public String insertEvent(Event event) {
+	public String insertEvent(Event event) throws SQLException {
 		getConnection();
 		String sql = "INSERT INTO event_store VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? )";
 		String headersSql = "INSERT INTO event_headers VALUES ( ?,?,? )";
@@ -66,7 +66,6 @@ static Connection conn;
 			} catch(NullPointerException e){
 				ps.setNull(6, 0);
 			}
-			//ps.setInt(6, event.getSequenceNumber());
 			ps.setString(7, event.getMessageType());
 			ps.setString(8, event.getDataType());
 			ps.setString(9, event.getSource());
@@ -77,20 +76,15 @@ static Connection conn;
 			} catch(NullPointerException e){
 				ps.setNull(12, 0);
 			}
-			if(!event.getPublishTimeStamp().equals(new DateTime(0))){
+			try {
 				ps.setLong(13, event.getPublishTimeStamp().getMillis());
-			} else {
+			} catch(NullPointerException e) {
 				ps.setNull(13, 0);
 			}
 			ps.setLong(14, event.getReceivedTimeStamp().getMillis());
-			/*if(!event.getReceivedTimeStamp().equals(new DateTime(0))){
-				ps.setLong(14, event.getReceivedTimeStamp().getMillis());
-			} else {
-				ps.setNull(14, 0);
-			}*/
-			if(!event.getExpirationTimeStamp().equals(new DateTime(0))){
+			try{
 				ps.setLong(15, event.getExpirationTimeStamp().getMillis());
-			} else {
+			} catch(NullPointerException e){
 				ps.setNull(15, 0);
 			}
 			ps.setString(16, event.getPreEventState());
@@ -101,11 +95,6 @@ static Connection conn;
 				ps.setNull(18, 0);
 			}
 			ps.setLong(19, event.getInsertTimeStamp().getMillis());
-			/*if(!event.getInsertTimeStamp().equals(new DateTime(0))){
-				ps.setLong(19, event.getInsertTimeStamp().getMillis());
-			} else {
-				ps.setNull(19, 0);
-			}*/
 			
 			ps.executeUpdate();
 			
@@ -132,8 +121,7 @@ static Connection conn;
 			
 			return eventId;
 		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
+			throw e;
 		} finally{
 			endConnection();
 		}

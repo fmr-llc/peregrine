@@ -54,9 +54,7 @@ public class Event {
     private DateTime insertTimeStamp;
 
     public Event(){
-    	publishTimeStamp = new DateTime(0);
     	receivedTimeStamp = DateTime.now();
-    	expirationTimeStamp = new DateTime(0);
     	customHeaders = new HashMap<String, String>();
     	customPayload = new HashMap<String, DataItem>();
     	insertTimeStamp = DateTime.now();
