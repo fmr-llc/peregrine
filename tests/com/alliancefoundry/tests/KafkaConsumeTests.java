@@ -43,21 +43,21 @@ public class KafkaConsumeTests {
 		event2.setEventId("200");
 		
 		event3 = new Event(null, "841df123", "p8352", "p8352", 1, "Insert", "Object", "Publisher", "Kafka", 
-				"test2", false, new DateTime("2015-09-09T10:07:18.285-0400"), 
-				new DateTime("2015-09-09T10:07:18.285-0400"), new DateTime("2015-09-16T10:07:18.285-0400"), 
-				"preState1", "postState1", true, new DateTime("2015-09-09T10:07:18.285-0400"));
+				"test2", false, new DateTime("2015-09-09T10:07:18:48.285-0400"), 
+				new DateTime("2015-09-09T10:07:18:48.285-0400"), new DateTime("2015-09-16T10:07:18:48.285-0400"), 
+				"preState1", "postState1", true, new DateTime("2015-09-09T10:07:18:48.285-0400"));
 		event3.setEventId("201");
 		
 		event4 = new Event("201", "841df124", "p8352", "p8352", 2, "Update", "Object", "Publisher", "Kafka", 
-				"test2", false, new DateTime("2015-09-09T10:07:18.285-0400"), 
-				new DateTime("2015-09-09T10:07:18.285-0400"), new DateTime("2015-09-16T10:07:18.285-0400"),
-				"preEventState2", "postEventState2", true, new DateTime("2015-09-09T10:07:18.285-0400"));
+				"test2", false, new DateTime("2015-09-09T10:07:18:48.285-0400"), 
+				new DateTime("2015-09-09T10:07:18:48.285-0400"), new DateTime("2015-09-16T10:07:18:48.285-0400"),
+				"preEventState2", "postEventState2", true, new DateTime("2015-09-09T10:07:18:48.285-0400"));
 		event4.setEventId("202");
 		
 		event5 = new Event(null, "841gh124", "p8352", "p8352", 1, "Insert", "Object", "EventService", 
-				"destination", "topic", false, new DateTime("2015-09-09T10:07:18.285-0400"), 
-				new DateTime("2015-09-09T10:07:18.285-0400"), new DateTime("2015-09-16T10:07:18.285-0400"), 
-				"preState", "postState", true, new DateTime("2015-09-09T10:07:18.285-0400"));
+				"destination", "topic", false, new DateTime("2015-09-09T10:07:18:48.285-0400"), 
+				new DateTime("2015-09-09T10:07:18:48.285-0400"), new DateTime("2015-09-16T10:07:18:48.285-0400"), 
+				"preState", "postState", true, new DateTime("2015-09-09T10:07:18:48.285-0400"));
 		event5.setEventId("5");
 		
 		event6 = event2;
@@ -131,11 +131,7 @@ public class KafkaConsumeTests {
 		manager.setupPublishersViaAppContext();
 		manager.connectPublishers();
 		manager.publishEvent(event3, configs);
-		EventServicePublisher manager2 = new EventServicePublisher();
-		manager2.setupPublishersViaAppContext();
-		manager2.connectPublishers();
-		manager2.publishEvent(event3, configs);
-		manager2.publishEvent(event4, configs);
+		manager.publishEvent(event4, configs);
 		
 		KafkaSubscriber kafkaSubscriber = new KafkaSubscriber();
 		String event = kafkaSubscriber.consumeEvent();
