@@ -471,7 +471,7 @@ public class Event {
 		// test preEventState
 		if(preEventState != null && e2.preEventState != null){
 			// perform test
-			if(preEventState.equals(e2.preEventState)){
+			if(!preEventState.equals(e2.preEventState)){
 				return false;
 			}
 		}else if(preEventState == null && e2.preEventState == null){
@@ -483,7 +483,7 @@ public class Event {
 		// test postEventState
 		if(postEventState != null && e2.postEventState != null){
 			// perform test
-			if(postEventState.equals(e2.postEventState)){
+			if(!postEventState.equals(e2.postEventState)){
 				return false;
 			}
 		}else if(postEventState == null && e2.postEventState == null){
@@ -513,5 +513,20 @@ public class Event {
 		return true;
 	}
     
+    public static void main(String[] a){
+    	
+    	// test the equals method
+    	Event e1 = new Event();
+    	e1.setCorrelationId("core1");
+    	
+    	Event e2 = new Event();
+    	e2.setCorrelationId("core2");
+    	
+    	Event e3 = new Event();
+    	e3.setCorrelationId("core1");
+    	
+    	System.out.println(e1.equals(e2));
+    	System.out.println(e1.equals(e3));
+    }
 
 }
