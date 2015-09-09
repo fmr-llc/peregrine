@@ -55,13 +55,13 @@ public class Event {
     private DateTime insertTimeStamp;
 
     public Event(){
+    	//create the unique eventId
     	UUID uuid = UUID.randomUUID();
 		eventId = uuid.toString();
     	
     	receivedTimeStamp = DateTime.now();
     	customHeaders = new HashMap<String, String>();
     	customPayload = new HashMap<String, DataItem>();
-    	insertTimeStamp = DateTime.now();
     }
 	
 	/**
@@ -280,5 +280,38 @@ public class Event {
 	public DateTime getInsertTimeStamp() {
 		return insertTimeStamp;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	/*@Override
+	public String toString() {
+		String str = "{\"eventId\":\"" + this.eventId + "\",\"parentId\":\"" + this.parentId + "\",\"eventName\":\""
+				+ this.eventName + "\",\"objectId\":\"" + this.objectId + "\",\"correlationId\":\"" + this.correlationId
+				+ "\",\"sequenceNumber\":\"" + this.sequenceNumber + "\",\"messageType\":\"" + this.messageType
+				+ "\",\"dataType\":\"" + this.dataType + "\",\"source\":\"" + this.source + "\",\"destination\":\""
+				+ this.destination + "\",\"subdestination\":\"" + this.subdestination + "\",\"replayIndicator\":\""
+				+ this.replayIndicator + "\",\"publishTimeStamp\":\"" + this.publishTimeStamp
+				+ "\",\"receivedTimeStamp\":\"" + this.receivedTimeStamp + "\",\"expirationTimeStamp\":\""
+				+ this.expirationTimeStamp + "\",\"customHeaders\":{";
+		for (String key : event.getCustomHeaders().keySet()) {
+			headersPs.setString(1, eventId);
+			headersPs.setString(2, key);
+			headersPs.setString(3, event.getCustomHeaders().get(key));
+			headersPs.executeUpdate();
+		}
+		str += "},\"customPayload\":{";
+		for (String key : event.getCustomPayload().keySet()) {
+			payloadPs.setString(1, eventId);
+			payloadPs.setString(2, key);
+			payloadPs.setString(3, event.getCustomPayload().get(key).getValue());
+			payloadPs.setString(4, event.getCustomPayload().get(key).getDataType());
+			payloadPs.executeUpdate();
+		}
+		str += "},\"preEventState\":\"" + this.preEventState + "\",\"postEventState\":\"" + this.postEventState
+				+ "\",\"insertTimeStamp\":\"" + this.insertTimeStamp + "\",\"isPublishable\":\"" + this.isPublishable
+				+ "\"}";
+		return str;
+	}*/
 
 }
