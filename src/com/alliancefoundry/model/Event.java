@@ -281,4 +281,237 @@ public class Event {
 		return insertTimeStamp;
 	}
 
+	
+	@Override
+	public boolean equals(Object obj) {
+		// if object isnt an event object use normal equals comparison
+		if(!(obj instanceof Event)){
+			return super.equals(obj);
+		}
+		Event e2 = (Event)obj;
+		
+		// test eventid
+		if(eventId != e2.eventId){
+			return false;
+		}
+		
+		// test parentid
+		if(parentId != null && e2.parentId != null){
+			// perform test
+			if(!parentId.equals(e2.parentId)){
+				return false;
+			}
+		}else if(parentId == null && e2.parentId == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test eventName
+		if(eventName != null && e2.eventName != null){
+			// perform test
+			if(!eventName.equals(e2.eventName)){
+				return false;
+			}
+		}else if(eventName == null && e2.eventName == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test objectId
+		if(objectId != null && e2.objectId != null){
+			// perform test
+			if(!objectId.equals(e2.objectId)){
+				return false;
+			}
+		}else if(objectId == null && e2.objectId == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test correlationId
+		if(correlationId != null && e2.correlationId != null){
+			// perform test
+			if(!correlationId.equals(e2.correlationId)){
+				return false;
+			}
+		}else if(correlationId == null && e2.correlationId == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test sequenceNumber
+		if(sequenceNumber != null && e2.sequenceNumber != null){
+			// perform test
+			if(!sequenceNumber.equals(e2.sequenceNumber)){
+				return false;
+			}
+		}else if(sequenceNumber == null && e2.sequenceNumber == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test messageType
+		if(messageType != null && e2.messageType != null){
+			// perform test
+			if(!messageType.equals(e2.messageType)){
+				return false;
+			}
+		}else if(messageType == null && e2.messageType == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test source
+		if(source != null && e2.source != null){
+			// perform test
+			if(!source.equals(e2.source)){
+				return false;
+			}
+		}else if(source == null && e2.source == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test destination
+		if(destination != null && e2.destination != null){
+			// perform test
+			if(!destination.equals(e2.destination)){
+				return false;
+			}
+		}else if(destination == null && e2.destination == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test subdestination
+		if(subdestination != null && e2.subdestination != null){
+			// perform test
+			if(!subdestination.equals(e2.subdestination)){
+				return false;
+			}
+		}else if(subdestination == null && e2.subdestination == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test replayIndicator
+		if (replayIndicator != e2.replayIndicator){
+			return false;
+		}
+		
+		// test publishedTimeStamp
+		if(publishTimeStamp != null && e2.publishTimeStamp != null){
+			// perform test
+			if(publishTimeStamp.getMillis() != e2.publishTimeStamp.getMillis()){
+				return false;
+			}
+		}else if(publishTimeStamp == null && e2.publishTimeStamp == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test receivedTimeStamp
+		if(receivedTimeStamp != null && e2.receivedTimeStamp != null){
+			// perform test
+			if(receivedTimeStamp.getMillis() != e2.receivedTimeStamp.getMillis()){
+				return false;
+			}
+		}else if(receivedTimeStamp == null && e2.receivedTimeStamp == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test expirationTimeStamp
+		if(expirationTimeStamp != null && e2.expirationTimeStamp != null){
+			// perform test
+			if(expirationTimeStamp.getMillis() != e2.expirationTimeStamp.getMillis()){
+				return false;
+			}
+		}else if(expirationTimeStamp == null && e2.expirationTimeStamp == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test customHeaders
+		if(customHeaders != null && e2.customHeaders != null){
+			// perform test
+			if(customHeaders.size() != e2.customHeaders.size()){
+				return false;
+			}
+		}else if(customHeaders == null && e2.customHeaders == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test payload
+		if(customPayload != null && e2.customPayload != null){
+			// perform test
+			if(customPayload.size() != e2.customPayload.size()){
+				return false;
+			}
+		}else if(customPayload == null && e2.customPayload == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test preEventState
+		if(preEventState != null && e2.preEventState != null){
+			// perform test
+			if(preEventState.equals(e2.preEventState)){
+				return false;
+			}
+		}else if(preEventState == null && e2.preEventState == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test postEventState
+		if(postEventState != null && e2.postEventState != null){
+			// perform test
+			if(postEventState.equals(e2.postEventState)){
+				return false;
+			}
+		}else if(postEventState == null && e2.postEventState == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}
+		
+		// test isPublishable
+		if (isPublishable != e2.isPublishable){
+			return false;
+		}
+
+		
+		// test insertTimeStamp
+		if(insertTimeStamp != null && e2.insertTimeStamp != null){
+			// perform test
+			if(insertTimeStamp.getMillis() != e2.insertTimeStamp.getMillis()){
+				return false;
+			}
+		}else if(insertTimeStamp == null && e2.insertTimeStamp == null){
+		}else{
+			// not the same, either one or the other is null but not both
+			return false;
+		}	    // other
+		
+		return true;
+	}
+    
+
 }
