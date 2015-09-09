@@ -71,13 +71,6 @@
 			<version>${mysqlclient.version}</version>
 		</dependency>
 
-		<!-- message broker dependencies -->
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-client</artifactId>
-			<version>${activemqclient.version}</version>
-		</dependency>
-
         <!-- metrics and logging -->
         <dependency>
             <groupId>com.codahale.metrics</groupId>
@@ -102,7 +95,6 @@
             <artifactId>metrics-servlet</artifactId>
             <version>${metrics.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -153,15 +145,15 @@
 		
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-all</artifactId>
-			<version>5.12.0</version>
+			<artifactId>activemq-client</artifactId>
+			<version>${activemqclient.version}</version>
 		</dependency>
 			
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka_2.9.2</artifactId>
 			<version>0.8.2.1</version>
-		</dependency>
+		</dependency> 
 		
 		<!-- json parser dependencies -->
 		<dependency>
