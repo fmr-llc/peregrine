@@ -115,7 +115,7 @@ public class KafkaConsumeTests {
 		ObjectMapper mapper = new ObjectMapper(); 
 		Event actual = mapper.readValue(event, Event.class);
 		
-		assertEquals(expected, actual);
+		assertTrue(expected.equals(actual));
 	}
 	
 	// Publish and consume 2 events.
@@ -166,7 +166,7 @@ public class KafkaConsumeTests {
 		ObjectMapper mapper = new ObjectMapper(); 
 		Event[] actual = mapper.readValue(event, Event[].class);
 		
-		assertEquals(expected, actual);
+		assertTrue(expected.equals(actual));
 	}
 	
 	// Publish and Consume an event with only mandatory fields filled.
@@ -187,6 +187,6 @@ public class KafkaConsumeTests {
 		ObjectMapper mapper = new ObjectMapper(); 
 		Event actual = mapper.readValue(event, Event.class);
 		
-		assertEquals(expected, actual);
+		assertTrue(expected.equals(actual));
 	}
 }
