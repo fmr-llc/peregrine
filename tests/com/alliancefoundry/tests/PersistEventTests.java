@@ -203,11 +203,9 @@ public class PersistEventTests {
 		
 		event.setPublishTimeStamp(null);
 		event.setExpirationTimeStamp(null);
-		System.out.println("1: " + event.getPublishTimeStamp() + " - " + event.getExpirationTimeStamp());
 		String eventId;
 		try {
 			eventId = dao.insertEvent(event);
-			System.out.println("2: " + eventId);
 			Event eventFromDb = dao.getEvent(eventId);
 			Event expected = event;
 			Event actual = eventFromDb;
