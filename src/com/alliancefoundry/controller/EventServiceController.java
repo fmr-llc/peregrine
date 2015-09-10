@@ -64,14 +64,16 @@ public class EventServiceController  {
 			try {
 				eventIds.add(dao.insertEvent(e));
 			} catch (SQLException eSQL) {
-				//TODO: Get log.debug message to show up when this exception is reached
+				log.debug("Event could not be created.");
 			}
 		}
 		String eventIdStr = "";
 		for(String l : eventIds){
 			eventIdStr += l + " ";
 		}
-		log.debug("created events with event id[s] " + eventIdStr);
+		if(!eventIdStr.equals("")){
+			log.debug("created events with event id[s] " + eventIdStr);
+		}
 		return eventIdStr;
 	}
 	
