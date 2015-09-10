@@ -51,8 +51,8 @@ static Connection conn;
 		String headersSql = "INSERT INTO event_headers VALUES ( ?,?,? )";
 		String payloadSql = "INSERT INTO event_payload VALUES ( ?,?,?,? )";
 		try {
-			UUID uuid = UUID.randomUUID();
-			String eventId = uuid.toString();
+			//UUID uuid = UUID.randomUUID();
+			String eventId = event.getEventId();
 			PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
 			//set the value of each column for the row being inserted other
 			//than eventId
@@ -94,6 +94,7 @@ static Connection conn;
 			}catch(NullPointerException e){
 				ps.setNull(18, 0);
 			}
+			event.setInsertTimeStamp(DateTime.now());
 			ps.setLong(19, event.getInsertTimeStamp().getMillis());
 			
 			ps.executeUpdate();
@@ -228,7 +229,7 @@ static Connection conn;
 		String reqObjectId = "AND objectId = ? ";
 		String reqCorrelationId = "AND correlationId = ? ";
 		String reqEventName = "AND eventName = ? ";
-		//TODO: provide for request with generations count
+		String reqGenerations = "AND generations = ? ";
 		
 		String sql = "SELECT * FROM event_store WHERE TRUE ";
 		
@@ -247,8 +248,11 @@ static Connection conn;
 		if(req.getCorrelationId() != null){
 			sql += reqCorrelationId;
 		}
-		if(req.getName()!= null){
+		if(req.getName() != null){
 			sql += reqEventName;
+		}
+		if(req.getGenerations() != null){
+			sql += reqGenerations;
 		}
 		
 		/*String headersSql = "SELECT name,value FROM event_headers WHERE eventId = ?";
@@ -277,8 +281,12 @@ static Connection conn;
 				ps.setString(index, req.getCorrelationId());
 				index++;
 			}
-			if(req.getName()!= null){
+			if(req.getName() != null){
 				ps.setString(index, req.getName());
+				index++;
+			}
+			if(req.getGenerations() != null){
+				ps.setInt(index, req.getGenerations());
 				index++;
 			}
 
