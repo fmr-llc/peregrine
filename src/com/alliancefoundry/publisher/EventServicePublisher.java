@@ -54,6 +54,8 @@ public class EventServicePublisher {
 		kafkaPublshisher = ctx.getBean("kafkaPublisher", KafkaPublisher.class);
 		mqPublisher = ctx.getBean("activemqPublisher", ActiveMQPublisher.class);
 		
+		mqPublisher.connect();
+		
 		publishers.add(mqPublisher);
 		publishers.add(kafkaPublshisher);
 		
