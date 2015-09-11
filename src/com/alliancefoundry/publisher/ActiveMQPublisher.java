@@ -1,5 +1,6 @@
 package com.alliancefoundry.publisher;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.jms.Connection;
@@ -133,6 +134,55 @@ public class ActiveMQPublisher implements PublisherInterface {
 
 	public void setDestType(String destType) {
 		this.destType = destType;
+	}
+
+	@Override
+	public void publishEvent(List<Event> events, Map<String, String> config) {
+		
+		// create connection
+		Connection connection = null;
+		Session session = null;
+		MessageProducer producer = null;
+		
+		String topicName = config.get(EventServicePublisher.TOPIC_KEY);
+		
+		// turn java onject to json string
+		ObjectMapper mapper = new ObjectMapper(); 
+		//POJO to JSON
+		String jsonMessage = null;
+		try {
+			jsonMessage = mapper.writeValueAsString(events);
+		} catch (JsonProcessingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		
+		try {
+			// create connection
+			connection = connectionFactory.createConnection();
+			
+			// create session
+			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			
+			Destination destination = session.createTopic(topicName);
+			
+			// create producer
+			producer = session.createProducer(destination);
+			producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+			
+			TextMessage txtMessage = session.createTextMessage(jsonMessage);
+			
+			// publish topic to subscribers
+			producer.send(txtMessage);
+
+			System.out.println("Message sent to subscribers");
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 

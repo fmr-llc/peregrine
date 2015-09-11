@@ -1,5 +1,6 @@
 package com.alliancefoundry.publisher;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -59,11 +60,30 @@ public class KafkaPublisher implements PublisherInterface {
 		String topic = (String)eventConfig.get(EventServicePublisher.TOPIC_KEY);
 		KeyedMessage<String, String> jsonData = new KeyedMessage<String, String>(topic, jsonEvent);
 		producer.send(jsonData);
-		
-		System.out.println(jsonData);
-		
+				
 		producer.close();
 
+	}
+	
+	@Override
+	public void publishEvent(List<Event> events, Map<String, String> eventConfig) {
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonEvent = null;
+		
+		try {
+			jsonEvent = mapper.writeValueAsString(events);
+		} 
+		catch (JsonProcessingException e) {
+		
+			e.printStackTrace();
+		}
+
+		String topic = (String)eventConfig.get(EventServicePublisher.TOPIC_KEY);
+		KeyedMessage<String, String> jsonData = new KeyedMessage<String, String>(topic, jsonEvent);
+		producer.send(jsonData);
+			
+		producer.close();
+		
 	}
 	
 	public String getDestType() {
@@ -74,8 +94,6 @@ public class KafkaPublisher implements PublisherInterface {
 		this.destType = destType;
 	}
 
-	
-	
 }
 
 
