@@ -35,6 +35,20 @@ public class EventServicePublisher {
 		
 	}
 	
+	public void publishEvent(List<Event> events, Map<String, String> eventConfig) {
+		
+		String destination = eventConfig.get(DESTINATION_KEY);
+		
+		
+		for( PublisherInterface publisher : publishers){
+			if(destination.equals(publisher.getDestType())){
+				
+				publisher.publishEvent(events, eventConfig);
+			}
+		}
+		
+	}
+	
 	public void connectPublishers(){
 		for( PublisherInterface publisher : publishers){
 			publisher.connect();
@@ -54,8 +68,6 @@ public class EventServicePublisher {
 		kafkaPublshisher = ctx.getBean("kafkaPublisher", KafkaPublisher.class);
 		mqPublisher = ctx.getBean("activemqPublisher", ActiveMQPublisher.class);
 		
-		mqPublisher.connect();
-		
 		publishers.add(mqPublisher);
 		publishers.add(kafkaPublshisher);
 		
@@ -70,7 +82,5 @@ public class EventServicePublisher {
 	public void setPublishers(List<PublisherInterface> publishers) {
 		this.publishers = publishers;
 	}
-	
-	
 	
 }

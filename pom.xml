@@ -143,13 +143,13 @@
 		</dependency>
 		
 		<!-- message broker dependencies -->
-		<!-- 
+		
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-client</artifactId>
 			<version>${activemqclient.version}</version>
 		</dependency>
-			-->
+			
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka_2.9.2</artifactId>
@@ -174,13 +174,7 @@
            <artifactId>jackson-annotations</artifactId>
            <version>2.5.0</version>
         </dependency>
-	<!--	
-<dependency>
-	<groupId>org.apache.activemq</groupId>
-	<artifactId>activemq-all</artifactId>
-	<version>5.12.0</version>
-</dependency>
--->
+		
     </dependencies>
 
 
