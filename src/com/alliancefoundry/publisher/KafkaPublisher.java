@@ -5,8 +5,11 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.alliancefoundry.model.Event;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
@@ -47,6 +50,10 @@ public class KafkaPublisher implements PublisherInterface {
 	public void publishEvent(Event event, Map<String, String> eventConfig) {
 		
 		ObjectMapper mapper = new ObjectMapper();
+		  mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // no more null-valued properties
+		    mapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
+		    mapper.setSerializationInclusion(Include.NON_NULL);
+
 		String jsonEvent = null;
 		
 		try {

@@ -36,8 +36,10 @@ public class KafkaTests {
 	
 	@Test
 	public void testCosummingEvent() throws JsonProcessingException {
-
-		configs.put(EventServicePublisher.TOPIC_KEY, "test");
+		
+		String topic = "mumblyFrumps";
+		
+		configs.put(EventServicePublisher.TOPIC_KEY, topic);
 		configs.put(EventServicePublisher.DESTINATION_KEY, EventServicePublisher.KAFKA_KEY);
 			
 		event.setSequenceNumber(42);
@@ -47,10 +49,10 @@ public class KafkaTests {
 		manager.connectPublishers();
 		manager.publishEvent(event, configs);
 
-		KafkaSubscriber kafkaSubscriber = new KafkaSubscriber();
+		KafkaSubscriber kafkaSubscriber = new KafkaSubscriber(topic);
 		kafkaSubscriber.consumeEvent();
 		
-		assertEquals("Should be 72", 42, event.getSequenceNumber());
+		assertEquals("Should be 42", 42, event.getSequenceNumber());
 	}
 	
 	@Test
@@ -72,7 +74,9 @@ public class KafkaTests {
 	@Test
 	public void testNull() {
 		
-		configs.put(EventServicePublisher.TOPIC_KEY, "test");
+		String topic = "testTopic";
+		
+		configs.put(EventServicePublisher.TOPIC_KEY, topic);
 		configs.put(EventServicePublisher.DESTINATION_KEY, EventServicePublisher.KAFKA_KEY);
 
 		EventServicePublisher manager = new EventServicePublisher();
@@ -80,10 +84,10 @@ public class KafkaTests {
 		manager.connectPublishers();
 		manager.publishEvent(event2, configs);
 
-		KafkaSubscriber kafkaSubscriber = new KafkaSubscriber();
+		KafkaSubscriber kafkaSubscriber = new KafkaSubscriber(topic);
 		kafkaSubscriber.consumeEvent();
 		
-		assertEquals("Should be 22", 12, event2.getSequenceNumber());
+		assertEquals("Should be 12", 12, event2.getSequenceNumber());
 		
 	}
 }

@@ -32,11 +32,12 @@ public class JDBCDAOtest {
 	@Test
 	public void getFromDbTest() {
 		//run insert first, in order to find out a valid eventId
-		eventId = "4413df38-53a2-44df-bb89-10ad79f01f2e";
+		eventId = "c0b3568f-0333-4bce-8d2b-eb84c354fabb";
 		
 		eventFromDb = dao.getEvent(eventId);
 		String expected = eventId;
 		String actual = eventFromDb.getEventId();
+		System.out.println(expected + "     " + actual);
 		assertEquals(expected,actual);
 	}
 	

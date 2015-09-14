@@ -9,6 +9,8 @@ import org.joda.time.DateTime;
 import com.alliancefoundry.serializer.CustomJsonDateDeserializer;
 import com.alliancefoundry.serializer.MyDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -18,6 +20,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * Created by Paul Bernard
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(Include.NON_NULL)
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class Event {
 
     // Headers
@@ -26,7 +30,7 @@ public class Event {
     private String eventName;
     private String objectId;
     private String correlationId;
-    private Integer sequenceNumber = null;
+    private Integer sequenceNumber;
     private String messageType;
     private String dataType;
     private String source;
@@ -61,6 +65,60 @@ public class Event {
     	customHeaders = new HashMap<String, String>();
     	customPayload = new HashMap<String, DataItem>();
     	insertTimeStamp = DateTime.now();
+    }
+	
+    public Event(Map<String, Object> map){
+		this();
+    	
+    	this.eventId = (String) map.get("eventId");
+    	this.parentId = (String) map.get("parentId");
+		this.eventName = (String) map.get("eventName");
+		this.objectId = (String) map.get("objectId");
+		this.correlationId = (String) map.get("correlationId");
+		try{
+			System.out.println(map.get("sequenceNumber")+"");
+			System.out.println(map.get("sequenceNumber")+"");
+			this.sequenceNumber = (Integer) map.get("sequenceNumber");		
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		this.messageType = (String) map.get("messageType");
+		this.dataType = (String) map.get("dataType");
+		this.source = (String) map.get("source");
+		this.destination = (String) map.get("destination");
+		this.subdestination = (String) map.get("subdestination");
+		try{
+			this.replayIndicator = (Boolean) map.get("replayIndicator");
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		try{
+			this.publishTimeStamp = DateTime.parse((String) map.get("publishTimeStamp"));
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		try{
+			this.receivedTimeStamp = DateTime.parse((String) map.get("receivedTimeStamp"));
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		try{
+			this.expirationTimeStamp = DateTime.parse((String) map.get("expirationTimeStamp"));
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		this.preEventState = (String) map.get("preEventState");
+		this.postEventState = (String) map.get("postEventState");
+		try{
+			this.isPublishable = (Boolean) map.get("publishable");
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		try{
+			this.insertTimeStamp = DateTime.parse((String) map.get("insertTimeStamp"));
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
     }
 	
 	/**
