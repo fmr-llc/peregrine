@@ -1,6 +1,5 @@
 package com.alliancefoundry.model;
 
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -289,12 +288,12 @@ public class Event {
 			return super.equals(obj);
 		}
 		Event e2 = (Event)obj;
-		
+
 		// test eventid
-		if(eventId != e2.eventId){
+		if(!eventId.equals(e2.eventId)){
 			return false;
 		}
-		
+
 		// test parentid
 		if(parentId != null && e2.parentId != null){
 			// perform test
@@ -306,7 +305,7 @@ public class Event {
 			// not the same, either one or the other is null but not both
 			return false;
 		}
-		
+
 		// test eventName
 		if(eventName != null && e2.eventName != null){
 			// perform test
@@ -378,7 +377,7 @@ public class Event {
 			// not the same, either one or the other is null but not both
 			return false;
 		}
-		
+
 		// test destination
 		if(destination != null && e2.destination != null){
 			// perform test
@@ -390,7 +389,8 @@ public class Event {
 			// not the same, either one or the other is null but not both
 			return false;
 		}
-		
+    	System.out.println("kuyj");
+
 		// test subdestination
 		if(subdestination != null && e2.subdestination != null){
 			// perform test
@@ -402,7 +402,7 @@ public class Event {
 			// not the same, either one or the other is null but not both
 			return false;
 		}
-		
+
 		// test replayIndicator
 		if (replayIndicator != e2.replayIndicator){
 			return false;
@@ -431,7 +431,7 @@ public class Event {
 			// not the same, either one or the other is null but not both
 			return false;
 		}
-		
+
 		// test expirationTimeStamp
 		if(expirationTimeStamp != null && e2.expirationTimeStamp != null){
 			// perform test
@@ -443,7 +443,7 @@ public class Event {
 			// not the same, either one or the other is null but not both
 			return false;
 		}
-		
+
 		// test customHeaders
 		if(customHeaders != null && e2.customHeaders != null){
 			// perform test
@@ -455,7 +455,7 @@ public class Event {
 			// not the same, either one or the other is null but not both
 			return false;
 		}
-		
+
 		// test payload
 		if(customPayload != null && e2.customPayload != null){
 			// perform test
@@ -467,7 +467,7 @@ public class Event {
 			// not the same, either one or the other is null but not both
 			return false;
 		}
-		
+
 		// test preEventState
 		if(preEventState != null && e2.preEventState != null){
 			// perform test
@@ -479,7 +479,7 @@ public class Event {
 			// not the same, either one or the other is null but not both
 			return false;
 		}
-		
+
 		// test postEventState
 		if(postEventState != null && e2.postEventState != null){
 			// perform test
@@ -512,21 +512,19 @@ public class Event {
 		
 		return true;
 	}
-    
-    public static void main(String[] a){
-    	
-    	// test the equals method
-    	Event e1 = new Event();
-    	e1.setCorrelationId("core1");
-    	
-    	Event e2 = new Event();
-    	e2.setCorrelationId("core2");
-    	
-    	Event e3 = new Event();
-    	e3.setCorrelationId("core1");
-    	
-    	System.out.println(e1.equals(e2));
-    	System.out.println(e1.equals(e3));
-    }
 
+	@Override
+	public String toString() {
+		return "Event [getCustomHeaders()=" + getCustomHeaders() + ", getCustomPayload()=" + getCustomPayload()
+				+ ", getEventId()=" + getEventId() + ", getParentId()=" + getParentId() + ", getEventName()="
+				+ getEventName() + ", getObjectId()=" + getObjectId() + ", getCorrelationId()=" + getCorrelationId()
+				+ ", getSequenceNumber()=" + getSequenceNumber() + ", getMessageType()=" + getMessageType()
+				+ ", getDataType()=" + getDataType() + ", getSource()=" + getSource() + ", getDestination()="
+				+ getDestination() + ", getSubdestination()=" + getSubdestination() + ", isReplayIndicator()="
+				+ isReplayIndicator() + ", getPublishTimeStamp()=" + getPublishTimeStamp() + ", getReceivedTimeStamp()="
+				+ getReceivedTimeStamp() + ", getExpirationTimeStamp()=" + getExpirationTimeStamp()
+				+ ", getPreEventState()=" + getPreEventState() + ", getPostEventState()=" + getPostEventState()
+				+ ", isPublishable()=" + isPublishable() + ", getInsertTimeStamp()=" + getInsertTimeStamp() + "]";
+	}
+    
 }
