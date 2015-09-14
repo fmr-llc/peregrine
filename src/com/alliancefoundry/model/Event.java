@@ -193,7 +193,7 @@ public class Event {
 		this.postEventState = postEventState;
 	}
 
-	public void setPublishable(boolean isPublishable) {
+	public void setIsPublishable(boolean isPublishable) {
 		this.isPublishable = isPublishable;
 	}
 
@@ -273,7 +273,7 @@ public class Event {
 		return postEventState;
 	}
 
-	public boolean isPublishable() {
+	public boolean getIsPublishable() {
 		return isPublishable;
 	}
 

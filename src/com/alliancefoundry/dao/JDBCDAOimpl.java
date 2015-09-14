@@ -18,7 +18,7 @@ import com.alliancefoundry.model.EventsRequest;
 import com.mysql.jdbc.PreparedStatement;
 
 public class JDBCDAOimpl {
-static Connection conn;
+	static Connection conn;
 	
 	private static void getConnection(){
 		try {
@@ -90,7 +90,7 @@ static Connection conn;
 			ps.setString(16, event.getPreEventState());
 			ps.setString(17, event.getPostEventState());
 			try{
-				ps.setBoolean(18, event.isPublishable());
+				ps.setBoolean(18, event.getIsPublishable());
 			}catch(NullPointerException e){
 				ps.setNull(18, 0);
 			}
@@ -223,13 +223,13 @@ static Connection conn;
     		throw new IllegalArgumentException("A createdAfter date must be specified.");
     	}
 		getConnection();
-		String reqCreatedAfter = "AND publishTimeStamp > ? ";
-		String reqCreatedBefore = "AND publishTimeStamp < ? ";
+		String reqCreatedAfter = "AND insertTimeStamp > ? ";
+		String reqCreatedBefore = "AND insertTimeStamp < ? ";
 		String reqSource = "AND source = ? ";
 		String reqObjectId = "AND objectId = ? ";
 		String reqCorrelationId = "AND correlationId = ? ";
 		String reqEventName = "AND eventName = ? ";
-		String reqGenerations = "AND generations = ? ";
+		//String reqGenerations = "AND generations = ? ";
 		
 		String sql = "SELECT * FROM event_store WHERE TRUE ";
 		
@@ -251,9 +251,9 @@ static Connection conn;
 		if(req.getName() != null){
 			sql += reqEventName;
 		}
-		if(req.getGenerations() != null){
+		/*if(req.getGenerations() != null){
 			sql += reqGenerations;
-		}
+		}*/
 		
 		/*String headersSql = "SELECT name,value FROM event_headers WHERE eventId = ?";
 		String payloadSql = "SELECT name,value FROM event_payload WHERE eventId = ?";*/
@@ -285,10 +285,10 @@ static Connection conn;
 				ps.setString(index, req.getName());
 				index++;
 			}
-			if(req.getGenerations() != null){
+			/*if(req.getGenerations() != null){
 				ps.setInt(index, req.getGenerations());
 				index++;
-			}
+			}*/
 
 			ResultSet rs = ps.executeQuery();
 
@@ -367,6 +367,94 @@ static Connection conn;
 				e.setEventId(eventId);
 				eventList.add(e);
 			}
+			if(req.getGenerations() > 0){
+				List<Event> genList = new ArrayList<Event>();
+				genList = generations(eventList,"1001",0,req.getGenerations());
+				return genList;
+				/*String genSql = "SELECT * FROM event_store "
+						+ "WHERE correlationId = ? "
+						+ "ORDER BY insertTimeStamp "
+						+ "LIMIT ? ";
+				for(Event e: eventList){
+					PreparedStatement genPs = (PreparedStatement) conn.prepareStatement(genSql);
+					genPs.setString(1, e.getCorrelationId());
+					genPs.setInt(2, req.getGenerations());
+					ResultSet genRs = genPs.executeQuery();
+					while(genRs.next()){
+						String genEventId = genRs.getString("eventId");
+						String genParentId = genRs.getString("parentId");
+						String genEventName = genRs.getString("eventName");
+						String genObjectId = genRs.getString("objectId");
+						String genCorrelationId = genRs.getString("correlationId");
+						int genSequenceNumber = genRs.getInt("sequenceNumber");
+						String genMessageType = genRs.getString("messageType");
+						String genDataType = genRs.getString("dataType");
+						String genSource = genRs.getString("source");
+						String genDestination = genRs.getString("destination");
+						String genSubdestination = genRs.getString("subdestination");
+						boolean genReplayIndicator = genRs.getBoolean("replayIndicator");
+						DateTime genPublishTimeStamp = new DateTime(genRs.getLong("publishTimeStamp"));
+						DateTime genReceivedTimeStamp = new DateTime(genRs.getLong("receivedTimeStamp"));
+						DateTime genExpirationTimeStamp = new DateTime(genRs.getLong("expirationTimeStamp"));
+						String genPreEventState = genRs.getString("preEventState");
+						String genPostEventState = genRs.getString("postEventState");
+						boolean genIsPublishable = genRs.getBoolean("isPublishable");
+						DateTime genInsertTimeStamp = new DateTime(genRs.getLong("insertTimeStamp"));
+						
+						/*PreparedStatement psHeaders = (PreparedStatement) conn.prepareStatement(headersSql);
+						
+						//set the value being checked for equality
+						psHeaders.setLong(1, eventId);
+						
+						ResultSet rsHeaders = psHeaders.executeQuery();
+						Map<String,String> customHeaders = new HashMap<String,String>();
+						
+						//get to start of resultSet
+						rsHeaders.next();
+						while(rsHeaders.next()){
+							customHeaders.put(rsHeaders.getString("name"), rsHeaders.getString("value"));
+						}
+						
+						PreparedStatement psPayload = (PreparedStatement) conn.prepareStatement(payloadSql);
+						
+						//set the value being checked for equality
+						psPayload.setLong(1, eventId);
+						
+						ResultSet rsPayload = psPayload.executeQuery();
+						Map<String,String> customPayload = new HashMap<String,String>();
+						
+						//get to start of resultSet
+						rsPayload.next();
+						while(rsPayload.next()){
+							customPayload.put(rsPayload.getString("name"), rsPayload.getString("value"));
+						}*/
+						
+						/*Event genEvent = new Event(
+							genParentId,
+							genEventName,
+							genObjectId,
+							genCorrelationId,
+							genSequenceNumber,
+							genMessageType,
+							genDataType,
+							genSource,
+							genDestination,
+							genSubdestination,
+							genReplayIndicator,
+							genPublishTimeStamp,
+							genReceivedTimeStamp,
+							genExpirationTimeStamp,
+							genPreEventState,
+							genPostEventState,
+							genIsPublishable,
+							genInsertTimeStamp
+							);
+						genEvent.setEventId(genEventId);
+						genList.add(genEvent);
+					}
+				}
+				eventList = genList;*/
+			}
 			return eventList;
 		} catch (SQLException e) {
 			// all events couldn't be retrieved so return ones that could
@@ -375,4 +463,28 @@ static Connection conn;
 			endConnection();
 		}
 	}
+	
+	private List<Event> generations(List<Event> allEvents, String parentId, int currentGen, int maxGen){
+		List<Event> events = new ArrayList<Event>();
+		for(Event e : allEvents){
+			if(e.getParentId().equals(parentId)){
+				events.add(e);
+			}
+			if(currentGen >= maxGen){
+				return events;
+			}
+			currentGen++;
+		}
+		List<Event> temp = new ArrayList<Event>();
+		for(Event parent : events){
+			for(Event child : allEvents){
+				if(parent.getEventId().equals(child.getEventId())){
+					temp.addAll(generations(allEvents,parent.getEventId(),currentGen,maxGen));
+				}
+			}
+		}
+		events.addAll(temp);
+		return events;
+	}
+	
 }
