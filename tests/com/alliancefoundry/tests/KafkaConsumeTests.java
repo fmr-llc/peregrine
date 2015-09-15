@@ -3,7 +3,7 @@
  */
 package com.alliancefoundry.tests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -67,12 +67,10 @@ public class KafkaConsumeTests {
 		event7 = event4;
 		event7.setEventId("207");
 		
-		simpleEvent = new Event();
-//		simpleEvent = new Event(null, null, "asher456", null, null, "EventMessage", null, null, null, null, 
-//				null, new DateTime(), new DateTime("2015-09-09T10:07:18:48.285-0400"), new DateTime(), null, 
-//				null, null, new DateTime("2015-09-09T10:07:18:48.285-0400"));
-		simpleEvent.setPublishTimeStamp(null);
-		simpleEvent.setExpirationTimeStamp(null);
+//		simpleEvent = new Event();
+		simpleEvent = new Event(null, null, "asher456", null, null, "EventMessage", null, null, null, null, 
+				false, new DateTime(), new DateTime("2015-09-09T10:07:18.285-0400"), new DateTime(), null, 
+				null, false, new DateTime("2015-09-09T10:07:18.285-0400"));
 		simpleEvent.setEventId("simple");
 		
 		configs = new HashMap<String, String>();
@@ -81,7 +79,7 @@ public class KafkaConsumeTests {
 	// Publish and Consume 1 event.
 	@Test
 	public void consumeTest1() throws JsonParseException, JsonMappingException, IOException {
-		String topic = "testJaneDoe";
+		String topic = "testJaneDoe344";
 		Event expected = event1;
 		
 		configs.put(EventServicePublisher.TOPIC_KEY, topic);
@@ -103,8 +101,8 @@ public class KafkaConsumeTests {
 	// Publish and Consume a second event
 	@Test
 	public void consumeTest2() throws JsonParseException, JsonMappingException, IOException {
-		String topic = "testJaneCamels";
-		Event expected = event2;
+		String topic = "testJaneDoe";
+		Event expected = event1;
 		
 		configs.put(EventServicePublisher.TOPIC_KEY, topic);
 		configs.put(EventServicePublisher.DESTINATION_KEY, EventServicePublisher.KAFKA_KEY);
@@ -140,10 +138,15 @@ public class KafkaConsumeTests {
 		KafkaSubscriber kafkaSubscriber = new KafkaSubscriber(topic);
 		String event = kafkaSubscriber.consumeEvent();
 		ObjectMapper mapper = new ObjectMapper(); 
-		List<Event> actual = mapper.readValue(event, List.class);
+		List<Map> eventsAsMaps = mapper.readValue(event, List.class);
 		
-		assertEquals(expected.size(), actual.size());
+		List<Event> actual = new ArrayList<>();
 		
+		for(Map map : eventsAsMaps){
+			actual.add(new Event(map));
+		}
+		
+		assertTrue(compareLists(expected, actual));
 	}
 	
 	// Publish and consume 3 events.
@@ -165,16 +168,23 @@ public class KafkaConsumeTests {
 		KafkaSubscriber kafkaSubscriber = new KafkaSubscriber(topic);
 		String event = kafkaSubscriber.consumeEvent();
 		ObjectMapper mapper = new ObjectMapper(); 
-		List<Event> actual = mapper.readValue(event, List.class);
+		List<Map> eventsAsMaps= mapper.readValue(event, List.class);
 		
-		assertEquals(expected.size(), actual.size());
+		List<Event> actual = new ArrayList<>();
+		
+		for(Map map : eventsAsMaps){
+			actual.add(new Event(map));
+		}
+		
+		assertTrue(compareLists(expected, actual));
 	}
+	
 	
 	// Publish and Consume an event with only mandatory fields filled.
 	@Test
 	public void consumeEventWithNullsTest() throws JsonParseException, JsonMappingException, IOException {
 		
-		String topic = "MumblyFrumps";
+		String topic = "testJohnDoe89088i9";
 		Event expected = simpleEvent;
 		
 		configs.put(EventServicePublisher.TOPIC_KEY, topic);
@@ -194,5 +204,55 @@ public class KafkaConsumeTests {
 		System.out.println(actual);
 		
 		assertEquals(expected, actual);
+	}
+	
+	// Test to see if, when an Event is published to a Topic, 2 different subscribers 
+	// get the same event from the topic.
+	@Test
+	public void consumeEventMultipleSubscribersTest() throws JsonParseException, JsonMappingException, IOException {
+		String topic = "testJohnDoe8675309";
+		
+		configs.put(EventServicePublisher.TOPIC_KEY, topic);
+		configs.put(EventServicePublisher.DESTINATION_KEY, EventServicePublisher.KAFKA_KEY);
+		
+		EventServicePublisher manager1 = new EventServicePublisher();
+		manager1.setupPublishersViaAppContext();
+		manager1.connectPublishers();
+		manager1.publishEvent(event1, configs);
+		
+		EventServicePublisher manager2 = new EventServicePublisher();
+		manager2.setupPublishersViaAppContext();
+		manager2.connectPublishers();
+		manager2.publishEvent(event1, configs);
+		
+		KafkaSubscriber kafkaSubscriber1 = new KafkaSubscriber(topic);
+		String event1 = kafkaSubscriber1.consumeEvent();
+		ObjectMapper mapper1 = new ObjectMapper(); 
+		Event expected = mapper1.readValue(event1, Event.class);
+		
+		KafkaSubscriber kafkaSubscriber2 = new KafkaSubscriber(topic);
+		String event2 = kafkaSubscriber2.consumeEvent();
+		ObjectMapper mapper2 = new ObjectMapper(); 
+		Event actual = mapper2.readValue(event2, Event.class);
+		
+		System.out.println(expected);
+		System.out.println(actual);
+		
+		assertEquals(expected, actual);
+	}
+	
+	public boolean compareLists(List<Event> list1, List<Event> list2) {
+		if (list1.size() == list2.size()) {
+			for (int a = 0; a < list1.size(); a++) {
+				Event ev1 = list1.get(a);
+				Event ev2 = list2.get(a);
+				if (!ev1.equals(ev2)) {
+					return false;
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
