@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.UUID;
-
 import org.joda.time.DateTime;
 
 import com.alliancefoundry.model.DataItem;
@@ -22,8 +20,7 @@ import com.mysql.jdbc.PreparedStatement;
 public class JDBCDAOimpl {
 static Connection conn;
 	
-	private void getConnection() throws IOException {
-	
+	private  void getConnection() throws IOException{
 		try {
 			Properties properties = new Properties();
 			properties.load(this.getClass().getClassLoader().getResourceAsStream("db.properties"));
@@ -34,15 +31,11 @@ static Connection conn;
 			
 			Class.forName(driver);
 			conn = DriverManager.getConnection(dburl,user,password);
-		} 
-		catch (ClassNotFoundException e) {
-			System.out.println("Specified driver was not found");
-		} 
-		catch (SQLException e) {
-			e.getMessage();
-		}
-		catch (Exception e) {
-			e.getMessage();
+			
+		} catch (ClassNotFoundException e) {
+			System.out.println("Specified database driver was not found.");
+		} catch (SQLException e) {
+			System.out.println("Specified database url, username, or password were invalid");
 		}
 	}
 
@@ -50,7 +43,6 @@ static Connection conn;
 		try {
 			conn.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
 			System.out.println("Connection was never open!");
 		}
 	}
@@ -74,46 +66,60 @@ static Connection conn;
 			ps.setString(3, event.getEventName());
 			ps.setString(4, event.getObjectId());
 			ps.setString(5, event.getCorrelationId());
-			try{
-				ps.setInt(6, event.getSequenceNumber());
-			} catch(NullPointerException e){
+
+			Integer seqNum = event.getSequenceNumber();
+			if(seqNum != null) {
+				ps.setInt(6, seqNum);
+			} else {
 				ps.setNull(6, 0);
 			}
+
 			ps.setString(7, event.getMessageType());
 			ps.setString(8, event.getDataType());
 			ps.setString(9, event.getSource());
 			ps.setString(10, event.getDestination());
 			ps.setString(11, event.getSubdestination());
-			try{
-				ps.setBoolean(12, event.isReplayIndicator());
-			} catch(NullPointerException e){
+
+			Boolean replay = event.isReplayIndicator();
+			if(replay != null) {
+				ps.setBoolean(12, replay);
+			} else {
 				ps.setNull(12, 0);
 			}
-			try {
-				ps.setLong(13, event.getPublishTimeStamp().getMillis());
-			} catch(NullPointerException e) {
+
+			DateTime pubTime = event.getPublishTimeStamp();
+			if(pubTime != null){
+				ps.setLong(13, pubTime.getMillis());
+			} else {
 				ps.setNull(13, 0);
 			}
+
 			ps.setLong(14, event.getReceivedTimeStamp().getMillis());
-			try{
-				ps.setLong(15, event.getExpirationTimeStamp().getMillis());
-			} catch(NullPointerException e){
+
+			DateTime expTime = event.getExpirationTimeStamp();
+			if(expTime != null){
+				ps.setLong(15, expTime.getMillis());
+			} else {
 				ps.setNull(15, 0);
 			}
+
 			ps.setString(16, event.getPreEventState());
 			ps.setString(17, event.getPostEventState());
-			try{
-				ps.setBoolean(18, event.isPublishable());
-			}catch(NullPointerException e){
+
+			Boolean publish = event.isPublishable();
+			if(publish != null){
+				ps.setBoolean(18, replay);
+			} else {
 				ps.setNull(18, 0);
 			}
+
 			event.setInsertTimeStamp(DateTime.now());
 			ps.setLong(19, event.getInsertTimeStamp().getMillis());
-			
+
 			ps.executeUpdate();
-			
+
 			PreparedStatement headersPs = (PreparedStatement) conn.prepareStatement(headersSql);
-			
+
 			//insert header info into its table
 			for(String key : event.getCustomHeaders().keySet()){
 				headersPs.setString(1, eventId);
@@ -121,9 +127,9 @@ static Connection conn;
 				headersPs.setString(3, event.getCustomHeaders().get(key));
 				headersPs.executeUpdate();
 			}
-			
+
 			PreparedStatement payloadPs = (PreparedStatement) conn.prepareStatement(payloadSql);
-			
+
 			//insert payload info into its table
 			for(String key : event.getCustomPayload().keySet()){
 				payloadPs.setString(1, eventId);
@@ -132,7 +138,7 @@ static Connection conn;
 				payloadPs.setString(4, event.getCustomPayload().get(key).getDataType());
 				payloadPs.executeUpdate();
 			}
-			
+
 			return eventId;
 		} catch (SQLException e) {
 			throw e;
@@ -326,34 +332,6 @@ static Connection conn;
 				String postEventState = rs.getString("postEventState");
 				boolean isPublishable = rs.getBoolean("isPublishable");
 				DateTime insertTimeStamp = new DateTime(rs.getLong("insertTimeStamp"));
-				
-				/*PreparedStatement psHeaders = (PreparedStatement) conn.prepareStatement(headersSql);
-				
-				//set the value being checked for equality
-				psHeaders.setLong(1, eventId);
-				
-				ResultSet rsHeaders = psHeaders.executeQuery();
-				Map<String,String> customHeaders = new HashMap<String,String>();
-				
-				//get to start of resultSet
-				rsHeaders.next();
-				while(rsHeaders.next()){
-					customHeaders.put(rsHeaders.getString("name"), rsHeaders.getString("value"));
-				}
-				
-				PreparedStatement psPayload = (PreparedStatement) conn.prepareStatement(payloadSql);
-				
-				//set the value being checked for equality
-				psPayload.setLong(1, eventId);
-				
-				ResultSet rsPayload = psPayload.executeQuery();
-				Map<String,String> customPayload = new HashMap<String,String>();
-				
-				//get to start of resultSet
-				rsPayload.next();
-				while(rsPayload.next()){
-					customPayload.put(rsPayload.getString("name"), rsPayload.getString("value"));
-				}*/
 				
 				Event e = new Event(
 					parentId,
