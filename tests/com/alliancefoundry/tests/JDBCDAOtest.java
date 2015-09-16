@@ -2,6 +2,7 @@ package com.alliancefoundry.tests;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ public class JDBCDAOtest {
 	} 
 
 	@Test
-	public void getFromDbTest() {
+	public void getFromDbTest() throws IOException {
 		//run insert first, in order to find out a valid eventId
 		eventId = "c0b3568f-0333-4bce-8d2b-eb84c354fabb";
 		
@@ -121,7 +122,7 @@ public class JDBCDAOtest {
 	}*/
 	
 	@Test
-	public void EventNotFoundInDbTest() {
+	public void EventNotFoundInDbTest() throws IOException {
 		//there shouldn't be an event with eventId of ""
 		eventId = "";
 		
@@ -132,7 +133,7 @@ public class JDBCDAOtest {
 	}
 	
 	@Test
-	public void insertToDbTest() {
+	public void insertToDbTest() throws IOException {
 		event = new Event(
 					"a",
 					"a",
@@ -177,7 +178,7 @@ public class JDBCDAOtest {
 	}
 	
 	@Test
-	public void insertMultipleEventsToDbTest() {
+	public void insertMultipleEventsToDbTest() throws IOException {
 		event = new Event(
 			"c",
 			"c",
@@ -239,7 +240,7 @@ public class JDBCDAOtest {
 	}
 	
 	@Test
-	public void insertToAndRetrieveFromDbDateTimeTest() {
+	public void insertToAndRetrieveFromDbDateTimeTest() throws IOException {
 		DateTime datetime = DateTime.now();
 		event = new Event(
 					"a",

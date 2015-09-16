@@ -176,8 +176,12 @@
            <version>2.5.0</version>
         </dependency>
         
-		
-		
+        <dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>4.2.1.RELEASE</version>
+		</dependency>
+        
     </dependencies>
 
 

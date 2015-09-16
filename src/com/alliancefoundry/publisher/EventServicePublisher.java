@@ -17,6 +17,8 @@ public class EventServicePublisher {
 	public static final String KAFKA_KEY = "kafka";
 	public static final String ACTIVEMQ_KEY = "activemq";
 	
+	private Map<String, PublisherInterface> pubs;
+	private IMapEvents mapper;
 	
 	@Autowired
 	List<PublisherInterface> publishers;
@@ -25,13 +27,18 @@ public class EventServicePublisher {
 		
 		String destination = eventConfig.get(DESTINATION_KEY);
 		
-		
+		PublisherInterface pub = pubs.get(destination);
+		if(pub != null){
+			pub.publishEvent(event, eventConfig);
+		}
+		/*
 		for( PublisherInterface publisher : publishers){
 			if(destination.equals(publisher.getDestType())){
 				
 				publisher.publishEvent(event, eventConfig);
 			}
 		}
+		*/
 		
 	}
 	
@@ -39,14 +46,42 @@ public class EventServicePublisher {
 		
 		String destination = eventConfig.get(DESTINATION_KEY);
 		
+		PublisherInterface pub = pubs.get(destination);
+		if(pub != null){
+			pub.publishEvent(events, eventConfig);
+		}
 		
+		/*
+
 		for( PublisherInterface publisher : publishers){
 			if(destination.equals(publisher.getDestType())){
 				
 				publisher.publishEvent(events, eventConfig);
 			}
 		}
+		*/
 		
+	}
+	
+	public void setEventMapper(IMapEvents mapper){
+		this.mapper = mapper;
+	}
+	
+	public void publishEventByMapper(Event event){
+		
+		Map<String, String> eventConfig = mapper.getConfigFromEvent(event);
+		if(eventConfig == null){
+			System.out.println("Event's topic and destination could not be determined");
+			return; // do nothing 
+		}
+		String destination = eventConfig.get(IMapEvents.DESTINATION_KEY);
+		String topic = eventConfig.get(IMapEvents.TOPIC_KEY);
+		
+		PublisherInterface publisher = pubs.get(destination);
+		if(publisher != null){
+			publisher.publishEvent(event, topic);
+		}
+
 	}
 	
 	public void connectPublishers(){
@@ -70,6 +105,9 @@ public class EventServicePublisher {
 		
 		publishers.add(mqPublisher);
 		publishers.add(kafkaPublshisher);
+		
+		pubs.put(ACTIVEMQ_KEY, mqPublisher);
+		pubs.put(KAFKA_KEY, kafkaPublshisher);
 		
 		ctx.close();
 

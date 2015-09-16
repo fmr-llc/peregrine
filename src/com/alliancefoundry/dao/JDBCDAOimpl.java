@@ -1,5 +1,6 @@
 package com.alliancefoundry.dao;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 
 import org.joda.time.DateTime;
@@ -20,16 +22,27 @@ import com.mysql.jdbc.PreparedStatement;
 public class JDBCDAOimpl {
 static Connection conn;
 	
-	private static void getConnection(){
+	private void getConnection() throws IOException {
+	
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection(
-					"jdbc:mysql://127.0.0.1/eventdb",
-					"root", "root");
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
+			Properties properties = new Properties();
+			properties.load(this.getClass().getClassLoader().getResourceAsStream("db.properties"));
+			String driver = properties.getProperty("db.driver");
+			String dburl = properties.getProperty("db.url");
+			String user = properties.getProperty("db.username");
+			String password = properties.getProperty("db.password");
+			
+			Class.forName(driver);
+			conn = DriverManager.getConnection(dburl,user,password);
+		} 
+		catch (ClassNotFoundException e) {
+			System.out.println("Specified driver was not found");
+		} 
+		catch (SQLException e) {
+			e.getMessage();
+		}
+		catch (Exception e) {
+			e.getMessage();
 		}
 	}
 
@@ -45,7 +58,7 @@ static Connection conn;
 	//Insert an Event object into the database using a prepared statement
 	//and return the event id of the Event object that was inserted.
 	//Returns null if insert failed.
-	public String insertEvent(Event event) throws SQLException {
+	public String insertEvent(Event event) throws SQLException, IOException {
 		getConnection();
 		String sql = "INSERT INTO event_store VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? )";
 		String headersSql = "INSERT INTO event_headers VALUES ( ?,?,? )";
@@ -131,7 +144,7 @@ static Connection conn;
 	//Retrieve an event from the database into an Event object
 	//that is returned.  Return null if the requested Event
 	//object is not found in the database.
-	public Event getEvent(String eventId) {
+	public Event getEvent(String eventId) throws IOException {
 		getConnection();
 		String sql = "SELECT * FROM event_store WHERE eventId = ?";
 		String headersSql = "SELECT name,value FROM event_headers WHERE eventId = ?";
@@ -217,7 +230,7 @@ static Connection conn;
 	
 	// Retrieve multiple events from the database based off of an EventsRequest object
 	//into a list of Event objects that is returned.
-	public List<Event> getEvents(EventsRequest req) {
+	public List<Event> getEvents(EventsRequest req) throws IOException {
 		List<Event> eventList = new ArrayList<Event>();
 		if( req.getCreatedAfter() == null || req.getCreatedAfter().equals("")){
     		throw new IllegalArgumentException("A createdAfter date must be specified.");
