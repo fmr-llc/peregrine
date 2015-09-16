@@ -52,7 +52,7 @@ public class KafkaTests {
 		KafkaSubscriber kafkaSubscriber = new KafkaSubscriber(topic);
 		kafkaSubscriber.consumeEvent();
 		
-		assertEquals("Should be 42", 42, event.getSequenceNumber());
+		assertEquals("Should be 42", 42, event.getSequenceNumber().intValue());
 	}
 	
 	@Test
@@ -87,7 +87,7 @@ public class KafkaTests {
 		KafkaSubscriber kafkaSubscriber = new KafkaSubscriber(topic);
 		kafkaSubscriber.consumeEvent();
 		
-		assertEquals("Should be 12", 12, event2.getSequenceNumber());
+		assertEquals("Should be 12", 12, event2.getSequenceNumber().intValue());
 		
 	}
 }
