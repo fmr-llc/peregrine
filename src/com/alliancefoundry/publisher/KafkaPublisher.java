@@ -60,8 +60,7 @@ public class KafkaPublisher implements PublisherInterface {
 			jsonEvent = mapper.writeValueAsString(event);
 		} 
 		catch (JsonProcessingException e) {
-		
-			e.printStackTrace();
+			System.out.println("Error converting object to JSON String.");
 		}
 
 		String topic = (String)eventConfig.get(EventServicePublisher.TOPIC_KEY);
@@ -81,8 +80,7 @@ public class KafkaPublisher implements PublisherInterface {
 			jsonEvent = mapper.writeValueAsString(events);
 		} 
 		catch (JsonProcessingException e) {
-		
-			e.printStackTrace();
+			System.out.println("Error converting object to JSON String.");
 		}
 
 		String topic = (String)eventConfig.get(EventServicePublisher.TOPIC_KEY);
