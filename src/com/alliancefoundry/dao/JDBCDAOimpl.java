@@ -17,7 +17,7 @@ import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
 import com.mysql.jdbc.PreparedStatement;
 
-public class JDBCDAOimpl {
+public class JDBCDAOimpl implements DAO {
 	static Connection conn;
 	
 	private static void getConnection(){
@@ -61,39 +61,42 @@ public class JDBCDAOimpl {
 			ps.setString(3, event.getEventName());
 			ps.setString(4, event.getObjectId());
 			ps.setString(5, event.getCorrelationId());
-			try{
-				ps.setInt(6, event.getSequenceNumber());
-			} catch(NullPointerException e){
+			//in order to set sequence number as null, you
+			//have to declare a variable for it first
+			Integer seqNum = event.getSequenceNumber();
+			if(seqNum != null) {
+				ps.setInt(6, seqNum);
+			} else {
 				ps.setNull(6, 0);
 			}
+			
 			ps.setString(7, event.getMessageType());
 			ps.setString(8, event.getDataType());
 			ps.setString(9, event.getSource());
 			ps.setString(10, event.getDestination());
 			ps.setString(11, event.getSubdestination());
-			try{
-				ps.setBoolean(12, event.isReplayIndicator());
-			} catch(NullPointerException e){
-				ps.setNull(12, 0);
-			}
-			try {
-				ps.setLong(13, event.getPublishTimeStamp().getMillis());
-			} catch(NullPointerException e) {
+			ps.setBoolean(12, event.isReplayIndicator());
+			//in order to set a time stamp as null, you
+			//have to declare a variable for it first
+			DateTime pubTime = event.getPublishTimeStamp();
+			if(pubTime != null){
+				ps.setLong(13, pubTime.getMillis());
+			} else {
 				ps.setNull(13, 0);
 			}
+			
 			ps.setLong(14, event.getReceivedTimeStamp().getMillis());
-			try{
-				ps.setLong(15, event.getExpirationTimeStamp().getMillis());
-			} catch(NullPointerException e){
+			
+			DateTime expTime = event.getExpirationTimeStamp();
+			if(expTime != null){
+				ps.setLong(15, expTime.getMillis());
+			} else {
 				ps.setNull(15, 0);
 			}
+			
 			ps.setString(16, event.getPreEventState());
 			ps.setString(17, event.getPostEventState());
-			try{
-				ps.setBoolean(18, event.getIsPublishable());
-			}catch(NullPointerException e){
-				ps.setNull(18, 0);
-			}
+			ps.setBoolean(18, event.getIsPublishable());
 			event.setInsertTimeStamp(DateTime.now());
 			ps.setLong(19, event.getInsertTimeStamp().getMillis());
 			
@@ -148,6 +151,8 @@ public class JDBCDAOimpl {
 			//get to start of resultSet
 			rs.next();
 			
+			Integer seq = rs.getInt("sequenceNumber");
+			if (rs.wasNull()) seq = null;
 			DateTime publish = new DateTime(rs.getLong("publishTimeStamp"));
 			if (rs.wasNull()) publish = null;
 			DateTime expiration = new DateTime(rs.getLong("expirationTimeStamp"));
@@ -158,7 +163,7 @@ public class JDBCDAOimpl {
 					rs.getString("eventName"),
 					rs.getString("objectId"),
 					rs.getString("correlationId"),
-					rs.getInt("sequenceNumber"),
+					seq,
 					rs.getString("messageType"),
 					rs.getString("dataType"),
 					rs.getString("source"),
@@ -217,11 +222,14 @@ public class JDBCDAOimpl {
 	
 	// Retrieve multiple events from the database based off of an EventsRequest object
 	//into a list of Event objects that is returned.
-	public List<Event> getEvents(EventsRequest req) {
+	public List<Event> getEvents(EventsRequest req) throws IllegalArgumentException{
 		List<Event> eventList = new ArrayList<Event>();
-		if( req.getCreatedAfter() == null || req.getCreatedAfter().equals("")){
-    		throw new IllegalArgumentException("A createdAfter date must be specified.");
+		if( req.getCreatedAfter() == null){
+    		throw new IllegalArgumentException("A createdAfter date must be specified");
     	}
+		if(req.getSource() == null && req.getObjectId() == null && req.getCorrelationId() == null){
+			throw new IllegalArgumentException("A source, object id, or correlation id must be specified");
+		}
 		getConnection();
 		String reqCreatedAfter = "AND insertTimeStamp > ? ";
 		String reqCreatedBefore = "AND insertTimeStamp < ? ";
@@ -229,7 +237,6 @@ public class JDBCDAOimpl {
 		String reqObjectId = "AND objectId = ? ";
 		String reqCorrelationId = "AND correlationId = ? ";
 		String reqEventName = "AND eventName = ? ";
-		//String reqGenerations = "AND generations = ? ";
 		
 		String sql = "SELECT * FROM event_store WHERE TRUE ";
 		
@@ -251,12 +258,9 @@ public class JDBCDAOimpl {
 		if(req.getName() != null){
 			sql += reqEventName;
 		}
-		/*if(req.getGenerations() != null){
-			sql += reqGenerations;
-		}*/
 		
-		/*String headersSql = "SELECT name,value FROM event_headers WHERE eventId = ?";
-		String payloadSql = "SELECT name,value FROM event_payload WHERE eventId = ?";*/
+		String headersSql = "SELECT name,value FROM event_headers WHERE eventId = ?";
+		String payloadSql = "SELECT name,value,dataType FROM event_payload WHERE eventId = ?";
 		
 		try {
 			PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
@@ -285,39 +289,39 @@ public class JDBCDAOimpl {
 				ps.setString(index, req.getName());
 				index++;
 			}
-			/*if(req.getGenerations() != null){
-				ps.setInt(index, req.getGenerations());
-				index++;
-			}*/
-
 			ResultSet rs = ps.executeQuery();
 
 			// get to start of resultSet
 			while (rs.next()) {
+				
+				Integer sequenceNumber = rs.getInt("sequenceNumber");
+				if (rs.wasNull()) sequenceNumber = null;
+				DateTime publishTimeStamp = new DateTime(rs.getLong("publishTimeStamp"));
+				if (rs.wasNull()) publishTimeStamp = null;
+				DateTime expirationTimeStamp = new DateTime(rs.getLong("expirationTimeStamp"));
+				if (rs.wasNull()) expirationTimeStamp = null;
+				
 				String eventId = rs.getString("eventId");
 				String parentId = rs.getString("parentId");
 				String eventName = rs.getString("eventName");
 				String objectId = rs.getString("objectId");
 				String correlationId = rs.getString("correlationId");
-				int sequenceNumber = rs.getInt("sequenceNumber");
 				String messageType = rs.getString("messageType");
 				String dataType = rs.getString("dataType");
 				String source = rs.getString("source");
 				String destination = rs.getString("destination");
 				String subdestination = rs.getString("subdestination");
 				boolean replayIndicator = rs.getBoolean("replayIndicator");
-				DateTime publishTimeStamp = new DateTime(rs.getLong("publishTimeStamp"));
 				DateTime receivedTimeStamp = new DateTime(rs.getLong("receivedTimeStamp"));
-				DateTime expirationTimeStamp = new DateTime(rs.getLong("expirationTimeStamp"));
 				String preEventState = rs.getString("preEventState");
 				String postEventState = rs.getString("postEventState");
 				boolean isPublishable = rs.getBoolean("isPublishable");
 				DateTime insertTimeStamp = new DateTime(rs.getLong("insertTimeStamp"));
 				
-				/*PreparedStatement psHeaders = (PreparedStatement) conn.prepareStatement(headersSql);
+				PreparedStatement psHeaders = (PreparedStatement) conn.prepareStatement(headersSql);
 				
 				//set the value being checked for equality
-				psHeaders.setLong(1, eventId);
+				psHeaders.setString(1, eventId);
 				
 				ResultSet rsHeaders = psHeaders.executeQuery();
 				Map<String,String> customHeaders = new HashMap<String,String>();
@@ -331,16 +335,18 @@ public class JDBCDAOimpl {
 				PreparedStatement psPayload = (PreparedStatement) conn.prepareStatement(payloadSql);
 				
 				//set the value being checked for equality
-				psPayload.setLong(1, eventId);
+				psPayload.setString(1, eventId);
 				
 				ResultSet rsPayload = psPayload.executeQuery();
-				Map<String,String> customPayload = new HashMap<String,String>();
+				Map<String,DataItem> customPayload = new HashMap<String,DataItem>();
 				
-				//get to start of resultSet
-				rsPayload.next();
+				//get payload info from its table
 				while(rsPayload.next()){
-					customPayload.put(rsPayload.getString("name"), rsPayload.getString("value"));
-				}*/
+					String payName = rsPayload.getString("name");
+					String payType = rsPayload.getString("dataType");
+					String payVal = rsPayload.getString("value");
+					customPayload.put(payName, new DataItem(payType,payVal));
+				}
 				
 				Event e = new Event(
 					parentId,
@@ -357,103 +363,23 @@ public class JDBCDAOimpl {
 					publishTimeStamp,
 					receivedTimeStamp,
 					expirationTimeStamp,
-					/*customHeaders,
-					customPayload,*/
 					preEventState,
 					postEventState,
 					isPublishable,
 					insertTimeStamp
 					);
 				e.setEventId(eventId);
+				e.setCustomHeaders(customHeaders);
+				e.setCustomPayload(customPayload);
 				eventList.add(e);
 			}
-			if(req.getGenerations() > 0){
+			Integer genNum = req.getGenerations();
+			if(genNum != null && genNum > 0){
 				List<Event> genList = new ArrayList<Event>();
-				genList = generations(eventList,"1001",0,req.getGenerations());
-				return genList;
-				/*String genSql = "SELECT * FROM event_store "
-						+ "WHERE correlationId = ? "
-						+ "ORDER BY insertTimeStamp "
-						+ "LIMIT ? ";
-				for(Event e: eventList){
-					PreparedStatement genPs = (PreparedStatement) conn.prepareStatement(genSql);
-					genPs.setString(1, e.getCorrelationId());
-					genPs.setInt(2, req.getGenerations());
-					ResultSet genRs = genPs.executeQuery();
-					while(genRs.next()){
-						String genEventId = genRs.getString("eventId");
-						String genParentId = genRs.getString("parentId");
-						String genEventName = genRs.getString("eventName");
-						String genObjectId = genRs.getString("objectId");
-						String genCorrelationId = genRs.getString("correlationId");
-						int genSequenceNumber = genRs.getInt("sequenceNumber");
-						String genMessageType = genRs.getString("messageType");
-						String genDataType = genRs.getString("dataType");
-						String genSource = genRs.getString("source");
-						String genDestination = genRs.getString("destination");
-						String genSubdestination = genRs.getString("subdestination");
-						boolean genReplayIndicator = genRs.getBoolean("replayIndicator");
-						DateTime genPublishTimeStamp = new DateTime(genRs.getLong("publishTimeStamp"));
-						DateTime genReceivedTimeStamp = new DateTime(genRs.getLong("receivedTimeStamp"));
-						DateTime genExpirationTimeStamp = new DateTime(genRs.getLong("expirationTimeStamp"));
-						String genPreEventState = genRs.getString("preEventState");
-						String genPostEventState = genRs.getString("postEventState");
-						boolean genIsPublishable = genRs.getBoolean("isPublishable");
-						DateTime genInsertTimeStamp = new DateTime(genRs.getLong("insertTimeStamp"));
-						
-						/*PreparedStatement psHeaders = (PreparedStatement) conn.prepareStatement(headersSql);
-						
-						//set the value being checked for equality
-						psHeaders.setLong(1, eventId);
-						
-						ResultSet rsHeaders = psHeaders.executeQuery();
-						Map<String,String> customHeaders = new HashMap<String,String>();
-						
-						//get to start of resultSet
-						rsHeaders.next();
-						while(rsHeaders.next()){
-							customHeaders.put(rsHeaders.getString("name"), rsHeaders.getString("value"));
-						}
-						
-						PreparedStatement psPayload = (PreparedStatement) conn.prepareStatement(payloadSql);
-						
-						//set the value being checked for equality
-						psPayload.setLong(1, eventId);
-						
-						ResultSet rsPayload = psPayload.executeQuery();
-						Map<String,String> customPayload = new HashMap<String,String>();
-						
-						//get to start of resultSet
-						rsPayload.next();
-						while(rsPayload.next()){
-							customPayload.put(rsPayload.getString("name"), rsPayload.getString("value"));
-						}*/
-						
-						/*Event genEvent = new Event(
-							genParentId,
-							genEventName,
-							genObjectId,
-							genCorrelationId,
-							genSequenceNumber,
-							genMessageType,
-							genDataType,
-							genSource,
-							genDestination,
-							genSubdestination,
-							genReplayIndicator,
-							genPublishTimeStamp,
-							genReceivedTimeStamp,
-							genExpirationTimeStamp,
-							genPreEventState,
-							genPostEventState,
-							genIsPublishable,
-							genInsertTimeStamp
-							);
-						genEvent.setEventId(genEventId);
-						genList.add(genEvent);
-					}
-				}
-				eventList = genList;*/
+				List<Node> eventForest = new ArrayList<Node>();
+				eventForest = generations((ArrayList<Event>) eventList, eventForest);
+				putGenerationsInList(eventForest,genList,0,req.getGenerations());
+				eventList = genList;
 			}
 			return eventList;
 		} catch (SQLException e) {
@@ -464,27 +390,37 @@ public class JDBCDAOimpl {
 		}
 	}
 	
-	private List<Event> generations(List<Event> allEvents, String parentId, int currentGen, int maxGen){
-		List<Event> events = new ArrayList<Event>();
-		for(Event e : allEvents){
-			if(e.getParentId().equals(parentId)){
-				events.add(e);
+	//Put a list of Events into a tree
+	private List<Node> generations(ArrayList<Event> events, List<Node> eventForest){
+		if(events.isEmpty()){
+			return eventForest;
+		} else if(eventForest.isEmpty()) {
+			eventForest.add(new Node(events.get(0)));
+			events.remove(events.get(0));
+			return generations(events, eventForest);
+		} else {
+			for(int index = 0; index < eventForest.size(); index++){
+				if(eventForest.get(index).insertNode(events.get(0))) {
+					events.remove(events.get(0));
+					return generations(events, eventForest);
+				}
 			}
-			if(currentGen >= maxGen){
-				return events;
-			}
-			currentGen++;
+			eventForest.add(new Node(events.get(0)));
+			events.remove(events.get(0));
+			return generations(events, eventForest);
 		}
-		List<Event> temp = new ArrayList<Event>();
-		for(Event parent : events){
-			for(Event child : allEvents){
-				if(parent.getEventId().equals(child.getEventId())){
-					temp.addAll(generations(allEvents,parent.getEventId(),currentGen,maxGen));
+	}
+	
+	//Parse through a tree of Nodes and put the events within them into a list of Events
+	private void putGenerationsInList(List<Node> eventForest, List<Event> genList, int genCount, int maxGens){
+		for(Node n : eventForest){
+			if(genCount < maxGens){
+				genList.add(n.getEvent());
+				if(n.getChildren() != null){
+					putGenerationsInList(n.getChildren(), genList, ++genCount, maxGens);
 				}
 			}
 		}
-		events.addAll(temp);
-		return events;
 	}
 	
 }

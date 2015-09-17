@@ -32,7 +32,7 @@ public class Event {
     private String source;
     private String destination;
     private String subdestination;
-    private Boolean replayIndicator;
+    private boolean replayIndicator;
     @JsonSerialize(using = MyDateTimeSerializer.class)
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     private DateTime publishTimeStamp;
@@ -48,7 +48,7 @@ public class Event {
     private Map<String, DataItem> customPayload;
     private String preEventState;
     private String postEventState;
-    private Boolean isPublishable;
+    private boolean isPublishable;
     @JsonSerialize(using = MyDateTimeSerializer.class)
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     private DateTime insertTimeStamp;
@@ -144,7 +144,7 @@ public class Event {
 		this.correlationId = correlationId;
 	}
 
-	public void setSequenceNumber(int sequenceNumber) {
+	public void setSequenceNumber(Integer sequenceNumber) {
 		this.sequenceNumber = sequenceNumber;
 	}
 
@@ -224,7 +224,7 @@ public class Event {
 		return correlationId;
 	}
 
-	public int getSequenceNumber() {
+	public Integer getSequenceNumber() {
 		return sequenceNumber;
 	}
 
@@ -389,7 +389,6 @@ public class Event {
 			// not the same, either one or the other is null but not both
 			return false;
 		}
-    	System.out.println("kuyj");
 
 		// test subdestination
 		if(subdestination != null && e2.subdestination != null){
@@ -524,7 +523,7 @@ public class Event {
 				+ isReplayIndicator() + ", getPublishTimeStamp()=" + getPublishTimeStamp() + ", getReceivedTimeStamp()="
 				+ getReceivedTimeStamp() + ", getExpirationTimeStamp()=" + getExpirationTimeStamp()
 				+ ", getPreEventState()=" + getPreEventState() + ", getPostEventState()=" + getPostEventState()
-				+ ", isPublishable()=" + isPublishable() + ", getInsertTimeStamp()=" + getInsertTimeStamp() + "]";
+				+ ", isPublishable()=" + getIsPublishable() + ", getInsertTimeStamp()=" + getInsertTimeStamp() + "]";
 	}
     
 }
