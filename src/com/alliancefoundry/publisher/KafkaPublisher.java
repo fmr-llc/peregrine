@@ -1,15 +1,9 @@
 package com.alliancefoundry.publisher;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import com.alliancefoundry.model.Event;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.alliancefoundry.serializer.JsonEventSerializer;
 
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
@@ -46,51 +40,6 @@ public class KafkaPublisher implements PublisherInterface {
 		this.brokerUrl = brokerUrl;
 	}
 	
-	@Override
-	public void publishEvent(Event event, Map<String, String> eventConfig) {
-		
-		ObjectMapper mapper = new ObjectMapper();
-		  mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // no more null-valued properties
-		    mapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
-		    mapper.setSerializationInclusion(Include.NON_NULL);
-
-		String jsonEvent = null;
-		
-		try {
-			jsonEvent = mapper.writeValueAsString(event);
-		} 
-		catch (JsonProcessingException e) {
-			System.out.println("Error converting object to JSON String.");
-		}
-
-		String topic = (String)eventConfig.get(EventServicePublisher.TOPIC_KEY);
-		KeyedMessage<String, String> jsonData = new KeyedMessage<String, String>(topic, jsonEvent);
-		producer.send(jsonData);
-				
-		producer.close();
-
-	}
-	
-	@Override
-	public void publishEvent(List<Event> events, Map<String, String> eventConfig) {
-		ObjectMapper mapper = new ObjectMapper();
-		String jsonEvent = null;
-		
-		try {
-			jsonEvent = mapper.writeValueAsString(events);
-		} 
-		catch (JsonProcessingException e) {
-			System.out.println("Error converting object to JSON String.");
-		}
-
-		String topic = (String)eventConfig.get(EventServicePublisher.TOPIC_KEY);
-		KeyedMessage<String, String> jsonData = new KeyedMessage<String, String>(topic, jsonEvent);
-		producer.send(jsonData);
-			
-		producer.close();
-		
-	}
-	
 	public String getDestType() {
 		return destType;
 	}
@@ -99,6 +48,14 @@ public class KafkaPublisher implements PublisherInterface {
 		this.destType = destType;
 	}
 
+	@Override
+	public void publishEvent(Event event, String Topic) {
+		
+		JsonEventSerializer serializer = new JsonEventSerializer();
+		String jsonEvent = serializer.convertToJSON(event);
+
+		String topic = Topic;
+		KeyedMessage<String, String> jsonData = new KeyedMessage<String, String>(topic, jsonEvent);
+		producer.send(jsonData);		
+	}
 }
-
-

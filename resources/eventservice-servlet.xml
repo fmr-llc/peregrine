@@ -52,15 +52,22 @@
 		<property name="destType" value="${dest.activemq}" />
 	</bean>
 	
-   <bean id="serviceManager" class="com.alliancefoundry.publisher.EventServicePublisher">
-      <property name="publishers"  >
-         <list>
-            <ref bean="kafkaPublisher"/>
-            <ref bean="activemqPublisher"/>
-         </list>
-      </property>
-   </bean>
-   
+	<bean id="eventPublisherservice" class="com.alliancefoundry.publisher.EventServicePublisher">
+		<property name="publishers">
+			<bean class="org.springframework.beans.factory.config.MapFactoryBean">
+				<property name="targetMapClass">
+					<value>java.util.HashMap</value>
+				</property>
+				<property name="sourceMap">
+					<map key-type="java.lang.String" value-type="com.alliancefoundry.publisher.PublisherInterface">
+            			<entry key="kafka"><ref bean="kafkaPublisher"/></entry>
+            			<entry key="activemq"><ref bean="activemqPublisher"/></entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
     <mvc:annotation-driven />
 
 </beans>
