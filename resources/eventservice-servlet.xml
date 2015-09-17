@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans  xmlns="http://www.springframework.org/schema/beans"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:mvc="http://www.springframework.org/schema/mvc" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:p="http://www.springframework.org/schema/p"
+        xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context 
+            http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/mvc
+            http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+	<!--  scan for controller -->
+    <context:component-scan base-package="com.alliancefoundry.controller"/>
+    
+     <!-- bean configuration -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix">
+            <value>/WEB-INF/pages/</value>
+        </property>
+        <property name="suffix">
+            <value>.jsp</value>
+        </property>
+    </bean>
+    
+    <bean id="kafkaPublisher" class="com.alliancefoundry.publisher.KafkaPublisher">
+		<property name="brokerUrl" value="localhost:9092" />
+		<property name="destType" value="kafka" />
+	</bean>
+	
+	<bean id="activemqPublisher" class="com.alliancefoundry.publisher.ActiveMQPublisher">
+		<property name="brokerUrl" value="tcp://localhost:61616" />
+		<property name="destType" value="activemq" />
+	</bean>
+	
+
+   <bean id="serviceManager" class="com.alliancefoundry.publisher.EventServicePublisher">
+      <property name="publishers"  >
+         <list>
+            <ref bean="kafkaPublisher"/>
+            <ref bean="activemqPublisher"/>
+         </list>
+      </property>
+   </bean>
+   
+    <mvc:annotation-driven />
+
+</beans>

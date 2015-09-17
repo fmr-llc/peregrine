@@ -10,7 +10,7 @@ public class EventsRequest {
 	private String objectId;
 	private String correlationId;
 	private String name;
-	private int generations;
+	private Integer generations;
 	
 	public DateTime getCreatedAfter(){
 		return createdAfter;
@@ -60,11 +60,11 @@ public class EventsRequest {
 		name = param;
 	}
 	
-	public int getGenerations(){
+	public Integer getGenerations(){
 		return generations;
 	}
 	
-	public void setGenerations(int param){
+	public void setGenerations(Integer param){
 		generations = param;
 	}
 
