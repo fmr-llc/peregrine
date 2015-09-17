@@ -525,5 +525,4 @@ public class Event {
 				+ ", getPreEventState()=" + getPreEventState() + ", getPostEventState()=" + getPostEventState()
 				+ ", isPublishable()=" + getIsPublishable() + ", getInsertTimeStamp()=" + getInsertTimeStamp() + "]";
 	}
-    
 }
