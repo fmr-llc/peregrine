@@ -72,7 +72,7 @@ public class ActiveMQTests {
 		
 		final int customEventId = 44;
 		
-		// create customer messagelistener
+		// create customer messageListener
 		MessageListener listener = new MessageListener() {
 			
 			public void onMessage(Message message) {
@@ -84,19 +84,15 @@ public class ActiveMQTests {
 						ObjectMapper mapper = new ObjectMapper(); 
 						Event event = mapper.readValue(eventAsJson, Event.class);
 						eventTestPass1 = customEventId == event.getSequenceNumber();
-//						System.out.println("\n\nEvent:"+event.getEventId());
 					} catch (JsonParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("Error converting JSON to an Object.");
 					} catch (JsonMappingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("Error mapping JSON to Object.");
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("Error parsing input source.");
 					} catch (JMSException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("An internal error occurred, preventing "
+								+ "the JMS provider from retrieving the text.");
 					}
 				}				
 			}
@@ -118,8 +114,7 @@ public class ActiveMQTests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Error sleep interrupted.");
 		}
 		
 		Assert.assertTrue("Event id should be 44",eventTestPass1);
@@ -138,6 +133,8 @@ public class ActiveMQTests {
 
 		kafkaPublshisher = ctx.getBean("kafkaPublisher", KafkaPublisher.class);
 		mqPublisher = ctx.getBean("activemqPublisher", ActiveMQPublisher.class);
+		
+		mqPublisher.connect();
 		
 		publishers.add(mqPublisher);
 		publishers.add(kafkaPublshisher);

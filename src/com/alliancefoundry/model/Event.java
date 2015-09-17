@@ -9,6 +9,8 @@ import org.joda.time.DateTime;
 import com.alliancefoundry.serializer.CustomJsonDateDeserializer;
 import com.alliancefoundry.serializer.MyDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -18,6 +20,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * Created by Paul Bernard
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(Include.NON_NULL)
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class Event {
 
     // Headers
@@ -26,7 +30,7 @@ public class Event {
     private String eventName;
     private String objectId;
     private String correlationId;
-    private Integer sequenceNumber = null;
+    private Integer sequenceNumber;
     private String messageType;
     private String dataType;
     private String source;
@@ -61,6 +65,58 @@ public class Event {
     	customHeaders = new HashMap<String, String>();
     	customPayload = new HashMap<String, DataItem>();
     	insertTimeStamp = DateTime.now();
+    }
+	
+    public Event(Map<String, Object> map){
+		this();
+    	
+    	this.eventId = (String) map.get("eventId");
+    	this.parentId = (String) map.get("parentId");
+		this.eventName = (String) map.get("eventName");
+		this.objectId = (String) map.get("objectId");
+		this.correlationId = (String) map.get("correlationId");
+		try{
+			this.sequenceNumber = (Integer) map.get("sequenceNumber");		
+		}catch(Exception ex){
+			System.out.println("Error converting SequenceNumber to an Integer.");
+		}
+		this.messageType = (String) map.get("messageType");
+		this.dataType = (String) map.get("dataType");
+		this.source = (String) map.get("source");
+		this.destination = (String) map.get("destination");
+		this.subdestination = (String) map.get("subdestination");
+		try{
+			this.replayIndicator = (Boolean) map.get("replayIndicator");
+		}catch(Exception ex){
+			System.out.println("Error converting ReplayIndicator to a Boolean.");
+		}
+		try{
+			this.publishTimeStamp = DateTime.parse((String) map.get("publishTimeStamp"));
+		}catch(Exception ex){
+			System.out.println("Error converting PublishTimeStamp to a DateTime object.");
+		}
+		try{
+			this.receivedTimeStamp = DateTime.parse((String) map.get("receivedTimeStamp"));
+		}catch(Exception ex){
+			System.out.println("Error converting ReceivedTimeStamp to a DateTime object.");
+		}
+		try{
+			this.expirationTimeStamp = DateTime.parse((String) map.get("expirationTimeStamp"));
+		}catch(Exception ex){
+			System.out.println("Error converting ExpirationTimeStamp to a DateTime object.");
+		}
+		this.preEventState = (String) map.get("preEventState");
+		this.postEventState = (String) map.get("postEventState");
+		try{
+			this.isPublishable = (Boolean) map.get("publishable");
+		}catch(Exception ex){
+			System.out.println("Error converting IsPublishable to a Boolean.");
+		}
+		try{
+			this.insertTimeStamp = DateTime.parse((String) map.get("insertTimeStamp"));
+		}catch(Exception ex){
+			System.out.println("Error converting InsertTimeStamp to a DateTime object.");
+		}
     }
 	
 	/**
@@ -144,7 +200,7 @@ public class Event {
 		this.correlationId = correlationId;
 	}
 
-	public void setSequenceNumber(int sequenceNumber) {
+	public void setSequenceNumber(Integer sequenceNumber) {
 		this.sequenceNumber = sequenceNumber;
 	}
 
@@ -168,7 +224,7 @@ public class Event {
 		this.subdestination = subdestination;
 	}
 
-	public void setReplayIndicator(boolean replayIndicator) {
+	public void setReplayIndicator(Boolean replayIndicator) {
 		this.replayIndicator = replayIndicator;
 	}
 
@@ -192,7 +248,7 @@ public class Event {
 		this.postEventState = postEventState;
 	}
 
-	public void setPublishable(boolean isPublishable) {
+	public void setPublishable(Boolean isPublishable) {
 		this.isPublishable = isPublishable;
 	}
 
@@ -224,7 +280,7 @@ public class Event {
 		return correlationId;
 	}
 
-	public int getSequenceNumber() {
+	public Integer getSequenceNumber() {
 		return sequenceNumber;
 	}
 
@@ -248,7 +304,7 @@ public class Event {
 		return subdestination;
 	}
 
-	public boolean isReplayIndicator() {
+	public Boolean isReplayIndicator() {
 		return replayIndicator;
 	}
 
@@ -272,7 +328,7 @@ public class Event {
 		return postEventState;
 	}
 
-	public boolean isPublishable() {
+	public Boolean isPublishable() {
 		return isPublishable;
 	}
 
@@ -389,7 +445,6 @@ public class Event {
 			// not the same, either one or the other is null but not both
 			return false;
 		}
-    	System.out.println("kuyj");
 
 		// test subdestination
 		if(subdestination != null && e2.subdestination != null){

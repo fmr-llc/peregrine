@@ -32,92 +32,14 @@ public class JDBCDAOtest {
 	@Test
 	public void getFromDbTest() {
 		//run insert first, in order to find out a valid eventId
-		eventId = "4413df38-53a2-44df-bb89-10ad79f01f2e";
+		eventId = "c0b3568f-0333-4bce-8d2b-eb84c354fabb";
 		
 		eventFromDb = dao.getEvent(eventId);
 		String expected = eventId;
 		String actual = eventFromDb.getEventId();
+		System.out.println(expected + "     " + actual);
 		assertEquals(expected,actual);
 	}
-	
-	/*@Test
-	public void getMultipleEventsFromDbNoParamsTest() {
-		EventsRequest req = new EventsRequest();
-		List<Event> eventList = new ArrayList<Event>();
-		eventList = dao.getEvents(req);
-		if(eventList.size() == 0){
-			fail();
-		} else {
-			int count = 1;
-			for(Event e : eventList){
-				if(e.getEventId() != count) fail();
-				count++;
-			}
-			assert(true);
-		}
-	}*/
-	
-	/*@Test
-	public void getMultipleEventsFromDbOneParamTest() {
-		EventsRequest req = new EventsRequest();
-		req.setSource("a");
-		List<Event> eventList = new ArrayList<Event>();
-		eventList = dao.getEvents(req);
-		if(eventList.size() == 0){
-			fail();
-		} else {
-			for(Event e : eventList){
-				if(!e.getSource().equals("a")) fail();
-			}
-			assert(true);
-		}
-	}
-	
-	@Test
-	public void getMultipleEventsFromDbMultipleParamTest() {
-		EventsRequest req = new EventsRequest();
-		req.setObjectId("a");
-		req.setName("a");
-		List<Event> eventList = new ArrayList<Event>();
-		eventList = dao.getEvents(req);
-		if(eventList.size() == 0){
-			fail();
-		} else {
-			for(Event e : eventList){
-				if(!e.getObjectId().equals("a")) fail();
-				if(!e.getEventName().equals("a")) fail();
-			}
-			assert(true);
-		}
-	}
-	
-	@Test
-	public void getMultipleEventsFromDbAllParamTest() {
-		EventsRequest req = new EventsRequest();
-		DateTime currentTime = DateTime.now();
-		req.setCreatedAfter(new DateTime(0));
-		req.setCreatedBefore(currentTime);
-		req.setSource("a");
-		req.setObjectId("a");
-		req.setCorrelationId("a");
-		req.setName("a");
-		req.setGenerations(0);
-		List<Event> eventList = new ArrayList<Event>();
-		eventList = dao.getEvents(req);
-		if(eventList.size() == 0){
-			fail();
-		} else {
-			for(Event e : eventList){
-				if(!(e.getPublishTimeStamp().getMillis() > 0)) fail();
-				if(!(e.getPublishTimeStamp().getMillis() < currentTime.getMillis())) fail();
-				if(!e.getSource().equals("a")) fail();
-				if(!e.getObjectId().equals("a")) fail();
-				if(!e.getCorrelationId().equals("a")) fail();
-				if(!e.getEventName().equals("a")) fail();
-			}
-			assert(true);
-		}
-	}*/
 	
 	@Test
 	public void EventNotFoundInDbTest() {
