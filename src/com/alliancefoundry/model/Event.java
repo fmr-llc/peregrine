@@ -110,13 +110,8 @@ public class Event {
     }
     
     public Event(){
-    	UUID uuid = UUID.randomUUID();
-		eventId = uuid.toString();
-    	
-    	receivedTimeStamp = DateTime.now();
     	customHeaders = new HashMap<String, String>();
     	customPayload = new HashMap<String, DataItem>();
-    	insertTimeStamp = DateTime.now();
     }
 	
 	/**

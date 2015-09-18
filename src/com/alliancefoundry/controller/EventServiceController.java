@@ -3,6 +3,7 @@ package com.alliancefoundry.controller;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.ws.rs.Consumes;
 
@@ -44,13 +45,16 @@ public class EventServiceController  {
 	@Consumes("application/json")
 	public String setEvent(@RequestBody Event evt){
 		String eventId = "";
+		evt.setEventId(UUID.randomUUID().toString());
+		evt.setReceivedTimeStamp(DateTime.now());
 		try {
 			eventId = dao.insertEvent(evt);
 			log.debug("created event with event id " + eventId);
+			return eventId;
 		} catch (SQLException e) {
-			log.debug("Event could not be created.");
+			log.debug("Error inserting an event: " + e.getMessage());
+			return null;
 		}
-		return eventId;
 	}
 	
 	/**
@@ -62,21 +66,20 @@ public class EventServiceController  {
 	@RequestMapping(value="/events", method = RequestMethod.POST)
 	public String setEvents(@RequestBody List<Event> evts){
 		List<String> eventIds = new ArrayList<String>();
-		for(Event e : evts){
-			try {
-				eventIds.add(dao.insertEvent(e));
-			} catch (SQLException eSQL) {
-				log.debug("Event could not be created.");
+		try {
+			eventIds = dao.insertEvents(evts);
+			String eventIdStr = "";
+			for(String l : eventIds){
+				eventIdStr += "\n" + l;
 			}
+			if(!eventIdStr.equals("")){
+				log.debug("created events with event id[s] " + eventIdStr);
+			}
+			return eventIdStr;
+		} catch (SQLException eSQL) {
+			log.debug("Error inserting an event: " + eSQL.getMessage());
+			return null;
 		}
-		String eventIdStr = "";
-		for(String l : eventIds){
-			eventIdStr += "\n" + l;
-		}
-		if(!eventIdStr.equals("")){
-			log.debug("created events with event id[s]" + eventIdStr);
-		}
-		return eventIdStr;
 	}
 	
 	/**
@@ -87,13 +90,18 @@ public class EventServiceController  {
 	 */
     @RequestMapping(value="/event/{id}", method = RequestMethod.GET)
     public Event getEvent(@PathVariable String id){
-    	Event eventFromDb = dao.getEvent(id);
-        if(eventFromDb != null) {
-        	log.debug("retrieved event with event id " + eventFromDb.getEventId());
-        } else {
-        	log.debug("No event could be retrieved with the specified id");
-        }
-        return eventFromDb;
+		try {
+			Event eventFromDb = dao.getEvent(id);
+			if(eventFromDb != null) {
+	        	log.debug("retrieved event with event id " + eventFromDb.getEventId());
+	        } else {
+	        	log.debug("No event could be retrieved with the specified id");
+	        }
+	        return eventFromDb;
+		} catch (SQLException e) {
+			log.debug("Error retrieving event: " + e.getMessage());
+			return null;
+		}
     }
     
     @RequestMapping(value="/events", method = RequestMethod.GET)
@@ -127,16 +135,42 @@ public class EventServiceController  {
     			eventIdStr += "\n" + e.getEventId();
     		}
     		if(!eventIdStr.equals("")){
-    			log.debug("retrieved events with event id[s]" + eventIdStr);
+    			log.debug("retrieved events with event id[s] " + eventIdStr);
     		} else {
     			log.debug("No events match the specified request parameters");
     		}
     		return eventsFromDb;
     	} catch(IllegalArgumentException e){
-    		System.out.println(e.getMessage());
+    		log.debug("Incorrect or missing request parameter");
+    		return null;
+    	} catch(SQLException eSQL) {
+    		log.debug("Error retrieving an event: " + eSQL.getMessage());
     		return null;
     	}
     }
 
+    @RequestMapping(value="/latest-event", method = RequestMethod.GET)
+    public Event getLatestEvent(
+    		@RequestParam(value="source", required=false) String source,	
+    		@RequestParam(value="objectId", required=false) String objectId,
+    		@RequestParam(value="correlationId", required=false) String correlationId,
+    		@RequestParam(value="name", required=false) String name){
+
+    	EventsRequest req = new EventsRequest(null, null, source, objectId,
+    			correlationId, name, null);
+    	Event event;
+		try {
+			event = dao.getLatestEvent(req);
+			if(event != null){
+	    		log.debug("retrieved event with event id " + event.getEventId());
+	    	} else {
+	    		log.debug("No event matches the specified request parameters");
+	    	}
+			return event;
+		} catch (SQLException e) {
+			log.debug("Error retrieving event: " + e.getMessage());
+			return null;
+		}
+    }
 
 }

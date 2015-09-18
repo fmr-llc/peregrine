@@ -29,6 +29,7 @@ public class JDBCDAOtest {
 	
 	Event getEvent1;
 	Event getEvent2;
+	//this will also be the most recent inserted
 	Event getEvent3;
 	String parentEventId;
 	String child1EventId;
@@ -78,49 +79,79 @@ public class JDBCDAOtest {
 		dao.insertEvent(getEvent3);
 	}
 	
+	/**************************
+	 *Testing getLatestEvent()
+	 * @throws SQLException *
+	 **************************/
+	
+	@Test
+	public void getLatestEventFromDbNoParamsTest() throws SQLException {
+		EventsRequest req = new EventsRequest(null,null,null,null,null,null,null);
+		long actual = dao.getLatestEvent(req).getInsertTimeStamp().getMillis();
+		long expected = getEvent3.getInsertTimeStamp().getMillis();
+		assertEquals(expected,actual);
+	}
+	
+	@Test(expected=SQLException.class)
+	public void getLatestEventFromDbNoMatchingParamsTest() throws SQLException {
+		EventsRequest req = new EventsRequest(null,null,"","","","",null);
+		dao.getLatestEvent(req);
+	}
+	
+	@Test
+	public void getLatestEventFromDbMultipleMatchingParamsTest() throws SQLException {
+		EventsRequest req = new EventsRequest(null,null,
+				getEvent2.getSource(),
+				getEvent2.getObjectId(),
+				getEvent2.getCorrelationId(),
+				getEvent2.getEventName(),
+				null);
+		long actual = dao.getLatestEvent(req).getInsertTimeStamp().getMillis();
+		long expected = getEvent2.getInsertTimeStamp().getMillis();
+		assertEquals(expected,actual);
+	}
+	
 	/********************
-	 *Testing getEvent()*
+	 *Testing getEvent()
+	 * @throws SQLException *
 	 ********************/
 	
 	@Test
-	public void getFromDbTest() {
+	public void getFromDbTest() throws SQLException {
 		eventId = parentEventId;
-		
 		eventFromDb = dao.getEvent(eventId);
 		String expected = eventId;
 		String actual = eventFromDb.getEventId();
 		assertEquals(expected,actual);
 	}
 	
-	@Test
-	public void EventNotFoundInDbTest() {
+	@Test(expected=SQLException.class)
+	public void EventNotFoundInDbTest() throws SQLException {
 		//there shouldn't be an event with eventId of ""
 		eventId = "";
-		
-		Event eventFromDb = dao.getEvent(eventId);
-		Event expected = null;
-		Event actual = eventFromDb;
-		assertEquals(expected, actual);
+		dao.getEvent(eventId);
 	}
 	
 	/*********************
-	 *Testing getEvents()*
+	 *Testing getEvents()
+	 * @throws SQLException 
+	 * @throws IllegalArgumentException *
 	 *********************/
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void getMultipleEventsFromDbOnlyGenParamAndCreatedAfterParamTest() {
+	public void getMultipleEventsFromDbOnlyGenParamAndCreatedAfterParamTest() throws IllegalArgumentException, SQLException {
 		EventsRequest req = new EventsRequest(createdAfter,null,null,null,null,null,generations);
 		dao.getEvents(req);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void getMultipleEventsFromDbNoParamsTest() {
+	public void getMultipleEventsFromDbNoParamsTest() throws IllegalArgumentException, SQLException {
 		EventsRequest req = new EventsRequest(null,null,null,null,null,null,null);
 		dao.getEvents(req);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void getMultipleEventsFromDbOneParamTest() {
+	public void getMultipleEventsFromDbOneParamTest() throws IllegalArgumentException, SQLException {
 		EventsRequest req = new EventsRequest(createdAfter,null,null,null,null,null,null);
 		List<Event> eventList = new ArrayList<Event>();
 		eventList = dao.getEvents(req);
@@ -136,7 +167,7 @@ public class JDBCDAOtest {
 	}
 	
 	@Test
-	public void getMultipleEventsFromDbMultipleParamTest() {
+	public void getMultipleEventsFromDbMultipleParamTest() throws IllegalArgumentException, SQLException {
 		EventsRequest req = new EventsRequest(createdAfter,null,null,objectId,null,name,null);
 		List<Event> eventList = new ArrayList<Event>();
 		eventList = dao.getEvents(req);
@@ -154,7 +185,7 @@ public class JDBCDAOtest {
 	}
 	
 	@Test
-	public void getMultipleEventsFromDbAllParamTest() {
+	public void getMultipleEventsFromDbAllParamTest() throws IllegalArgumentException, SQLException {
 		EventsRequest req = new EventsRequest(createdAfter,createdBefore,source,objectId,correlationId,name,generations);
 		List<Event> eventList = new ArrayList<Event>();
 		eventList = dao.getEvents(req);
@@ -175,31 +206,14 @@ public class JDBCDAOtest {
 	}
 	
 	/***********************
-	 *Testing insertEvent()*
+	 *Testing insertEvent()
+	 * @throws SQLException *
 	 ***********************/
 	
 	@Test
-	public void insertToDbTest() {
-		event = new Event(
-					"a",
-					"Random Test",
-					"a",
-					"a",
-					null,
-					"a",
-					"a",
-					"a",
-					"a",
-					"a",
-					true,
-					null,
-					DateTime.now(),
-					DateTime.now(),
-					"a",
-					"a",
-					false,
-					DateTime.now()
-				);
+	public void insertToDbTest() throws SQLException {
+		event = getEvent2;
+		event.setEventId(UUID.randomUUID().toString());
 		Map<String,String> headers = new HashMap<String,String>();
 		Map<String,DataItem> payload = new HashMap<String,DataItem>();
 		
@@ -223,84 +237,11 @@ public class JDBCDAOtest {
 	}
 	
 	@Test
-	public void insertMultipleEventsToDbTest() {
-		event = new Event(
-			"c",
-			"c",
-			"c",
-			"c",
-			3,
-			"c",
-			"c",
-			"c",
-			"c",
-			"c",
-			true,
-			DateTime.now(),
-			DateTime.now(),
-			DateTime.now(),
-			"c",
-			"c",
-			true,
-			DateTime.now()
-		);
-		Event event2 = new Event(
-			"b",
-			"b",
-			"b",
-			"b",
-			3,
-			"b",
-			"b",
-			"b",
-			"b",
-			"b",
-			true,
-			DateTime.now(),
-			DateTime.now(),
-			DateTime.now(),
-			"b",
-			"b",
-			true,
-			DateTime.now()
-		);
-		List<String> expected = new ArrayList<String>();
-		try {
-			expected.add(dao.insertEvent(event));
-			expected.add(dao.insertEvent(event2));
-		} catch (SQLException e) {
-			System.out.println("There was a SQL issue when attempting to insert multiple events to the database");
-		}
-		List<String> actual = new ArrayList<String>();
-		for(String id : expected){
-			actual.add((dao.getEvent(id)).getEventId());
-		}
-		assertEquals(expected, actual);
-	}
-	
-	@Test
-	public void insertToAndRetrieveFromDbDateTimeTest() {
+	public void insertToAndRetrieveFromDbDateTimeTest() throws SQLException {
 		DateTime datetime = DateTime.now();
-		event = new Event(
-					"a",
-					"a",
-					"a",
-					"a",
-					3,
-					"a",
-					"a",
-					"a",
-					"a",
-					"a",
-					true,
-					datetime,
-					datetime,
-					datetime,
-					"a",
-					"a",
-					true,
-					datetime
-				);
+		event = getEvent2;
+		event.setEventId(UUID.randomUUID().toString());
+		event.setPublishTimeStamp(datetime);
 		try {
 			eventId = dao.insertEvent(event);
 		} catch (SQLException e) {
@@ -312,5 +253,45 @@ public class JDBCDAOtest {
 		//datetime 
 		String actual = eventFromDb.getPublishTimeStamp().toString();
 		assertEquals(expected, actual);
+	}
+	
+	/***********************
+	 *Testing insertEvents()
+	 * @throws SQLException *
+	 ***********************/
+	
+	@Test
+	public void insertMultipleEventsToDbTest() throws SQLException {
+		event = getEvent2;
+		Event event2 = getEvent3;
+		event.setEventId(UUID.randomUUID().toString());
+		event2.setEventId(UUID.randomUUID().toString());
+		List<Event> events = new ArrayList<Event>();
+		events.add(event);
+		events.add(event2);
+		List<String> expected = new ArrayList<String>();
+		try {
+			expected = dao.insertEvents(events);
+		} catch (SQLException e) {
+			System.out.println("There was a SQL issue when attempting to insert multiple events to the database");
+		}
+		List<String> actual = new ArrayList<String>();
+		for(String id : expected){
+			actual.add((dao.getEvent(id)).getEventId());
+		}
+		assertEquals(expected, actual);
+	}
+	
+	@Test(expected=SQLException.class)
+	public void insertMultipleEventsToDbInvalidEventTest() throws SQLException{
+		event = getEvent2;
+		Event event2 = getEvent3;
+		event.setEventId("multiple insert test");
+		event2.setEventId("multiple insert test (2)");
+		event2.setObjectId(null);
+		List<Event> events = new ArrayList<Event>();
+		events.add(event);
+		events.add(event2);
+		dao.insertEvents(events);
 	}
 }
