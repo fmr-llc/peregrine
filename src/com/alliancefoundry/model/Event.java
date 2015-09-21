@@ -2,12 +2,10 @@ package com.alliancefoundry.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-
 import org.joda.time.DateTime;
 
-import com.alliancefoundry.serializer.CustomJsonDateDeserializer;
-import com.alliancefoundry.serializer.MyDateTimeSerializer;
+import com.alliancefoundry.serializer.JsonDateTimeSerializer;
+import com.alliancefoundry.serializer.JsonDateTimeDeserializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -30,21 +28,21 @@ public class Event {
     private String eventName;
     private String objectId;
     private String correlationId;
-    private Integer sequenceNumber;
+    private Integer sequenceNumber = null;
     private String messageType;
     private String dataType;
     private String source;
     private String destination;
     private String subdestination;
-    private Boolean replayIndicator;
-    @JsonSerialize(using = MyDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    private boolean replayIndicator;
+    @JsonSerialize(using = JsonDateTimeSerializer.class)
+    @JsonDeserialize(using = JsonDateTimeDeserializer.class)
     private DateTime publishTimeStamp;
-    @JsonSerialize(using = MyDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    @JsonSerialize(using = JsonDateTimeSerializer.class)
+    @JsonDeserialize(using = JsonDateTimeDeserializer.class)
     private DateTime receivedTimeStamp;
-    @JsonSerialize(using = MyDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    @JsonSerialize(using = JsonDateTimeSerializer.class)
+    @JsonDeserialize(using = JsonDateTimeDeserializer.class)
     private DateTime expirationTimeStamp;
 
     // other
@@ -52,71 +50,15 @@ public class Event {
     private Map<String, DataItem> customPayload;
     private String preEventState;
     private String postEventState;
-    private Boolean isPublishable;
-    @JsonSerialize(using = MyDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    private boolean isPublishable;
+    @JsonSerialize(using = JsonDateTimeSerializer.class)
+    @JsonDeserialize(using = JsonDateTimeDeserializer.class)
     private DateTime insertTimeStamp;
 
+
     public Event(){
-    	UUID uuid = UUID.randomUUID();
-		eventId = uuid.toString();
-    	
-    	receivedTimeStamp = DateTime.now();
     	customHeaders = new HashMap<String, String>();
     	customPayload = new HashMap<String, DataItem>();
-    	insertTimeStamp = DateTime.now();
-    }
-	
-    public Event(Map<String, Object> map){
-		this();
-    	
-    	this.eventId = (String) map.get("eventId");
-    	this.parentId = (String) map.get("parentId");
-		this.eventName = (String) map.get("eventName");
-		this.objectId = (String) map.get("objectId");
-		this.correlationId = (String) map.get("correlationId");
-		try{
-			this.sequenceNumber = (Integer) map.get("sequenceNumber");		
-		}catch(Exception ex){
-			System.out.println("Error converting SequenceNumber to an Integer.");
-		}
-		this.messageType = (String) map.get("messageType");
-		this.dataType = (String) map.get("dataType");
-		this.source = (String) map.get("source");
-		this.destination = (String) map.get("destination");
-		this.subdestination = (String) map.get("subdestination");
-		try{
-			this.replayIndicator = (Boolean) map.get("replayIndicator");
-		}catch(Exception ex){
-			System.out.println("Error converting ReplayIndicator to a Boolean.");
-		}
-		try{
-			this.publishTimeStamp = DateTime.parse((String) map.get("publishTimeStamp"));
-		}catch(Exception ex){
-			System.out.println("Error converting PublishTimeStamp to a DateTime object.");
-		}
-		try{
-			this.receivedTimeStamp = DateTime.parse((String) map.get("receivedTimeStamp"));
-		}catch(Exception ex){
-			System.out.println("Error converting ReceivedTimeStamp to a DateTime object.");
-		}
-		try{
-			this.expirationTimeStamp = DateTime.parse((String) map.get("expirationTimeStamp"));
-		}catch(Exception ex){
-			System.out.println("Error converting ExpirationTimeStamp to a DateTime object.");
-		}
-		this.preEventState = (String) map.get("preEventState");
-		this.postEventState = (String) map.get("postEventState");
-		try{
-			this.isPublishable = (Boolean) map.get("publishable");
-		}catch(Exception ex){
-			System.out.println("Error converting IsPublishable to a Boolean.");
-		}
-		try{
-			this.insertTimeStamp = DateTime.parse((String) map.get("insertTimeStamp"));
-		}catch(Exception ex){
-			System.out.println("Error converting InsertTimeStamp to a DateTime object.");
-		}
     }
 	
 	/**
@@ -139,6 +81,7 @@ public class Event {
 	 * @param isPublishable
 	 * @param insertTimeStamp
 	 */
+    
 	public Event(String parentId, String eventName, String objectId, String correlationId,
 			Integer sequenceNumber, String messageType, String dataType, String source, String destination,
 			String subdestination, boolean replayIndicator, DateTime publishTimeStamp, DateTime receivedTimeStamp,
@@ -224,7 +167,7 @@ public class Event {
 		this.subdestination = subdestination;
 	}
 
-	public void setReplayIndicator(Boolean replayIndicator) {
+	public void setReplayIndicator(boolean replayIndicator) {
 		this.replayIndicator = replayIndicator;
 	}
 
@@ -248,7 +191,7 @@ public class Event {
 		this.postEventState = postEventState;
 	}
 
-	public void setPublishable(Boolean isPublishable) {
+	public void setIsPublishable(boolean isPublishable) {
 		this.isPublishable = isPublishable;
 	}
 
@@ -304,7 +247,7 @@ public class Event {
 		return subdestination;
 	}
 
-	public Boolean isReplayIndicator() {
+	public boolean isReplayIndicator() {
 		return replayIndicator;
 	}
 
@@ -328,7 +271,7 @@ public class Event {
 		return postEventState;
 	}
 
-	public Boolean isPublishable() {
+	public boolean getIsPublishable() {
 		return isPublishable;
 	}
 
@@ -336,235 +279,142 @@ public class Event {
 		return insertTimeStamp;
 	}
 
-	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((correlationId == null) ? 0 : correlationId.hashCode());
+		result = prime * result + ((customHeaders == null) ? 0 : customHeaders.hashCode());
+		result = prime * result + ((customPayload == null) ? 0 : customPayload.hashCode());
+		result = prime * result + ((dataType == null) ? 0 : dataType.hashCode());
+		result = prime * result + ((destination == null) ? 0 : destination.hashCode());
+		result = prime * result + ((eventId == null) ? 0 : eventId.hashCode());
+		result = prime * result + ((eventName == null) ? 0 : eventName.hashCode());
+		result = prime * result + ((expirationTimeStamp == null) ? 0 : expirationTimeStamp.hashCode());
+		result = prime * result + ((insertTimeStamp == null) ? 0 : insertTimeStamp.hashCode());
+		result = prime * result + (isPublishable ? 1231 : 1237);
+		result = prime * result + ((messageType == null) ? 0 : messageType.hashCode());
+		result = prime * result + ((objectId == null) ? 0 : objectId.hashCode());
+		result = prime * result + ((parentId == null) ? 0 : parentId.hashCode());
+		result = prime * result + ((postEventState == null) ? 0 : postEventState.hashCode());
+		result = prime * result + ((preEventState == null) ? 0 : preEventState.hashCode());
+		result = prime * result + ((publishTimeStamp == null) ? 0 : publishTimeStamp.hashCode());
+		result = prime * result + ((receivedTimeStamp == null) ? 0 : receivedTimeStamp.hashCode());
+		result = prime * result + (replayIndicator ? 1231 : 1237);
+		result = prime * result + ((sequenceNumber == null) ? 0 : sequenceNumber.hashCode());
+		result = prime * result + ((source == null) ? 0 : source.hashCode());
+		result = prime * result + ((subdestination == null) ? 0 : subdestination.hashCode());
+		return result;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
-		// if object isnt an event object use normal equals comparison
-		if(!(obj instanceof Event)){
-			return super.equals(obj);
-		}
-		Event e2 = (Event)obj;
-
-		// test eventid
-		if(!eventId.equals(e2.eventId)){
+		if (this == obj)
+			return true;
+		if (obj == null)
 			return false;
-		}
-
-		// test parentid
-		if(parentId != null && e2.parentId != null){
-			// perform test
-			if(!parentId.equals(e2.parentId)){
+		if (getClass() != obj.getClass())
+			return false;
+		Event other = (Event) obj;
+		if (correlationId == null) {
+			if (other.correlationId != null)
 				return false;
-			}
-		}else if(parentId == null && e2.parentId == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!correlationId.equals(other.correlationId))
 			return false;
-		}
-
-		// test eventName
-		if(eventName != null && e2.eventName != null){
-			// perform test
-			if(!eventName.equals(e2.eventName)){
+		if (customHeaders == null) {
+			if (other.customHeaders != null)
 				return false;
-			}
-		}else if(eventName == null && e2.eventName == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!customHeaders.equals(other.customHeaders))
 			return false;
-		}
-		
-		// test objectId
-		if(objectId != null && e2.objectId != null){
-			// perform test
-			if(!objectId.equals(e2.objectId)){
+		if (customPayload == null) {
+			if (other.customPayload != null)
 				return false;
-			}
-		}else if(objectId == null && e2.objectId == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!customPayload.equals(other.customPayload))
 			return false;
-		}
-		
-		// test correlationId
-		if(correlationId != null && e2.correlationId != null){
-			// perform test
-			if(!correlationId.equals(e2.correlationId)){
+		if (dataType == null) {
+			if (other.dataType != null)
 				return false;
-			}
-		}else if(correlationId == null && e2.correlationId == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!dataType.equals(other.dataType))
 			return false;
-		}
-		
-		// test sequenceNumber
-		if(sequenceNumber != null && e2.sequenceNumber != null){
-			// perform test
-			if(!sequenceNumber.equals(e2.sequenceNumber)){
+		if (destination == null) {
+			if (other.destination != null)
 				return false;
-			}
-		}else if(sequenceNumber == null && e2.sequenceNumber == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!destination.equals(other.destination))
 			return false;
-		}
-		
-		// test messageType
-		if(messageType != null && e2.messageType != null){
-			// perform test
-			if(!messageType.equals(e2.messageType)){
+		if (eventId == null) {
+			if (other.eventId != null)
 				return false;
-			}
-		}else if(messageType == null && e2.messageType == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!eventId.equals(other.eventId))
 			return false;
-		}
-		
-		// test source
-		if(source != null && e2.source != null){
-			// perform test
-			if(!source.equals(e2.source)){
+		if (eventName == null) {
+			if (other.eventName != null)
 				return false;
-			}
-		}else if(source == null && e2.source == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!eventName.equals(other.eventName))
 			return false;
-		}
-
-		// test destination
-		if(destination != null && e2.destination != null){
-			// perform test
-			if(!destination.equals(e2.destination)){
+		if (expirationTimeStamp == null) {
+			if (other.expirationTimeStamp != null)
 				return false;
-			}
-		}else if(destination == null && e2.destination == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!expirationTimeStamp.equals(other.expirationTimeStamp))
 			return false;
-		}
-
-		// test subdestination
-		if(subdestination != null && e2.subdestination != null){
-			// perform test
-			if(!subdestination.equals(e2.subdestination)){
+		if (insertTimeStamp == null) {
+			if (other.insertTimeStamp != null)
 				return false;
-			}
-		}else if(subdestination == null && e2.subdestination == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!insertTimeStamp.equals(other.insertTimeStamp))
 			return false;
-		}
-
-		// test replayIndicator
-		if (replayIndicator != e2.replayIndicator){
+		if (isPublishable != other.isPublishable)
 			return false;
-		}
-		
-		// test publishedTimeStamp
-		if(publishTimeStamp != null && e2.publishTimeStamp != null){
-			// perform test
-			if(publishTimeStamp.getMillis() != e2.publishTimeStamp.getMillis()){
+		if (messageType == null) {
+			if (other.messageType != null)
 				return false;
-			}
-		}else if(publishTimeStamp == null && e2.publishTimeStamp == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!messageType.equals(other.messageType))
 			return false;
-		}
-		
-		// test receivedTimeStamp
-		if(receivedTimeStamp != null && e2.receivedTimeStamp != null){
-			// perform test
-			if(receivedTimeStamp.getMillis() != e2.receivedTimeStamp.getMillis()){
+		if (objectId == null) {
+			if (other.objectId != null)
 				return false;
-			}
-		}else if(receivedTimeStamp == null && e2.receivedTimeStamp == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!objectId.equals(other.objectId))
 			return false;
-		}
-
-		// test expirationTimeStamp
-		if(expirationTimeStamp != null && e2.expirationTimeStamp != null){
-			// perform test
-			if(expirationTimeStamp.getMillis() != e2.expirationTimeStamp.getMillis()){
+		if (parentId == null) {
+			if (other.parentId != null)
 				return false;
-			}
-		}else if(expirationTimeStamp == null && e2.expirationTimeStamp == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!parentId.equals(other.parentId))
 			return false;
-		}
-
-		// test customHeaders
-		if(customHeaders != null && e2.customHeaders != null){
-			// perform test
-			if(customHeaders.size() != e2.customHeaders.size()){
+		if (postEventState == null) {
+			if (other.postEventState != null)
 				return false;
-			}
-		}else if(customHeaders == null && e2.customHeaders == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!postEventState.equals(other.postEventState))
 			return false;
-		}
-
-		// test payload
-		if(customPayload != null && e2.customPayload != null){
-			// perform test
-			if(customPayload.size() != e2.customPayload.size()){
+		if (preEventState == null) {
+			if (other.preEventState != null)
 				return false;
-			}
-		}else if(customPayload == null && e2.customPayload == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!preEventState.equals(other.preEventState))
 			return false;
-		}
-
-		// test preEventState
-		if(preEventState != null && e2.preEventState != null){
-			// perform test
-			if(!preEventState.equals(e2.preEventState)){
+		if (publishTimeStamp == null) {
+			if (other.publishTimeStamp != null)
 				return false;
-			}
-		}else if(preEventState == null && e2.preEventState == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!publishTimeStamp.equals(other.publishTimeStamp))
 			return false;
-		}
-
-		// test postEventState
-		if(postEventState != null && e2.postEventState != null){
-			// perform test
-			if(!postEventState.equals(e2.postEventState)){
+		if (receivedTimeStamp == null) {
+			if (other.receivedTimeStamp != null)
 				return false;
-			}
-		}else if(postEventState == null && e2.postEventState == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!receivedTimeStamp.equals(other.receivedTimeStamp))
 			return false;
-		}
-		
-		// test isPublishable
-		if (isPublishable != e2.isPublishable){
+		if (replayIndicator != other.replayIndicator)
 			return false;
-		}
-
-		
-		// test insertTimeStamp
-		if(insertTimeStamp != null && e2.insertTimeStamp != null){
-			// perform test
-			if(insertTimeStamp.getMillis() != e2.insertTimeStamp.getMillis()){
+		if (sequenceNumber == null) {
+			if (other.sequenceNumber != null)
 				return false;
-			}
-		}else if(insertTimeStamp == null && e2.insertTimeStamp == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!sequenceNumber.equals(other.sequenceNumber))
 			return false;
-		}	    // other
-		
+		if (source == null) {
+			if (other.source != null)
+				return false;
+		} else if (!source.equals(other.source))
+			return false;
+		if (subdestination == null) {
+			if (other.subdestination != null)
+				return false;
+		} else if (!subdestination.equals(other.subdestination))
+			return false;
 		return true;
 	}
 
@@ -579,7 +429,6 @@ public class Event {
 				+ isReplayIndicator() + ", getPublishTimeStamp()=" + getPublishTimeStamp() + ", getReceivedTimeStamp()="
 				+ getReceivedTimeStamp() + ", getExpirationTimeStamp()=" + getExpirationTimeStamp()
 				+ ", getPreEventState()=" + getPreEventState() + ", getPostEventState()=" + getPostEventState()
-				+ ", isPublishable()=" + isPublishable() + ", getInsertTimeStamp()=" + getInsertTimeStamp() + "]";
+				+ ", isPublishable()=" + getIsPublishable() + ", getInsertTimeStamp()=" + getInsertTimeStamp() + "]";
 	}
-    
 }
