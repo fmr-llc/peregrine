@@ -3,11 +3,8 @@ package com.alliancefoundry.controller;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
-import javax.ws.rs.Consumes;
-
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,10 +39,8 @@ public class EventServiceController  {
 	 * @return
 	 */
 	@RequestMapping(value="/event", method = RequestMethod.POST)
-	@Consumes("application/json")
 	public String setEvent(@RequestBody Event evt){
 		String eventId = "";
-		evt.setEventId(UUID.randomUUID().toString());
 		evt.setReceivedTimeStamp(DateTime.now());
 		try {
 			eventId = dao.insertEvent(evt);
@@ -64,20 +59,21 @@ public class EventServiceController  {
 	 * @return
 	 */
 	@RequestMapping(value="/events", method = RequestMethod.POST)
-	public String setEvents(@RequestBody List<Event> evts){
+	public List<String> setEvents(@RequestBody List<Event> evts){
 		List<String> eventIds = new ArrayList<String>();
 		try {
+			for(Event e : evts){
+				e.setReceivedTimeStamp(DateTime.now());
+			}
 			eventIds = dao.insertEvents(evts);
-			String eventIdStr = "";
-			for(String l : eventIds){
-				eventIdStr += "\n" + l;
+			if (eventIds.size() > 0){
+			    log.debug("Created events with event id[s]" + eventIds.stream().collect(Collectors.joining("\n")));
+			} else {
+				log.debug("No events provided to insert");
 			}
-			if(!eventIdStr.equals("")){
-				log.debug("created events with event id[s] " + eventIdStr);
-			}
-			return eventIdStr;
-		} catch (SQLException eSQL) {
-			log.debug("Error inserting an event: " + eSQL.getMessage());
+			return eventIds;
+		} catch (SQLException e) {
+			log.debug("Error inserting an event: " + e.getMessage());
 			return null;
 		}
 	}
@@ -111,7 +107,7 @@ public class EventServiceController  {
     		@RequestParam(value="source", required=false) String source,	
     		@RequestParam(value="objectId", required=false) String objectId,
     		@RequestParam(value="correlationId", required=false) String correlationId,
-    		@RequestParam(value="name", required=false) String name,
+    		@RequestParam(value="eventName", required=false) String eventName,
 			@RequestParam(value="generations", required=false) Integer generations){
     	DateTime createdAfterVal;
     	DateTime createdBeforeVal;
@@ -126,25 +122,25 @@ public class EventServiceController  {
     		createdBeforeVal = new DateTime(createdBefore);
     	}
     	EventsRequest req = new EventsRequest(createdAfterVal, createdBeforeVal, source, objectId,
-    			correlationId, name, generations);
+    			correlationId, eventName, generations);
     	List<Event> eventsFromDb = new ArrayList<Event>();
+    	List<String> eventIds = new ArrayList<String>();
     	try{
     		eventsFromDb = dao.getEvents(req);
-    		String eventIdStr = "";
     		for(Event e : eventsFromDb){
-    			eventIdStr += "\n" + e.getEventId();
+    			eventIds.add(e.getEventId());
     		}
-    		if(!eventIdStr.equals("")){
-    			log.debug("retrieved events with event id[s] " + eventIdStr);
+    		if(eventIds.size() > 0){
+    			log.debug("retrieved events with event id[s] " + eventIds.stream().collect(Collectors.joining("\n")));
     		} else {
     			log.debug("No events match the specified request parameters");
     		}
     		return eventsFromDb;
     	} catch(IllegalArgumentException e){
-    		log.debug("Incorrect or missing request parameter");
+    		log.debug("Incorrect or missing request parameter: " + e.getMessage());
     		return null;
-    	} catch(SQLException eSQL) {
-    		log.debug("Error retrieving an event: " + eSQL.getMessage());
+    	} catch(SQLException e) {
+    		log.debug("Error retrieving an event: " + e.getMessage());
     		return null;
     	}
     }
@@ -154,10 +150,10 @@ public class EventServiceController  {
     		@RequestParam(value="source", required=false) String source,	
     		@RequestParam(value="objectId", required=false) String objectId,
     		@RequestParam(value="correlationId", required=false) String correlationId,
-    		@RequestParam(value="name", required=false) String name){
+    		@RequestParam(value="eventName", required=false) String eventName){
 
     	EventsRequest req = new EventsRequest(null, null, source, objectId,
-    			correlationId, name, null);
+    			correlationId, eventName, null);
     	Event event;
 		try {
 			event = dao.getLatestEvent(req);
@@ -167,6 +163,9 @@ public class EventServiceController  {
 	    		log.debug("No event matches the specified request parameters");
 	    	}
 			return event;
+		} catch(IllegalArgumentException e){
+    		log.debug("Incorrect or missing request parameter: " + e.getMessage());
+    		return null;
 		} catch (SQLException e) {
 			log.debug("Error retrieving event: " + e.getMessage());
 			return null;

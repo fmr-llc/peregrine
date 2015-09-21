@@ -51,7 +51,7 @@ public class JDBCDAOimpl implements DAO {
 		String headersSql = "INSERT INTO event_headers VALUES ( ?,?,? )";
 		String payloadSql = "INSERT INTO event_payload VALUES ( ?,?,?,? )";
 		try {
-			String eventId = event.getEventId();
+			String eventId = UUID.randomUUID().toString();
 			PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
 			//set the value of each column for the row being inserted other
 			//than eventId
@@ -143,7 +143,7 @@ public class JDBCDAOimpl implements DAO {
 				String sql = "INSERT INTO event_store VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? )";
 				String headersSql = "INSERT INTO event_headers VALUES ( ?,?,? )";
 				String payloadSql = "INSERT INTO event_payload VALUES ( ?,?,?,? )";
-				String eventId = event.getEventId();
+				String eventId = UUID.randomUUID().toString();
 				PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
 				// set the value of each column for the row being inserted other
 				// than eventId
@@ -336,9 +336,8 @@ public class JDBCDAOimpl implements DAO {
 		
 		String sql = "SELECT * FROM event_store WHERE TRUE ";
 		
-		if(req.getCreatedAfter() != null){
-			sql += reqCreatedAfter;
-		}
+		sql += reqCreatedAfter;
+		
 		if(req.getCreatedBefore() != null){
 			sql += reqCreatedBefore;
 		}
@@ -351,7 +350,7 @@ public class JDBCDAOimpl implements DAO {
 		if(req.getCorrelationId() != null){
 			sql += reqCorrelationId;
 		}
-		if(req.getName() != null){
+		if(req.getEventName() != null){
 			sql += reqEventName;
 		}
 		
@@ -381,8 +380,8 @@ public class JDBCDAOimpl implements DAO {
 				ps.setString(index, req.getCorrelationId());
 				index++;
 			}
-			if(req.getName() != null){
-				ps.setString(index, req.getName());
+			if(req.getEventName() != null){
+				ps.setString(index, req.getEventName());
 				index++;
 			}
 			ResultSet rs = ps.executeQuery();
@@ -522,8 +521,11 @@ public class JDBCDAOimpl implements DAO {
 	//Retrieve the most recent event inserted into the database based 
 	//off of an EventsRequest object.  Basically the same as getEvents
 	//except doesn't care about createdBefore, createdAfter, or generations
-	public Event getLatestEvent(EventsRequest req) throws SQLException {
+	public Event getLatestEvent(EventsRequest req) throws SQLException, IllegalArgumentException {
 		Event event;
+		if( req.getSource() == null){
+    		throw new IllegalArgumentException("A source must be specified");
+    	}
 		getConnection();
 		String reqSource = "AND source = ? ";
 		String reqObjectId = "AND objectId = ? ";
@@ -532,16 +534,15 @@ public class JDBCDAOimpl implements DAO {
 		
 		String sql = "SELECT * FROM event_store WHERE TRUE ";
 		
-		if(req.getSource() != null){
-			sql += reqSource;
-		}
+		sql += reqSource;
+		
 		if(req.getObjectId() != null){
 			sql += reqObjectId;
 		}
 		if(req.getCorrelationId() != null){
 			sql += reqCorrelationId;
 		}
-		if(req.getName() != null){
+		if(req.getEventName() != null){
 			sql += reqEventName;
 		}
 		
@@ -565,8 +566,8 @@ public class JDBCDAOimpl implements DAO {
 				ps.setString(index, req.getCorrelationId());
 				index++;
 			}
-			if(req.getName() != null){
-				ps.setString(index, req.getName());
+			if(req.getEventName() != null){
+				ps.setString(index, req.getEventName());
 				index++;
 			}
 			ResultSet rs = ps.executeQuery();

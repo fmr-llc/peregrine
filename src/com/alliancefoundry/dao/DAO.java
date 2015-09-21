@@ -11,5 +11,5 @@ public interface DAO {
 	public List<String> insertEvents(List<Event> events) throws SQLException;
 	public Event getEvent(String eventId) throws SQLException;
 	public List<Event> getEvents(EventsRequest req) throws IllegalArgumentException, SQLException;
-	public Event getLatestEvent(EventsRequest req) throws SQLException;
+	public Event getLatestEvent(EventsRequest req) throws IllegalArgumentException, SQLException;
 }

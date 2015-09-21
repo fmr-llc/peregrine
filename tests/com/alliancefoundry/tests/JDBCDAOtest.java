@@ -56,27 +56,19 @@ public class JDBCDAOtest {
 		name = "Testing name";
 		generations = 2;
 		
-		parentEventId = UUID.randomUUID().toString();
-		child1EventId = UUID.randomUUID().toString();
-		child2EventId = UUID.randomUUID().toString();
-		
 		AbstractApplicationContext ctx;
 		ctx = new ClassPathXmlApplicationContext("db-mock-events.xml");
 
 		getEvent1 = ctx.getBean("parentEvent", Event.class);
-		getEvent1.setEventId(parentEventId);
+		parentEventId = dao.insertEvent(getEvent1);
 		getEvent2 = ctx.getBean("childEvent1", Event.class);
-		getEvent2.setEventId(child1EventId);
 		getEvent2.setParentId(parentEventId);
+		child1EventId = dao.insertEvent(getEvent2);
 		getEvent3 = ctx.getBean("childEvent2", Event.class);
-		getEvent3.setEventId(child2EventId);
 		getEvent3.setParentId(parentEventId);
+		child2EventId = dao.insertEvent(getEvent3);
 		
 		ctx.close();
-		
-		dao.insertEvent(getEvent1);
-		dao.insertEvent(getEvent2);
-		dao.insertEvent(getEvent3);
 	}
 	
 	/**************************
@@ -118,9 +110,8 @@ public class JDBCDAOtest {
 	
 	@Test
 	public void getFromDbTest() throws SQLException {
-		eventId = parentEventId;
-		eventFromDb = dao.getEvent(eventId);
-		String expected = eventId;
+		eventFromDb = dao.getEvent(child1EventId);
+		String expected = child1EventId;
 		String actual = eventFromDb.getEventId();
 		assertEquals(expected,actual);
 	}

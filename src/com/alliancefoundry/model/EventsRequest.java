@@ -15,7 +15,7 @@ public class EventsRequest {
 	private String source;
 	private String objectId;
 	private String correlationId;
-	private String name;
+	private String eventName;
 	private Integer generations;
 	
 	/**
@@ -24,17 +24,17 @@ public class EventsRequest {
 	 * @param source
 	 * @param objectId
 	 * @param correlationId
-	 * @param name
+	 * @param eventName
 	 * @param generations
 	 */
 	public EventsRequest(DateTime createdAfter, DateTime createdBefore, String source, String objectId,
-			String correlationId, String name, Integer generations) {
+			String correlationId, String eventName, Integer generations) {
 		this.createdAfter = createdAfter;
 		this.createdBefore = createdBefore;
 		this.source = source;
 		this.objectId = objectId;
 		this.correlationId = correlationId;
-		this.name = name;
+		this.eventName = eventName;
 		this.generations = generations;
 	}
 	
@@ -78,12 +78,12 @@ public class EventsRequest {
 		correlationId = param;
 	}
 	
-	public String getName(){
-		return name;
+	public String getEventName(){
+		return eventName;
 	}
 	
-	public void setName(String param){
-		name = param;
+	public void setEventName(String param){
+		eventName = param;
 	}
 	
 	public Integer getGenerations(){
