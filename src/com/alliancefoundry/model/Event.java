@@ -78,7 +78,7 @@ public class Event {
 		try{
 			this.replayIndicator = (Boolean) map.get("replayIndicator");
 		}catch(Exception ex){
-			System.out.println("Error converting ReplayIndicator to a Boolean.");
+			System.out.println("Error converting ReplayIndicator to a boolean.");
 		}
 		try{
 			this.publishTimeStamp = DateTime.parse((String) map.get("publishTimeStamp"));
@@ -98,9 +98,9 @@ public class Event {
 		this.preEventState = (String) map.get("preEventState");
 		this.postEventState = (String) map.get("postEventState");
 		try{
-			this.isPublishable = (Boolean) map.get("publishable");
+			this.isPublishable = (Boolean) map.get("isPublishable");
 		}catch(Exception ex){
-			System.out.println("Error converting IsPublishable to a Boolean.");
+			System.out.println("Error converting IsPublishable to a boolean.");
 		}
 		try{
 			this.insertTimeStamp = DateTime.parse((String) map.get("insertTimeStamp"));

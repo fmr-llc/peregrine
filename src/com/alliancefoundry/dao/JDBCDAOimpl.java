@@ -51,7 +51,7 @@ public class JDBCDAOimpl implements DAO {
 		String headersSql = "INSERT INTO event_headers VALUES ( ?,?,? )";
 		String payloadSql = "INSERT INTO event_payload VALUES ( ?,?,?,? )";
 		try {
-			String eventId = event.getEventId();
+			String eventId = UUID.randomUUID().toString();
 			PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
 			//set the value of each column for the row being inserted other
 			//than eventId
@@ -143,7 +143,7 @@ public class JDBCDAOimpl implements DAO {
 				String sql = "INSERT INTO event_store VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? )";
 				String headersSql = "INSERT INTO event_headers VALUES ( ?,?,? )";
 				String payloadSql = "INSERT INTO event_payload VALUES ( ?,?,?,? )";
-				String eventId = event.getEventId();
+				String eventId = UUID.randomUUID().toString();
 				PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
 				// set the value of each column for the row being inserted other
 				// than eventId
