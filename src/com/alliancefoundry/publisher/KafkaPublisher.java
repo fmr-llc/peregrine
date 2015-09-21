@@ -40,13 +40,13 @@ public class KafkaPublisher implements PublisherInterface {
 		this.brokerUrl = brokerUrl;
 	}
 	
-	public String getDestType() {
+	/*public String getDestType() {
 		return destType;
 	}
 
 	public void setDestType(String destType) {
 		this.destType = destType;
-	}
+	}*/
 
 	@Override
 	public void publishEvent(Event event, String Topic) {

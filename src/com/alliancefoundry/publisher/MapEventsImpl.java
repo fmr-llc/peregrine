@@ -1,7 +1,6 @@
 package com.alliancefoundry.publisher;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.alliancefoundry.model.Event;
@@ -16,8 +15,6 @@ public class MapEventsImpl implements IMapEvents {
 			return null;
 		}
 		
-		// Example of messagetype would be
-		// "kafaka - topic1"
 		String[] bundle = ev.getMessageType().split(" - ");
 		String dest = bundle[0].trim();
 		String topic  = null;

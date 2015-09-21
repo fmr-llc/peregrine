@@ -44,12 +44,12 @@
 	 
 	 <bean id="kafkaPublisher" class="com.alliancefoundry.publisher.KafkaPublisher">
 		<property name="brokerUrl" value="${kafka.url}" />
-		<property name="destType" value="${dest.kafka}" />
+		<!--  <property name="destType" value="${dest.kafka}" />-->
 	</bean>
 	
 	<bean id="activemqPublisher" class="com.alliancefoundry.publisher.ActiveMQPublisher">
 		<property name="brokerUrl" value="${activemq.url}" />
-		<property name="destType" value="${dest.activemq}" />
+		<!--  <property name="destType" value="${dest.activemq}" />-->
 	</bean>
 	
 	<bean id="eventPublisherservice" class="com.alliancefoundry.publisher.EventServicePublisher">

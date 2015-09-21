@@ -1,6 +1,5 @@
 package com.alliancefoundry.publisher;
 
-import java.util.List;
 import java.util.Map;
 
 import com.alliancefoundry.model.Event;

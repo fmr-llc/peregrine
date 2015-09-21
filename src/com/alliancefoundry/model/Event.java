@@ -1,18 +1,19 @@
+
 package com.alliancefoundry.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-
 import org.joda.time.DateTime;
 
-import com.alliancefoundry.serializer.JsonDateTimeDeserializer;
 import com.alliancefoundry.serializer.JsonDateTimeSerializer;
+import com.alliancefoundry.serializer.JsonDateTimeDeserializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+
 
 /**
  * Created by Paul Bernard
@@ -28,13 +29,13 @@ public class Event {
     private String eventName;
     private String objectId;
     private String correlationId;
-    private Integer sequenceNumber;
+    private Integer sequenceNumber = null;
     private String messageType;
     private String dataType;
     private String source;
     private String destination;
     private String subdestination;
-    private Boolean replayIndicator;
+    private boolean replayIndicator;
     @JsonSerialize(using = JsonDateTimeSerializer.class)
     @JsonDeserialize(using = JsonDateTimeDeserializer.class)
     private DateTime publishTimeStamp;
@@ -50,22 +51,17 @@ public class Event {
     private Map<String, DataItem> customPayload;
     private String preEventState;
     private String postEventState;
-    private Boolean isPublishable;
+    private boolean isPublishable;
     @JsonSerialize(using = JsonDateTimeSerializer.class)
     @JsonDeserialize(using = JsonDateTimeDeserializer.class)
     private DateTime insertTimeStamp;
 
     public Event(){
-    	UUID uuid = UUID.randomUUID();
-		eventId = uuid.toString();
-    	
-    	receivedTimeStamp = DateTime.now();
     	customHeaders = new HashMap<String, String>();
     	customPayload = new HashMap<String, DataItem>();
-    	insertTimeStamp = DateTime.now();
     }
 	
-   /**
+	/**
 	 * @param parentId
 	 * @param eventName
 	 * @param objectId
@@ -170,7 +166,7 @@ public class Event {
 		this.subdestination = subdestination;
 	}
 
-	public void setReplayIndicator(Boolean replayIndicator) {
+	public void setReplayIndicator(boolean replayIndicator) {
 		this.replayIndicator = replayIndicator;
 	}
 
@@ -194,7 +190,7 @@ public class Event {
 		this.postEventState = postEventState;
 	}
 
-	public void setPublishable(Boolean isPublishable) {
+	public void setIsPublishable(boolean isPublishable) {
 		this.isPublishable = isPublishable;
 	}
 
@@ -250,7 +246,7 @@ public class Event {
 		return subdestination;
 	}
 
-	public Boolean isReplayIndicator() {
+	public boolean isReplayIndicator() {
 		return replayIndicator;
 	}
 
@@ -274,7 +270,7 @@ public class Event {
 		return postEventState;
 	}
 
-	public Boolean isPublishable() {
+	public boolean getIsPublishable() {
 		return isPublishable;
 	}
 
@@ -295,7 +291,7 @@ public class Event {
 		result = prime * result + ((eventName == null) ? 0 : eventName.hashCode());
 		result = prime * result + ((expirationTimeStamp == null) ? 0 : expirationTimeStamp.hashCode());
 		result = prime * result + ((insertTimeStamp == null) ? 0 : insertTimeStamp.hashCode());
-		result = prime * result + ((isPublishable == null) ? 0 : isPublishable.hashCode());
+		result = prime * result + (isPublishable ? 1231 : 1237);
 		result = prime * result + ((messageType == null) ? 0 : messageType.hashCode());
 		result = prime * result + ((objectId == null) ? 0 : objectId.hashCode());
 		result = prime * result + ((parentId == null) ? 0 : parentId.hashCode());
@@ -303,7 +299,7 @@ public class Event {
 		result = prime * result + ((preEventState == null) ? 0 : preEventState.hashCode());
 		result = prime * result + ((publishTimeStamp == null) ? 0 : publishTimeStamp.hashCode());
 		result = prime * result + ((receivedTimeStamp == null) ? 0 : receivedTimeStamp.hashCode());
-		result = prime * result + ((replayIndicator == null) ? 0 : replayIndicator.hashCode());
+		result = prime * result + (replayIndicator ? 1231 : 1237);
 		result = prime * result + ((sequenceNumber == null) ? 0 : sequenceNumber.hashCode());
 		result = prime * result + ((source == null) ? 0 : source.hashCode());
 		result = prime * result + ((subdestination == null) ? 0 : subdestination.hashCode());
@@ -364,10 +360,7 @@ public class Event {
 				return false;
 		} else if (!insertTimeStamp.equals(other.insertTimeStamp))
 			return false;
-		if (isPublishable == null) {
-			if (other.isPublishable != null)
-				return false;
-		} else if (!isPublishable.equals(other.isPublishable))
+		if (isPublishable != other.isPublishable)
 			return false;
 		if (messageType == null) {
 			if (other.messageType != null)
@@ -404,10 +397,7 @@ public class Event {
 				return false;
 		} else if (!receivedTimeStamp.equals(other.receivedTimeStamp))
 			return false;
-		if (replayIndicator == null) {
-			if (other.replayIndicator != null)
-				return false;
-		} else if (!replayIndicator.equals(other.replayIndicator))
+		if (replayIndicator != other.replayIndicator)
 			return false;
 		if (sequenceNumber == null) {
 			if (other.sequenceNumber != null)
@@ -438,7 +428,6 @@ public class Event {
 				+ isReplayIndicator() + ", getPublishTimeStamp()=" + getPublishTimeStamp() + ", getReceivedTimeStamp()="
 				+ getReceivedTimeStamp() + ", getExpirationTimeStamp()=" + getExpirationTimeStamp()
 				+ ", getPreEventState()=" + getPreEventState() + ", getPostEventState()=" + getPostEventState()
-				+ ", isPublishable()=" + isPublishable() + ", getInsertTimeStamp()=" + getInsertTimeStamp() + "]";
+				+ ", isPublishable()=" + getIsPublishable() + ", getInsertTimeStamp()=" + getInsertTimeStamp() + "]";
 	}
-    
 }
