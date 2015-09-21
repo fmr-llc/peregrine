@@ -1,37 +1,46 @@
-package com.alliancefoundry.dao;
+ package com.alliancefoundry.dao;
+ 
+ import java.io.IOException;
+ import java.sql.Connection;
+ import java.sql.DriverManager;
+ import java.sql.ResultSet;
+ import java.sql.SQLException;
+ import java.util.ArrayList;
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
+ 
+ import java.util.Properties;
+ import java.util.UUID;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.joda.time.DateTime;
-
-import com.alliancefoundry.model.DataItem;
-import com.alliancefoundry.model.Event;
-import com.alliancefoundry.model.EventsRequest;
-import com.mysql.jdbc.PreparedStatement;
+ import org.joda.time.DateTime;
+ 
+ import com.alliancefoundry.model.DataItem;
+ import com.alliancefoundry.model.Event;
+ import com.alliancefoundry.model.EventsRequest;
+ import com.mysql.jdbc.PreparedStatement;
 
 public class JDBCDAOimpl implements DAO {
 	static Connection conn;
 	
-	private static void getConnection(){
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection(
-					"jdbc:mysql://127.0.0.1/eventdb",
-					"root", "root");
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
+	private  void getConnection() throws IOException{
+ 		try {
+ 			Properties properties = new Properties();
+ 			properties.load(this.getClass().getClassLoader().getResourceAsStream("db.properties"));
+ 			String driver = properties.getProperty("db.driver");
+ 			String dburl = properties.getProperty("db.url");
+ 			String user = properties.getProperty("db.username");
+ 			String password = properties.getProperty("db.password");
+ 			
+ 			Class.forName(driver);
+ 			conn = DriverManager.getConnection(dburl,user,password);
+ 			
+ 		} catch (ClassNotFoundException e) {
+ 			System.out.println("Specified database driver was not found.");
+ 		} catch (SQLException e) {
+ 			System.out.println("Specified database url, username, or password were invalid");
+ 		}
+ 	}
 
 	private static void endConnection(){
 		try {
@@ -46,7 +55,12 @@ public class JDBCDAOimpl implements DAO {
 	//and return the event id of the Event object that was inserted.
 	//Returns null if insert failed.
 	public String insertEvent(Event event) throws SQLException {
-		getConnection();
+		try {
+			getConnection();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String sql = "INSERT INTO event_store VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? )";
 		String headersSql = "INSERT INTO event_headers VALUES ( ?,?,? )";
 		String payloadSql = "INSERT INTO event_payload VALUES ( ?,?,?,? )";
@@ -136,7 +150,12 @@ public class JDBCDAOimpl implements DAO {
 	// Returns null if insert failed.
 	public List<String> insertEvents(List<Event> events) throws SQLException {
 		List<String> eventIds = new ArrayList<String>();
-		getConnection();
+		try {
+			getConnection();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		conn.setAutoCommit(false);
 		try {
 			for (Event event : events) {
@@ -231,7 +250,12 @@ public class JDBCDAOimpl implements DAO {
 	//that is returned.  Return null if the requested Event
 	//object is not found in the database.
 	public Event getEvent(String eventId) throws SQLException {
-		getConnection();
+		try {
+			getConnection();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String sql = "SELECT * FROM event_store WHERE eventId = ?";
 		String headersSql = "SELECT name,value FROM event_headers WHERE eventId = ?";
 		String payloadSql = "SELECT name,value,dataType FROM event_payload WHERE eventId = ?";
@@ -326,7 +350,12 @@ public class JDBCDAOimpl implements DAO {
 		if(req.getSource() == null && req.getObjectId() == null && req.getCorrelationId() == null){
 			throw new IllegalArgumentException("A source, object id, or correlation id must be specified");
 		}
-		getConnection();
+		try {
+			getConnection();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String reqCreatedAfter = "AND insertTimeStamp > ? ";
 		String reqCreatedBefore = "AND insertTimeStamp < ? ";
 		String reqSource = "AND source = ? ";
@@ -526,7 +555,12 @@ public class JDBCDAOimpl implements DAO {
 		if( req.getSource() == null){
     		throw new IllegalArgumentException("A source must be specified");
     	}
-		getConnection();
+		try {
+			getConnection();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String reqSource = "AND source = ? ";
 		String reqObjectId = "AND objectId = ? ";
 		String reqCorrelationId = "AND correlationId = ? ";

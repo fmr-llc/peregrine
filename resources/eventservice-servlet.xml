@@ -25,26 +25,49 @@
         </property>
     </bean>
     
-    <bean id="kafkaPublisher" class="com.alliancefoundry.publisher.KafkaPublisher">
-		<property name="brokerUrl" value="localhost:9092" />
-		<property name="destType" value="kafka" />
+    <bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:broker.properties</value>
+				<value>classpath:db.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+	 	<property name="driverClassName" value="${db.driver}"/>
+	 	<property name="url" value="${db.url}"/>
+	 	<property name="username" value="${db.username}"/>
+	 	<property name="password" value="${db.password}"/>
+	</bean>
+	 
+	 <bean id="kafkaPublisher" class="com.alliancefoundry.publisher.KafkaPublisher">
+		<property name="brokerUrl" value="${kafka.url}" />
+		<!--  <property name="destType" value="${dest.kafka}" />-->
 	</bean>
 	
 	<bean id="activemqPublisher" class="com.alliancefoundry.publisher.ActiveMQPublisher">
-		<property name="brokerUrl" value="tcp://localhost:61616" />
-		<property name="destType" value="activemq" />
+		<property name="brokerUrl" value="${activemq.url}" />
+		<!--  <property name="destType" value="${dest.activemq}" />-->
 	</bean>
 	
-
-   <bean id="serviceManager" class="com.alliancefoundry.publisher.EventServicePublisher">
-      <property name="publishers"  >
-         <list>
-            <ref bean="kafkaPublisher"/>
-            <ref bean="activemqPublisher"/>
-         </list>
-      </property>
-   </bean>
-   
+	<bean id="eventPublisherservice" class="com.alliancefoundry.publisher.EventServicePublisher">
+		<property name="publishers">
+			<bean class="org.springframework.beans.factory.config.MapFactoryBean">
+				<property name="targetMapClass">
+					<value>java.util.HashMap</value>
+				</property>
+				<property name="sourceMap">
+					<map key-type="java.lang.String" value-type="com.alliancefoundry.publisher.PublisherInterface">
+            			<entry key="kafka"><ref bean="kafkaPublisher"/></entry>
+            			<entry key="activemq"><ref bean="activemqPublisher"/></entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
     <mvc:annotation-driven />
 
 

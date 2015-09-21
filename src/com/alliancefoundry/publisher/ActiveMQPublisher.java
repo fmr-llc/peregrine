@@ -1,8 +1,5 @@
 package com.alliancefoundry.publisher;
 
-import java.util.List;
-import java.util.Map;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
@@ -17,8 +14,7 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import com.alliancefoundry.model.Event;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alliancefoundry.serializer.JsonEventSerializer;
 
 public class ActiveMQPublisher implements PublisherInterface {
 	
@@ -26,7 +22,6 @@ public class ActiveMQPublisher implements PublisherInterface {
 	private String username;
 	private String password;
 	private ConnectionFactory connectionFactory;
-	private boolean isConnected;
 	private boolean usingLoginCredentials = false;
 	private String destType;
 
@@ -46,91 +41,6 @@ public class ActiveMQPublisher implements PublisherInterface {
 		}else{// connect with no login credintials
 			// create connection factory
 			connectionFactory = new ActiveMQConnectionFactory(this.brokerUrl);
-		}
-		
-	}
-
-	@Override
-	public void publishEvent(Event event, Map<String, String> config){
-		
-		// create connection
-		Connection connection = null;
-		Session session = null;
-		MessageProducer producer = null;
-		
-		String topicName = config.get(EventServicePublisher.TOPIC_KEY);
-		
-		// turn java onject to json string
-		ObjectMapper mapper = new ObjectMapper(); 
-		//POJO to JSON
-		String jsonMessage = null;
-		try {
-			jsonMessage = mapper.writeValueAsString(event);
-		} catch (JsonProcessingException e1) {
-			System.out.println("Error converting object to JSON String.");
-		}
-
-		
-		// create connection
-		try {
-			connection = connectionFactory.createConnection();
-		} catch (JMSException e) {
-			System.out.println("An internal error occurred, preventing the "
-					+ "publisher from connecting to the ActiveMQ server.");
-		}
-		
-		// create session
-		try {
-			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-		} catch (JMSException e) {
-			System.out.println("An internal error occurred, preventing the "
-					+ "Connection object from creating a session.");
-		}
-		
-		Destination destination = null;
-		try {
-			destination = session.createTopic(topicName);
-		} catch (JMSException e) {
-			System.out.println("An internal error occurred, preventing the "
-					+ "session from creating a topic.");
-		}
-		
-		// create producer
-		try {
-			producer = session.createProducer(destination);
-		} catch (JMSException e) {
-			System.out.println("An internal error occurred, preventing the "
-					+ "session from creating a MessageProducer.");
-		}
-		try {
-			producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-		} catch (JMSException e) {
-			System.out.println("An internal error occurred, preventing the "
-					+ "JMS provider from setting the delivery mode.");
-		}
-		
-		TextMessage txtMessage = null;
-		try {
-			txtMessage = session.createTextMessage(jsonMessage);
-		} catch (JMSException e) {
-			System.out.println("An internal error occurred, preventing the " 
-					+ "JMS provider from creating the text message.");
-		}
-		
-		// publish topic to subscribers
-		try {
-			producer.send(txtMessage);
-		} catch (MessageFormatException e) {
-			System.out.println("The producer tried to send an invalid message.");
-		} catch (InvalidDestinationException e) {
-			System.out.println("The producer tried to send a message with an "
-					+ "invalid destination.");
-		} catch (UnsupportedOperationException e) {
-			System.out.println("The destination for the message was not specified "
-					+ "at creation time.");
-		} catch (JMSException e) {
-			System.out.println("An internal error occurred, preventing the " 
-					+ "producer from sending the message.");
 		}
 		
 	}
@@ -176,89 +86,78 @@ public class ActiveMQPublisher implements PublisherInterface {
 	}
 
 	@Override
-	public void publishEvent(List<Event> events, Map<String, String> config) {
+	public void publishEvent(Event event, String Topic) {
 		
 		// create connection
-		Connection connection = null;
-		Session session = null;
-		MessageProducer producer = null;
-		
-		String topicName = config.get(EventServicePublisher.TOPIC_KEY);
-		
-		// turn java onject to json string
-		ObjectMapper mapper = new ObjectMapper(); 
-		//POJO to JSON
-		String jsonMessage = null;
-		try {
-			jsonMessage = mapper.writeValueAsString(events);
-		} catch (JsonProcessingException e1) {
-			System.out.println("Error converting object to JSON String.");
+				Connection connection = null;
+				Session session = null;
+				MessageProducer producer = null;
+				
+				String topicName = Topic;
+				
+				JsonEventSerializer serializer = new JsonEventSerializer();
+				String jsonMessage = serializer.convertToJSON(event);
+				
+				// create connection
+				try {
+					connection = connectionFactory.createConnection();
+				} catch (JMSException e) {
+					System.out.println("An internal error occurred, preventing the "
+							+ "publisher from connecting to the ActiveMQ server.");
+				}
+				
+				// create session
+				try {
+					session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+				} catch (JMSException e) {
+					System.out.println("An internal error occurred, preventing the "
+							+ "Connection object from creating a session.");
+				}
+				
+				Destination destination = null;
+				try {
+					destination = session.createTopic(topicName);
+				} catch (JMSException e) {
+					System.out.println("An internal error occurred, preventing the "
+							+ "session from creating a topic.");
+				}
+				
+				// create producer
+				try {
+					producer = session.createProducer(destination);
+				} catch (JMSException e) {
+					System.out.println("An internal error occurred, preventing the "
+							+ "session from creating a MessageProducer.");
+				}
+				try {
+					producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+				} catch (JMSException e) {
+					System.out.println("An internal error occurred, preventing the "
+							+ "JMS provider from setting the delivery mode.");
+				}
+				
+				TextMessage txtMessage = null;
+				try {
+					txtMessage = session.createTextMessage(jsonMessage);
+				} catch (JMSException e) {
+					System.out.println("An internal error occurred, preventing the " 
+							+ "JMS provider from creating the text message.");
+				}
+				
+				// publish topic to subscribers
+				try {
+					producer.send(txtMessage);
+				} catch (MessageFormatException e) {
+					System.out.println("The producer tried to send an invalid message.");
+				} catch (InvalidDestinationException e) {
+					System.out.println("The producer tried to send a message with an "
+							+ "invalid destination.");
+				} catch (UnsupportedOperationException e) {
+					System.out.println("The destination for the message was not specified "
+							+ "at creation time.");
+				} catch (JMSException e) {
+					System.out.println("An internal error occurred, preventing the " 
+							+ "producer from sending the message.");
+				}
 		}
-		
-		// create connection
-		try {
-			connection = connectionFactory.createConnection();
-		} catch (JMSException e) {
-			System.out.println("An internal error occurred, preventing the "
-					+ "publisher from connecting to the ActiveMQ server.");
-		}
-		
-		// create session
-		try {
-			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-		} catch (JMSException e) {
-			System.out.println("An internal error occurred, preventing the "
-					+ "Connection object from creating a session.");
-		}
-		
-		Destination destination = null;
-		try {
-			destination = session.createTopic(topicName);
-		} catch (JMSException e) {
-			System.out.println("An internal error occurred, preventing the "
-					+ "session from creating a topic.");
-		}
-		
-		// create producer
-		try {
-			producer = session.createProducer(destination);
-		} catch (JMSException e1) {
-			System.out.println("An internal error occurred, preventing the "
-					+ "session from creating a MessageProducer.");
-		}
-		try {
-			producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-		} catch (JMSException e) {
-			System.out.println("An internal error occurred, preventing the "
-					+ "JMS provider from setting the delivery mode.");
-		}
-		
-		TextMessage txtMessage = null;
-		try {
-			txtMessage = session.createTextMessage(jsonMessage);
-		} catch (JMSException e) {
-			System.out.println("An internal error occurred, preventing the " 
-					+ "JMS provider from creating the text message.");
-		}
-		
-		// publish topic to subscribers
-		try {
-			producer.send(txtMessage);
-		} catch (MessageFormatException e) {
-			System.out.println("The producer tried to send an invalid message.");
-		} catch (InvalidDestinationException e) {
-			System.out.println("The producer tried to send a message with an "
-					+ "invalid destination.");
-		} catch (UnsupportedOperationException e) {
-			System.out.println("The destination for the message was not specified "
-					+ "at creation time.");
-		} catch (JMSException e) {
-			System.out.println("An internal error occurred, preventing the " 
-					+ "producer from sending the message.");
-		}
-		
-		
-	}
-
-
 }

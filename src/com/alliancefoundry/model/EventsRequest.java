@@ -2,12 +2,6 @@ package com.alliancefoundry.model;
 
 import org.joda.time.DateTime;
 
-import com.alliancefoundry.serializer.CustomJsonDateDeserializer;
-import com.alliancefoundry.serializer.MyDateTimeSerializer;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 public class EventsRequest {
 	
 	private DateTime createdAfter;
