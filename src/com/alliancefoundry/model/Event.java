@@ -1,4 +1,3 @@
-
 package com.alliancefoundry.model;
 
 import java.util.HashMap;
@@ -56,6 +55,7 @@ public class Event {
     @JsonDeserialize(using = JsonDateTimeDeserializer.class)
     private DateTime insertTimeStamp;
 
+
     public Event(){
     	customHeaders = new HashMap<String, String>();
     	customPayload = new HashMap<String, DataItem>();
@@ -81,6 +81,7 @@ public class Event {
 	 * @param isPublishable
 	 * @param insertTimeStamp
 	 */
+    
 	public Event(String parentId, String eventName, String objectId, String correlationId,
 			Integer sequenceNumber, String messageType, String dataType, String source, String destination,
 			String subdestination, boolean replayIndicator, DateTime publishTimeStamp, DateTime receivedTimeStamp,
