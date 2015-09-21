@@ -2,6 +2,12 @@ package com.alliancefoundry.model;
 
 import org.joda.time.DateTime;
 
+import com.alliancefoundry.serializer.CustomJsonDateDeserializer;
+import com.alliancefoundry.serializer.MyDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 public class EventsRequest {
 	
 	private DateTime createdAfter;
@@ -11,6 +17,26 @@ public class EventsRequest {
 	private String correlationId;
 	private String name;
 	private Integer generations;
+	
+	/**
+	 * @param createdAfter
+	 * @param createdBefore
+	 * @param source
+	 * @param objectId
+	 * @param correlationId
+	 * @param name
+	 * @param generations
+	 */
+	public EventsRequest(DateTime createdAfter, DateTime createdBefore, String source, String objectId,
+			String correlationId, String name, Integer generations) {
+		this.createdAfter = createdAfter;
+		this.createdBefore = createdBefore;
+		this.source = source;
+		this.objectId = objectId;
+		this.correlationId = correlationId;
+		this.name = name;
+		this.generations = generations;
+	}
 	
 	public DateTime getCreatedAfter(){
 		return createdAfter;

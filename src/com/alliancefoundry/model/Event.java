@@ -30,13 +30,13 @@ public class Event {
     private String eventName;
     private String objectId;
     private String correlationId;
-    private Integer sequenceNumber;
+    private Integer sequenceNumber = null;
     private String messageType;
     private String dataType;
     private String source;
     private String destination;
     private String subdestination;
-    private Boolean replayIndicator;
+    private boolean replayIndicator;
     @JsonSerialize(using = MyDateTimeSerializer.class)
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     private DateTime publishTimeStamp;
@@ -52,21 +52,11 @@ public class Event {
     private Map<String, DataItem> customPayload;
     private String preEventState;
     private String postEventState;
-    private Boolean isPublishable;
+    private boolean isPublishable;
     @JsonSerialize(using = MyDateTimeSerializer.class)
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     private DateTime insertTimeStamp;
 
-    public Event(){
-    	UUID uuid = UUID.randomUUID();
-		eventId = uuid.toString();
-    	
-    	receivedTimeStamp = DateTime.now();
-    	customHeaders = new HashMap<String, String>();
-    	customPayload = new HashMap<String, DataItem>();
-    	insertTimeStamp = DateTime.now();
-    }
-	
     public Event(Map<String, Object> map){
 		this();
     	
@@ -117,6 +107,11 @@ public class Event {
 		}catch(Exception ex){
 			System.out.println("Error converting InsertTimeStamp to a DateTime object.");
 		}
+    }
+    
+    public Event(){
+    	customHeaders = new HashMap<String, String>();
+    	customPayload = new HashMap<String, DataItem>();
     }
 	
 	/**
@@ -224,7 +219,7 @@ public class Event {
 		this.subdestination = subdestination;
 	}
 
-	public void setReplayIndicator(Boolean replayIndicator) {
+	public void setReplayIndicator(boolean replayIndicator) {
 		this.replayIndicator = replayIndicator;
 	}
 
@@ -248,7 +243,7 @@ public class Event {
 		this.postEventState = postEventState;
 	}
 
-	public void setPublishable(Boolean isPublishable) {
+	public void setIsPublishable(boolean isPublishable) {
 		this.isPublishable = isPublishable;
 	}
 
@@ -304,7 +299,7 @@ public class Event {
 		return subdestination;
 	}
 
-	public Boolean isReplayIndicator() {
+	public boolean isReplayIndicator() {
 		return replayIndicator;
 	}
 
@@ -328,7 +323,7 @@ public class Event {
 		return postEventState;
 	}
 
-	public Boolean isPublishable() {
+	public boolean getIsPublishable() {
 		return isPublishable;
 	}
 
@@ -579,7 +574,6 @@ public class Event {
 				+ isReplayIndicator() + ", getPublishTimeStamp()=" + getPublishTimeStamp() + ", getReceivedTimeStamp()="
 				+ getReceivedTimeStamp() + ", getExpirationTimeStamp()=" + getExpirationTimeStamp()
 				+ ", getPreEventState()=" + getPreEventState() + ", getPostEventState()=" + getPostEventState()
-				+ ", isPublishable()=" + isPublishable() + ", getInsertTimeStamp()=" + getInsertTimeStamp() + "]";
+				+ ", isPublishable()=" + getIsPublishable() + ", getInsertTimeStamp()=" + getInsertTimeStamp() + "]";
 	}
-    
 }
