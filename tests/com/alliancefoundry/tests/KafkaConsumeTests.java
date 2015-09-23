@@ -219,7 +219,7 @@ public class KafkaConsumeTests {
 			publisher.connectPublishers();
 			publisher.publishEventByMapper(expected);
 			
-			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testTopic1");
+			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testTopic100");
 			String event = kafkaSubscriber.consumeEvent();
 			ObjectMapper mapper = new ObjectMapper(); 
 			Event actual = mapper.readValue(event, Event.class);
@@ -270,7 +270,7 @@ public class KafkaConsumeTests {
 			publisher.connectPublishers();
 			publisher.publishEventByMapper(expected);
 			
-			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testTopic4");
+			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testTopic400");
 			String event = kafkaSubscriber.consumeEvent();
 			ObjectMapper mapper = new ObjectMapper(); 
 			Event actual = mapper.readValue(event, Event.class);

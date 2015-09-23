@@ -203,7 +203,7 @@
 		<property name="objectId" value="asher456" />
 		<property name="correlationId" value="asher456" />
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="kafka - testTopic1" />
+		<property name="messageType" value="kafka - testTopic100" />
 		<property name="dataType" value="Object" />
 		<property name="source" value="Publisher" />
 		<property name="destination" value="kafka" />
@@ -266,7 +266,7 @@
 		<property name="objectId" value="asher456" />
 		<property name="correlationId" value="asher456" />
 		<property name="sequenceNumber"><null/></property> <!-- Integer -->
-		<property name="messageType" value="kafka - testTopic4" />
+		<property name="messageType" value="kafka - testTopic400" />
 		<property name="dataType" value="Object" />
 		<property name="source" value="Publisher" />
 		<property name="destination" value="kafka" />
