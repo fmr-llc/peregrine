@@ -143,7 +143,6 @@
 		</dependency>
 		
 		<!-- message broker dependencies -->
-		
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-client</artifactId>
@@ -154,6 +153,18 @@
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka_2.9.2</artifactId>
 			<version>0.8.2.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-spring</artifactId>
+			<version>5.12.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-broker</artifactId>
+			<version>5.12.0</version>
 		</dependency>
 		
 		<!-- json parser dependencies -->
@@ -174,20 +185,13 @@
            <artifactId>jackson-annotations</artifactId>
            <version>2.5.0</version>
         </dependency>
-		
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-broker</artifactId>
-			<version>5.12.0</version>
+        
+        <dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>4.2.1.RELEASE</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-spring</artifactId>
-			<version>5.12.0</version>
-		</dependency>
-		
-
+        
     </dependencies>
 
 

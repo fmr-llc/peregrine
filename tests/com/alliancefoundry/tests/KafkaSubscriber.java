@@ -17,9 +17,9 @@ public class KafkaSubscriber {
 	 private final String zookeeper;
 	 private final String groupId;
 	 
-	 public KafkaSubscriber() {
+	 public KafkaSubscriber(String topic) {
 		 
-		 this.topic = "test2";
+		 this.topic = topic;
 		 this.zookeeper="127.0.0.1:2181";
 		 this.groupId= "testgroup";
 		 
@@ -56,7 +56,6 @@ public class KafkaSubscriber {
 		      
 		      if (consumerIte.hasNext()){
 		    	  result = new String(consumerIte.next().message());
-		    	  //System.out.println(result);
 		      }
 
 		    }
@@ -67,34 +66,4 @@ public class KafkaSubscriber {
 		    
 		    return result;
 	  }
-	
 }
-
-
-/*
- * 
- 	 public void consumeEvent() {
-
-		    Map<String, Integer> topicMap = new HashMap<String, Integer>();
-
-		    // Define single thread for topic
-		    topicMap.put(topic, new Integer(1));
-
-		    Map<String, List<KafkaStream<byte[], byte[]>>> consumerStreamsMap = 
-		        consumer.createMessageStreams(topicMap);
-
-		    List<KafkaStream<byte[], byte[]>> streamList = consumerStreamsMap
-		        .get(topic);
-
-		    for (final KafkaStream<byte[], byte[]> stream : streamList) {
-		      ConsumerIterator<byte[], byte[]> consumerIte = stream.iterator();
-		      while (consumerIte.hasNext())
-		        System.out.println("Event from Single Topic :: "
-		          + new String(consumerIte.next().message()));
-		    }
-		    if (consumer != null)
-		      consumer.shutdown();
-	  }
- 
- * */
- 

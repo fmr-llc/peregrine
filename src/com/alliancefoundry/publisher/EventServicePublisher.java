@@ -1,76 +1,63 @@
 package com.alliancefoundry.publisher;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.alliancefoundry.model.Event;
 
 public class EventServicePublisher {
-	
-	public static final String TOPIC_KEY = "topic";
-	public static final String DESTINATION_KEY = "destination";
-	public static final String KAFKA_KEY = "kafka";
-	public static final String ACTIVEMQ_KEY = "activemq";
-	
-	
-	@Autowired
-	List<PublisherInterface> publishers;
 
-	public void publishEvent(Event event, Map<String, String> eventConfig) {
+	@Autowired
+	private Map<String, PublisherInterface> publishers;
+	private IMapEvents mapper = new MapEventsImpl();
+	
+	public void setEventMapper(IMapEvents mapper){
+		this.mapper = mapper;
+	}
+	
+	public void publishEventByMapper(Event event){
 		
-		String destination = eventConfig.get(DESTINATION_KEY);
-		
-		
-		for( PublisherInterface publisher : publishers){
-			if(destination.equals(publisher.getDestType())){
-				
-				publisher.publishEvent(event, eventConfig);
-			}
+		Map<String, String> eventConfig = mapper.getConfigFromEvent(event);
+		if(eventConfig == null){
+			System.out.println("Event's topic and destination could not be determined");
+			return; // do nothing 
 		}
+		String destination = eventConfig.get(IMapEvents.DESTINATION_KEY);
+		String topic = eventConfig.get(IMapEvents.TOPIC_KEY);
 		
+		PublisherInterface publisher = publishers.get(destination);
+		if(publisher != null){
+			publisher.publishEvent(event, topic);
+		}
+
+	}
+	
+	public void publishEventByMapper(List<Event> events) {
+		
+		for(Event event : events){
+			publishEventByMapper(event);
+		}
+			
 	}
 	
 	public void connectPublishers(){
-		for( PublisherInterface publisher : publishers){
-			publisher.connect();
+		Set<String> keys = publishers.keySet();
+		for( String key : keys){
+			publishers.get(key).connect();
 		}
+		
+		
 	}
 	
-	public void setupPublishersViaAppContext(){
-		publishers = new ArrayList<>();
-		
-		KafkaPublisher kafkaPublshisher;
-		ActiveMQPublisher mqPublisher;
-
-		AbstractApplicationContext ctx;
-		ctx = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
-		ctx.registerShutdownHook();
-
-		kafkaPublshisher = ctx.getBean("kafkaPublisher", KafkaPublisher.class);
-		mqPublisher = ctx.getBean("activemqPublisher", ActiveMQPublisher.class);
-		
-		mqPublisher.connect();
-		
-		publishers.add(mqPublisher);
-		publishers.add(kafkaPublshisher);
-		
-		ctx.close();
-
-	}
-
-	public List<PublisherInterface> getPublishers() {
+	public Map<String, PublisherInterface> getPublishers() {
 		return publishers;
 	}
 
-	public void setPublishers(List<PublisherInterface> publishers) {
+	public void setPublishers(Map<String, PublisherInterface> publishers) {
 		this.publishers = publishers;
 	}
-	
-	
 	
 }

@@ -1,11 +1,9 @@
 package com.alliancefoundry.publisher;
 
-import java.util.Map;
 import java.util.Properties;
 
 import com.alliancefoundry.model.Event;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alliancefoundry.serializer.JsonEventSerializer;
 
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
@@ -42,40 +40,22 @@ public class KafkaPublisher implements PublisherInterface {
 		this.brokerUrl = brokerUrl;
 	}
 	
-	@Override
-	public void publishEvent(Event event, Map<String, String> eventConfig) {
-		
-		ObjectMapper mapper = new ObjectMapper();
-		String jsonEvent = null;
-		
-		try {
-			jsonEvent = mapper.writeValueAsString(event);
-		} 
-		catch (JsonProcessingException e) {
-		
-			e.printStackTrace();
-		}
-
-		String topic = (String)eventConfig.get(EventServicePublisher.TOPIC_KEY);
-		KeyedMessage<String, String> jsonData = new KeyedMessage<String, String>(topic, jsonEvent);
-		producer.send(jsonData);
-		
-		System.out.println(jsonData);
-		
-		producer.close();
-
-	}
-	
-	public String getDestType() {
+	/*public String getDestType() {
 		return destType;
 	}
 
 	public void setDestType(String destType) {
 		this.destType = destType;
+	}*/
+
+	@Override
+	public void publishEvent(Event event, String Topic) {
+		
+		JsonEventSerializer serializer = new JsonEventSerializer();
+		String jsonEvent = serializer.convertToJSON(event);
+
+		String topic = Topic;
+		KeyedMessage<String, String> jsonData = new KeyedMessage<String, String>(topic, jsonEvent);
+		producer.send(jsonData);		
 	}
-
-	
-	
 }
-
-

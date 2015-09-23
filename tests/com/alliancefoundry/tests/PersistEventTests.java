@@ -212,16 +212,9 @@ public class PersistEventTests {
 			assertEquals(expected.getPublishTimeStamp(), actual.getPublishTimeStamp());
 			assertEquals(expected.getExpirationTimeStamp(), actual.getExpirationTimeStamp());
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			fail("DAO was not able to insert and retrieve an event with a PublishTimeStamp " 
+					+ "and ExpirationTimeStamp of NULL.");
 		}
-//		DateTime expectedPTS = event.getPublishTimeStamp();
-//		DateTime actualPTS = eventFromDb.getPublishTimeStamp();
-//		DateTime expectedETS = event.getExpirationTimeStamp();
-//		DateTime actualETS = eventFromDb.getExpirationTimeStamp();
-//		System.out.println("expectedPTS: " + expectedPTS + "\nactualPTS: " + actualPTS + "\nexpectedETS: " + expectedETS + "\nactualETS: " + actualETS);
-//		assertEquals(expectedPTS.toString(), actualPTS.toString());
-//		assertEquals(expectedETS.toString(), actualETS.toString());
 	}
 	
 	/**
@@ -261,8 +254,8 @@ public class PersistEventTests {
 			assertEquals(expectedD, actualD);
 			assertEquals(expectedS, actualS);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			fail("DAO was not able to insert and retrieve an event with a destination "
+					+ "and subdestination of NULL.");
 		}
 	}
 	

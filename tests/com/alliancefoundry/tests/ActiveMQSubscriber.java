@@ -3,6 +3,7 @@ package com.alliancefoundry.tests;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
+import javax.jms.InvalidDestinationException;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
@@ -27,47 +28,49 @@ public class ActiveMQSubscriber {
 		this.name = name;
 	}
 	
-	public void subscribeTopic(String topicName) throws Exception{
-		// create connectionfactory
+	public void subscribeTopic(String topicName) {
+		// create connectionFactory
 		ConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+
+		// create connection
+		try {
+			connection = connectionFactory.createConnection();
+		} catch (JMSException e) {
+			System.out.println("An internal error occurred, preventing the "
+					+ "subscriber from connecting to the ActiveMQ server.");
+		}
 		
+		// start
+		try {
+			connection.start();
+		} catch (JMSException e1) {
+			System.out.println("An internal error occurred, preventing the "
+					+ "JMS provider from starting the message delivery.");
+		}
+		
+		// create session
+		try {
+			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+		} catch (JMSException e1) {
+			System.out.println("An internal error occurred, preventing the "
+					+ "Connection object from creating a session.");
+		}
+		
+		Destination destination = null;
+		try {
+			destination = session.createTopic(topicName);
+		} catch (JMSException e1) {
+			System.out.println("An internal error occurred, preventing the "
+					+ "session from creating a topic.");
+		}
 		
 		try {
-			// create connection
-			connection = connectionFactory.createConnection();
-			
-			// start
-			connection.start();
-			
-			// create session
-			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			
-			Destination destination = session.createTopic(topicName);
-			
 			consumer = session.createConsumer(destination);
-			
-			// create listener
-			MessageListener listener = new MessageListener() {
-				
-				public void onMessage(Message message) {
-					if(message instanceof TextMessage){
-						TextMessage txt = (TextMessage)message;
-						try {
-							System.out.println(name + ": " + txt.getText());
-						} catch (JMSException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				}
-			};
-			
-			consumer.setMessageListener(listener);			
-
-			
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (InvalidDestinationException e1) {
+			System.out.println("The specified destination was invalid.");
+		} catch (JMSException e1) {
+			System.out.println("An internal error occurred, preventing the "
+					+ "session from creating a consumer.");
 		}
 	}
 	
@@ -75,8 +78,8 @@ public class ActiveMQSubscriber {
 		try {
 			consumer.setMessageListener(listener);
 		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("An internal error has occurred, preventing the "
+					+ "MessageListener from being set.");
 		}
 	}
 	

@@ -27,29 +27,9 @@ public class ActiveMQPublisher implements PublisherInterface {
 	private boolean usingLoginCredentials = false;
 	private String destType;
 
-	class CustomException extends Exception{
-		static final int ERROR_INVALID_USERNAME_PASSWORD = 23;
-		static final int ERROR_BROKEN_CONNECTION = 2354;
-		static final int ERROR_CANNOT_REACH_HOST = 6454;
-		static final int ERROR_CANNOT_PARSE_JSON = 648954;
-		
-		int errorCode;
-		
-		public CustomException(String message, int errorCode) {
-			super(message);
-			this.errorCode = errorCode;
-		}
-		
-		public CustomException(Exception priorException, String message, int errorCode) {
-			super(message, priorException);
-			this.errorCode = errorCode;
-		}
-		
-	}
 	
 	// required for bean
 	public ActiveMQPublisher() {
-		
 
 	}
 	
@@ -68,7 +48,7 @@ public class ActiveMQPublisher implements PublisherInterface {
 	}
 
 	@Override
-	public void publishEvent(Event event, Map<String, String> config) throws CustomException{
+	public void publishEvent(Event event, Map<String, String> config){
 		
 		// create connection
 		Connection connection = null;
@@ -111,8 +91,6 @@ public class ActiveMQPublisher implements PublisherInterface {
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			throw new CustomException(e, "Json Parse Error", CustomException.ERROR_CANNOT_PARSE_JSON);
-			
 		}
 		
 	}
@@ -157,5 +135,80 @@ public class ActiveMQPublisher implements PublisherInterface {
 		this.destType = destType;
 	}
 
+	@Override
+	public void publishEvent(Event event, String Topic) {
+		
+		// create connection
+				Connection connection = null;
+				Session session = null;
+				MessageProducer producer = null;
+				
+				String topicName = Topic;
+				
+				JsonEventSerializer serializer = new JsonEventSerializer();
+				String jsonMessage = serializer.convertToJSON(event);
+				
+				// create connection
+				try {
+					connection = connectionFactory.createConnection();
+				} catch (JMSException e) {
+					System.out.println("An internal error occurred, preventing the "
+							+ "publisher from connecting to the ActiveMQ server.");
+				}
+				
+				// create session
+				try {
+					session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+				} catch (JMSException e) {
+					System.out.println("An internal error occurred, preventing the "
+							+ "Connection object from creating a session.");
+				}
+				
+				Destination destination = null;
+				try {
+					destination = session.createTopic(topicName);
+				} catch (JMSException e) {
+					System.out.println("An internal error occurred, preventing the "
+							+ "session from creating a topic.");
+				}
+				
+				// create producer
+				try {
+					producer = session.createProducer(destination);
+				} catch (JMSException e) {
+					System.out.println("An internal error occurred, preventing the "
+							+ "session from creating a MessageProducer.");
+				}
+				try {
+					producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+				} catch (JMSException e) {
+					System.out.println("An internal error occurred, preventing the "
+							+ "JMS provider from setting the delivery mode.");
+				}
+				
+				TextMessage txtMessage = null;
+				try {
+					txtMessage = session.createTextMessage(jsonMessage);
+				} catch (JMSException e) {
+					System.out.println("An internal error occurred, preventing the " 
+							+ "JMS provider from creating the text message.");
+				}
+				
+				// publish topic to subscribers
+				try {
+					producer.send(txtMessage);
+				} catch (MessageFormatException e) {
+					System.out.println("The producer tried to send an invalid message.");
+				} catch (InvalidDestinationException e) {
+					System.out.println("The producer tried to send a message with an "
+							+ "invalid destination.");
+				} catch (UnsupportedOperationException e) {
+					System.out.println("The destination for the message was not specified "
+							+ "at creation time.");
+				} catch (JMSException e) {
+					System.out.println("An internal error occurred, preventing the " 
+							+ "producer from sending the message.");
+				}
+		}
 
 }
