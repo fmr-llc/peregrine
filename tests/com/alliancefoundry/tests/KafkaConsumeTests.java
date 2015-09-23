@@ -349,7 +349,6 @@ public class KafkaConsumeTests {
 	// Publish and Consume an event with a null preEventState.
 	@Test
 	public void consumeEventWithNullPreEventStateTest() throws JsonParseException, JsonMappingException, IOException {
-		
 		Event expected = nullPreStateEvent;
 		
 		publisher.connectPublishers();
