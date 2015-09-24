@@ -50,55 +50,7 @@ public class ActiveMQPublisher implements PublisherInterface {
 		
 	}
 
-	/*
-	@Override
-	public void publishEvent(Event event, Map<String, String> config){
-		
-		// create connection
-		Connection connection = null;
-		Session session = null;
-		MessageProducer producer = null;
-		
-		String topicName = config.get(IMapEvents.TOPIC_KEY);
-		
-		// turn java onject to json string
-		ObjectMapper mapper = new ObjectMapper(); 
-		//POJO to JSON
-		String jsonMessage = null;
-		try {
-			jsonMessage = mapper.writeValueAsString(event);
-		} catch (JsonProcessingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 
-		
-		try {
-			// create connection
-			connection = connectionFactory.createConnection();
-			
-			// create session
-			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			
-			Destination destination = session.createTopic(topicName);
-			
-			// create producer
-			producer = session.createProducer(destination);
-			producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-			
-			TextMessage txtMessage = session.createTextMessage(jsonMessage);
-			
-			// publish topic to subscribers
-			producer.send(txtMessage);
-
-			System.out.println("Message sent to subscribers");
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-*/
 	public String getBrokerUrl() {
 		return brokerUrl;
 	}
