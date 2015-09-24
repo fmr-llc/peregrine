@@ -54,11 +54,12 @@ public class JDBC_broker_DAO_tests {
 	 *Testing insertEvent()
 	 * @throws IOException 
 	 * @throws JsonMappingException 
-	 * @throws JsonParseException *
+	 * @throws JsonParseException 
+	 * @throws EventNotFoundException *
 	 ***********************/
 	
 	@Test
-	public void insertToDbAndBrokerTest() throws JsonParseException, JsonMappingException, IOException {
+	public void insertToDbAndBrokerTest() throws JsonParseException, JsonMappingException, IOException, EventNotFoundException {
 		event = getEvent2;
 
 		Map<String,String> headers = new HashMap<String,String>();
@@ -73,12 +74,9 @@ public class JDBC_broker_DAO_tests {
 		event.setCustomPayload(payload);
 		
 		eventId = dao.insertEvent(event);
-		try {
-			eventFromDb = dao.getEvent(eventId);
-		} catch (EventNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
+		eventFromDb = dao.getEvent(eventId);
+	
 		String expected = eventId;
 		String actual = eventFromDb.getEventId();
 		
