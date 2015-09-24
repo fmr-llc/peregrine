@@ -55,6 +55,16 @@
 		<!--  <property name="destType" value="${dest.activemq}" />-->
 	</bean>
 	
+	<bean id="activemqSubscriber1" class="com.alliancefoundry.tests.ActiveMQSubscriber">
+		<property name="brokerUrl" value="${activemq.url}" />
+		<property name="name" value="${activemq.name1}" />
+	</bean>
+	
+	<bean id="activemqSubscriber2" class="com.alliancefoundry.tests.ActiveMQSubscriber">
+		<property name="brokerUrl" value="${activemq.url}" />
+		<property name="name" value="${activemq.name2}" />
+	</bean>
+	
 	<bean id="eventPublisherservice" class="com.alliancefoundry.publisher.EventServicePublisher">
 		<property name="publishers">
 			<bean class="org.springframework.beans.factory.config.MapFactoryBean">
