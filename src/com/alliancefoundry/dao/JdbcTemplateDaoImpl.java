@@ -27,8 +27,8 @@ import org.springframework.jdbc.core.RowMapper;
 public class JdbcTemplateDaoImpl implements DAO {
 	
 	private JdbcTemplate jdbcTemplate;
-	private static AbstractApplicationContext ctx;
-	private static SqlQuery sql;
+	private AbstractApplicationContext ctx;
+	private SqlQuery sql;
 	public JdbcTemplateDaoImpl(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 		ctx = new ClassPathXmlApplicationContext("queries.xml");
@@ -45,15 +45,15 @@ public class JdbcTemplateDaoImpl implements DAO {
 	 * @throws DataIntegrityViolationException	if insertion data is invalid
 	 */
 	public String insertEvent(Event event) throws DataIntegrityViolationException {
-		String sql = JdbcTemplateDaoImpl.sql.getInsertSingleEvent();
-		String headersSql = JdbcTemplateDaoImpl.sql.getInsertHeader();
-		String payloadSql = JdbcTemplateDaoImpl.sql.getInsertPayload();
+		String eventSql = sql.getInsertSingleEvent();
+		String headersSql = sql.getInsertHeader();
+		String payloadSql = sql.getInsertPayload();
 		String eventId = UUID.randomUUID().toString();
 		event.setEventId(eventId);
 		event.setInsertTimeStamp(DateTime.now());
 		try{
 			//insert into event_store
-			jdbcTemplate.update(sql,
+			jdbcTemplate.update(eventSql,
 					event.getEventId(),
 					event.getParentId(),
 					event.getEventName(),
@@ -104,9 +104,9 @@ public class JdbcTemplateDaoImpl implements DAO {
 	@Transactional
 	public List<String> insertEvents(List<Event> events) throws DataIntegrityViolationException {
 		List<String> eventIds = new ArrayList<String>();
-		String sql = JdbcTemplateDaoImpl.sql.getInsertSingleEvent();
-		String headersSql = JdbcTemplateDaoImpl.sql.getInsertHeader();
-		String payloadSql = JdbcTemplateDaoImpl.sql.getInsertPayload();
+		String eventSql = sql.getInsertSingleEvent();
+		String headersSql = sql.getInsertHeader();
+		String payloadSql = sql.getInsertPayload();
 		
 		try{
 			for (Event event : events) {
@@ -114,7 +114,7 @@ public class JdbcTemplateDaoImpl implements DAO {
 				String eventId = UUID.randomUUID().toString();
 				event.setEventId(eventId);
 				event.setInsertTimeStamp(DateTime.now());
-				jdbcTemplate.update(sql, 
+				jdbcTemplate.update(eventSql, 
 						event.getEventId(), 
 						event.getParentId(), 
 						event.getEventName(), 
@@ -165,13 +165,13 @@ public class JdbcTemplateDaoImpl implements DAO {
 	 * @throws EventNotFoundException	if the event does not exist
 	 */
 	public Event getEvent(String eventId) throws EventNotFoundException {
-		String sql = JdbcTemplateDaoImpl.sql.getSingleEventById();
-		List<Event> eventList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+		String eventSql = sql.getSingleEventById();
+		List<Event> eventList = jdbcTemplate.query(eventSql, new PreparedStatementSetter() {
 			@Override
 			public void setValues(java.sql.PreparedStatement ps) throws SQLException {
 				ps.setString(1, eventId);
 			}
-		}, new EventRowMapper(jdbcTemplate));
+		}, new EventRowMapper(jdbcTemplate, sql));
 		//query limits to one result because event ids are unique so there should only be one event
 		if (eventList.size() == 1) {
 			return eventList.get(0);
@@ -195,26 +195,26 @@ public class JdbcTemplateDaoImpl implements DAO {
 		}
 		
 		//build the SQL query
-		String sql = JdbcTemplateDaoImpl.sql.getMultipleEventsById();
-		sql += JdbcTemplateDaoImpl.sql.getReqCreatedAfter();
+		String eventSql = sql.getMultipleEventsById();
+		eventSql += sql.getReqCreatedAfter();
 		
 		if(req.getCreatedBefore() != null){
-			sql += JdbcTemplateDaoImpl.sql.getReqCreatedBefore();
+			eventSql += sql.getReqCreatedBefore();
 		}
 		if(req.getSource() != null){
-			sql += JdbcTemplateDaoImpl.sql.getReqSource();
+			eventSql += sql.getReqSource();
 		}
 		if(req.getObjectId() != null){
-			sql += JdbcTemplateDaoImpl.sql.getReqObjectId();
+			eventSql += sql.getReqObjectId();
 		}
 		if(req.getCorrelationId() != null){
-			sql += JdbcTemplateDaoImpl.sql.getReqCorrelationId();
+			eventSql += sql.getReqCorrelationId();
 		}
 		if(req.getEventName() != null){
-			sql += JdbcTemplateDaoImpl.sql.getReqEventName();
+			eventSql += sql.getReqEventName();
 		}
 		
-		List<Event> eventList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+		List<Event> eventList = jdbcTemplate.query(eventSql, new PreparedStatementSetter() {
 			@Override
 			public void setValues(java.sql.PreparedStatement ps) throws SQLException {
 				int index = 1;
@@ -244,7 +244,7 @@ public class JdbcTemplateDaoImpl implements DAO {
 					index++;
 				}
 			}
-		}, new EventRowMapper(jdbcTemplate));
+		}, new EventRowMapper(jdbcTemplate, sql));
 		if (eventList.size() == 0) {
 			throw new EventNotFoundException("No events matching the specified parameters were found in database");
 		}
@@ -274,22 +274,22 @@ public class JdbcTemplateDaoImpl implements DAO {
 			throw new IllegalArgumentException("A source must be specified");
 		}
 		//build the SQL query
-		String sql = JdbcTemplateDaoImpl.sql.getMultipleEventsById();
-		sql += JdbcTemplateDaoImpl.sql.getReqSource();
+		String eventSql = sql.getMultipleEventsById();
+		eventSql += sql.getReqSource();
 		
 		if(req.getObjectId() != null){
-			sql += JdbcTemplateDaoImpl.sql.getReqObjectId();
+			eventSql += sql.getReqObjectId();
 		}
 		if(req.getCorrelationId() != null){
-			sql += JdbcTemplateDaoImpl.sql.getReqCorrelationId();
+			eventSql += sql.getReqCorrelationId();
 		}
 		if(req.getEventName() != null){
-			sql += JdbcTemplateDaoImpl.sql.getReqEventName();
+			eventSql += sql.getReqEventName();
 		}
 
-		sql += JdbcTemplateDaoImpl.sql.getLatestEvent();
+		eventSql += sql.getLatestEvent();
 
-		List<Event> eventList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+		List<Event> eventList = jdbcTemplate.query(eventSql, new PreparedStatementSetter() {
 			@Override
 			public void setValues(java.sql.PreparedStatement ps) throws SQLException {
 				int index = 1;
@@ -311,7 +311,7 @@ public class JdbcTemplateDaoImpl implements DAO {
 					index++;
 				}
 			}
-		}, new EventRowMapper(jdbcTemplate));
+		}, new EventRowMapper(jdbcTemplate, sql));
 		if (eventList.size() == 0) {
 			throw new EventNotFoundException("No events matching the specified parameters were found in database");
 		}
@@ -366,8 +366,10 @@ public class JdbcTemplateDaoImpl implements DAO {
 	 */
 	private static class EventRowMapper implements RowMapper<Event> {
 		private JdbcTemplate jdbcTemplate;
-		public EventRowMapper(JdbcTemplate jdbcTemplate) {
+		private SqlQuery sql;
+		public EventRowMapper(JdbcTemplate jdbcTemplate, SqlQuery sql) {
 			this.jdbcTemplate = jdbcTemplate;
+			this.sql = sql;
 		}
 		public Event mapRow(ResultSet rs, int index) throws SQLException {
 			Integer sequenceNumber = rs.getInt("sequenceNumber");
