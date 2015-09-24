@@ -1,10 +1,12 @@
 package com.alliancefoundry.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -12,7 +14,8 @@ import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.alliancefoundry.dao.JDBCDAOimpl;
+import com.alliancefoundry.dao.DAO;
+import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -21,36 +24,41 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JDBC_broker_DAO_tests {
 	
-	JDBCDAOimpl dao;
+	DAO dao;
 	Event event;
 	String eventId;
 	Event eventFromDb;
 	
-	Event getEvent2;
+	Event getEvent1, getEvent2, getEvent3;
 
 	@Before
 	public void setUp() throws Exception {
 		
-		dao = new JDBCDAOimpl();
-
 		AbstractApplicationContext ctx;
 		ctx = new ClassPathXmlApplicationContext("db-mock-events.xml");
 
+		getEvent1 = ctx.getBean("parentEvent", Event.class);
 		getEvent2 = ctx.getBean("childEvent1", Event.class);
+		getEvent3 = ctx.getBean("childEvent2", Event.class);
+		
+		ctx.close(); 
+		
+		ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
+		
+		dao = ctx.getBean("dao", DAO.class);
 
 		ctx.close();
 	}
 	
 	/***********************
 	 *Testing insertEvent()
-	 * @throws SQLException 
 	 * @throws IOException 
 	 * @throws JsonMappingException 
 	 * @throws JsonParseException *
 	 ***********************/
 	
 	@Test
-	public void insertToDbAndBrokerTest() throws SQLException, JsonParseException, JsonMappingException, IOException {
+	public void insertToDbAndBrokerTest() throws JsonParseException, JsonMappingException, IOException {
 		event = getEvent2;
 
 		Map<String,String> headers = new HashMap<String,String>();
@@ -64,12 +72,13 @@ public class JDBC_broker_DAO_tests {
 		event.setCustomHeaders(headers);
 		event.setCustomPayload(payload);
 		
+		eventId = dao.insertEvent(event);
 		try {
-			eventId = dao.insertEvent(event);
-		} catch (SQLException e) {
-			System.out.println("There was a SQL issue when inserting the event into the database");
+			eventFromDb = dao.getEvent(eventId);
+		} catch (EventNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		eventFromDb = dao.getEvent(eventId);
 		String expected = eventId;
 		String actual = eventFromDb.getEventId();
 		
@@ -83,5 +92,60 @@ public class JDBC_broker_DAO_tests {
 		
 		//broker check
 		assertEquals(eventFromDb.getEventId(), actual2.getEventId());	
+	}
+	
+	@Test
+	public void insertMultipleEventsToDbTest() throws EventNotFoundException, JsonParseException, JsonMappingException, IOException {
+		
+		event = getEvent1;
+		Event event2 = getEvent3;
+		List<Event> events = new ArrayList<Event>();
+		events.add(event);
+		events.add(event2);
+		
+		List<String> expected = new ArrayList<String>();
+		expected = dao.insertEvents(events);
+		
+		List<String> actual = new ArrayList<String>();
+		
+		//for broker testing
+		List<String> actual2 = new ArrayList<String>();
+		
+		for(String id : expected){
+			
+			actual.add((dao.getEvent(id)).getEventId());
+			
+			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testJaneDoe346");
+			
+			String eventasString = kafkaSubscriber.consumeEvent();
+			ObjectMapper mapper = new ObjectMapper(); 
+			Event event = mapper.readValue(eventasString, Event.class);
+
+			actual2.add(event.getEventId());
+		}
+		
+		//db insert check
+		assertEquals(expected,actual);	
+				
+		//broker check
+		for(String evid : expected){
+			assertTrue(actual2.contains(evid));
+		}
+
+	}
+	
+	public boolean compareLists(List<String> expected, List<String> actual2) {
+		if (expected.size() == actual2.size()) {
+			for (int a = 0; a < expected.size(); a++) {
+				String ev1 = expected.get(a);
+				String ev2 = actual2.get(a);
+				if (!ev1.equals(ev2)) {
+					return false;
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

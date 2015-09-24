@@ -19,7 +19,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class KafkaConsumeTests {
 	
-	Event event1, event2, event3, event4, event5, event6, event7, simpleEvent;
+	Event event1, event2, event3, event4, event5, event6, event7, simpleEvent, 
+		nullParentEvent, nullEventNameEvent, nullCorrelationIdEvent, nullSequenceNumEvent, 
+		nullDataTypeEvent, nullSourceEvent, nullDestEvent, nullSubdestEvent, 
+		nullPreStateEvent, nullPostStateEvent;
 	EventServicePublisher publisher, publisher2;
 
 	@Before
@@ -45,11 +48,22 @@ public class KafkaConsumeTests {
 		event7.setEventId("207");
 	
 		simpleEvent = ctx.getBean("simpleEvent", Event.class);
-		
+
+		nullParentEvent = ctx.getBean("NullParentEvent", Event.class);
+		nullEventNameEvent = ctx.getBean("NullEventNameEvent", Event.class);
+		nullCorrelationIdEvent = ctx.getBean("NullCorrelationIdEvent", Event.class);
+		nullSequenceNumEvent = ctx.getBean("NullSequenceNumEvent", Event.class);
+		nullDataTypeEvent = ctx.getBean("NullDataTypeEvent", Event.class);
+		nullSourceEvent = ctx.getBean("NullSourceEvent", Event.class);
+		nullDestEvent = ctx.getBean("NullDestinationEvent", Event.class);
+		nullSubdestEvent = ctx.getBean("NullSubdestinationEvent", Event.class);
+		nullPreStateEvent = ctx.getBean("NullPreEventStateEvent", Event.class);
+		nullPostStateEvent = ctx.getBean("NullPostEventStateEvent", Event.class);
+				
 		ctx.close();
 		
 		AbstractApplicationContext pubctx;
-		pubctx = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
+		pubctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
 		pubctx.registerShutdownHook();
 
 		// setup publiher
@@ -178,7 +192,7 @@ public class KafkaConsumeTests {
 			publisher.publishEventByMapper(event1);
 			
 			AbstractApplicationContext pubctx2;
-			pubctx2 = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
+			pubctx2 = new ClassPathXmlApplicationContext("eventservice-beans.xml");
 			pubctx2.registerShutdownHook();
 
 			publisher2 = pubctx2.getBean("eventPublisherservice", EventServicePublisher.class);
@@ -200,6 +214,175 @@ public class KafkaConsumeTests {
 			assertEquals(expected, actual);
 		}
 		
+		// Publish and Consume an event with a null parentId.
+		@Test
+		public void consumeEventWithNullParentIdTest() throws JsonParseException, JsonMappingException, IOException {
+			
+			Event expected = nullParentEvent;
+			
+			publisher.connectPublishers();
+			publisher.publishEventByMapper(expected);
+			
+			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testTopic100");
+			String event = kafkaSubscriber.consumeEvent();
+			ObjectMapper mapper = new ObjectMapper(); 
+			Event actual = mapper.readValue(event, Event.class);
+			
+			assertEquals(expected, actual);
+		}
+		
+		// Publish and Consume an event with a null eventName.
+		@Test
+		public void consumeEventWithNullEventNameTest() throws JsonParseException, JsonMappingException, IOException {
+			
+			Event expected = nullEventNameEvent;
+			
+			publisher.connectPublishers();
+			publisher.publishEventByMapper(expected);
+			
+			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testTopic2");
+			String event = kafkaSubscriber.consumeEvent();
+			ObjectMapper mapper = new ObjectMapper(); 
+			Event actual = mapper.readValue(event, Event.class);
+			
+			assertEquals(expected, actual);
+		}
+		
+		// Publish and Consume an event with a null correlationId.
+		@Test
+		public void consumeEventWithNullCorrelationIdTest() throws JsonParseException, JsonMappingException, IOException {
+			
+			Event expected = nullCorrelationIdEvent;
+			
+			publisher.connectPublishers();
+			publisher.publishEventByMapper(expected);
+			
+			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testTopic3");
+			String event = kafkaSubscriber.consumeEvent();
+			ObjectMapper mapper = new ObjectMapper(); 
+			Event actual = mapper.readValue(event, Event.class);
+			
+			assertEquals(expected, actual);
+		}
+		
+		// Publish and Consume an event with a null sequenceNumber.
+		@Test
+		public void consumeEventWithNullSequenceNumberTest() throws JsonParseException, JsonMappingException, IOException {
+			
+			Event expected = nullSequenceNumEvent;
+			
+			publisher.connectPublishers();
+			publisher.publishEventByMapper(expected);
+			
+			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testTopic400");
+			String event = kafkaSubscriber.consumeEvent();
+			ObjectMapper mapper = new ObjectMapper(); 
+			Event actual = mapper.readValue(event, Event.class);
+			
+			assertEquals(expected, actual);
+		}
+		
+		// Publish and Consume an event with a null dataType.
+		@Test
+		public void consumeEventWithNullDataTypeTest() throws JsonParseException, JsonMappingException, IOException {
+			
+			Event expected = nullDataTypeEvent;
+			
+			publisher.connectPublishers();
+			publisher.publishEventByMapper(expected);
+			
+			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testTopic5");
+			String event = kafkaSubscriber.consumeEvent();
+			ObjectMapper mapper = new ObjectMapper(); 
+			Event actual = mapper.readValue(event, Event.class);
+			
+			assertEquals(expected, actual);
+		}
+		
+		// Publish and Consume an event with a null source.
+		@Test
+		public void consumeEventWithNullSourceTest() throws JsonParseException, JsonMappingException, IOException {
+			
+			Event expected = nullSourceEvent;
+			
+			publisher.connectPublishers();
+			publisher.publishEventByMapper(expected);
+			
+			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testTopic6");
+			String event = kafkaSubscriber.consumeEvent();
+			ObjectMapper mapper = new ObjectMapper(); 
+			Event actual = mapper.readValue(event, Event.class);
+			
+			assertEquals(expected, actual);
+		}
+		
+		// Publish and Consume an event with a null destination.
+		@Test
+		public void consumeEventWithNullDestinationTest() throws JsonParseException, JsonMappingException, IOException {
+			
+			Event expected = nullDestEvent;
+			
+			publisher.connectPublishers();
+			publisher.publishEventByMapper(expected);
+			
+			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testTopic7");
+			String event = kafkaSubscriber.consumeEvent();
+			ObjectMapper mapper = new ObjectMapper(); 
+			Event actual = mapper.readValue(event, Event.class);
+			
+			assertEquals(expected, actual);
+		}
+		
+		// Publish and Consume an event with a null subdestination.
+		@Test
+		public void consumeEventWithNullSubdestinationTest() throws JsonParseException, JsonMappingException, IOException {
+			
+			Event expected = nullSubdestEvent;
+			
+			publisher.connectPublishers();
+			publisher.publishEventByMapper(expected);
+			
+			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testTopic8");
+			String event = kafkaSubscriber.consumeEvent();
+			ObjectMapper mapper = new ObjectMapper(); 
+			Event actual = mapper.readValue(event, Event.class);
+			
+			assertEquals(expected, actual);
+		}
+		
+		// Publish and Consume an event with a null preEventState.
+		@Test
+		public void consumeEventWithNullPreEventStateTest() throws JsonParseException, JsonMappingException, IOException {
+			
+			Event expected = nullPreStateEvent;
+			
+			publisher.connectPublishers();
+			publisher.publishEventByMapper(expected);
+			
+			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testTopic9");
+			String event = kafkaSubscriber.consumeEvent();
+			ObjectMapper mapper = new ObjectMapper(); 
+			Event actual = mapper.readValue(event, Event.class);
+			
+			assertEquals(expected, actual);
+		}
+		
+		// Publish and Consume an event with a null postEventState.
+		@Test
+		public void consumeEventWithNullPostEventStateTest() throws JsonParseException, JsonMappingException, IOException {
+			
+			Event expected = nullPostStateEvent;
+			
+			publisher.connectPublishers();
+			publisher.publishEventByMapper(expected);
+			
+			KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testTopic10");
+			String event = kafkaSubscriber.consumeEvent();
+			ObjectMapper mapper = new ObjectMapper(); 
+			Event actual = mapper.readValue(event, Event.class);
+			
+			assertEquals(expected, actual);
+		}
 		
 		public boolean compareLists(List<Event> list1, List<Event> list2) {
 			if (list1.size() == list2.size()) {

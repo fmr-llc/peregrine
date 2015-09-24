@@ -197,4 +197,214 @@
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
+	<bean id="NullParentEvent" class="com.alliancefoundry.model.Event">
+		<property name="parentId"><null/></property>
+		<property name="eventName" value="Null Parent" />
+		<property name="objectId" value="asher456" />
+		<property name="correlationId" value="asher456" />
+		<property name="sequenceNumber" value="1" /> <!-- Integer -->
+		<property name="messageType" value="Event Type G" />
+		<property name="dataType" value="Object" />
+		<property name="source" value="Publisher" />
+		<property name="destination" value="kafka" />
+		<property name="subdestination" value="kafka topic123" />
+		<property name="replayIndicator" value="false" /> <!-- Boolean -->
+		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
+		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
+		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
+		<property name="preEventState" value="pre state" />
+		<property name="postEventState" value="post state" />
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+	</bean>
+	
+	<bean id="NullEventNameEvent" class="com.alliancefoundry.model.Event">
+		<property name="parentId" value="18" />
+		<property name="eventName"><null/></property>
+		<property name="objectId" value="asher456" />
+		<property name="correlationId" value="asher456" />
+		<property name="sequenceNumber" value="1" /> <!-- Integer -->
+		<property name="messageType" value="Event Type H" />
+		<property name="dataType" value="Object" />
+		<property name="source" value="Publisher" />
+		<property name="destination" value="kafka" />
+		<property name="subdestination" value="kafka topic123" />
+		<property name="replayIndicator" value="false" /> <!-- Boolean -->
+		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
+		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
+		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
+		<property name="preEventState" value="pre state" />
+		<property name="postEventState" value="post state" />
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+	</bean>
+	
+	<bean id="NullCorrelationIdEvent" class="com.alliancefoundry.model.Event">
+		<property name="parentId" value="18" />
+		<property name="eventName" value="Null Correlation Id" />
+		<property name="objectId" value="asher456" />
+		<property name="correlationId"><null/></property>
+		<property name="sequenceNumber" value="1" /> <!-- Integer -->
+		<property name="messageType" value="Event Type I" />
+		<property name="dataType" value="Object" />
+		<property name="source" value="Publisher" />
+		<property name="destination" value="kafka" />
+		<property name="subdestination" value="kafka topic123" />
+		<property name="replayIndicator" value="false" /> <!-- Boolean -->
+		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
+		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
+		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
+		<property name="preEventState" value="pre state" />
+		<property name="postEventState" value="post state" />
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+	</bean>
+	
+	<bean id="NullSequenceNumEvent" class="com.alliancefoundry.model.Event">
+		<property name="parentId" value="18" />
+		<property name="eventName" value="Null Sequence Number" />
+		<property name="objectId" value="asher456" />
+		<property name="correlationId" value="asher456" />
+		<property name="sequenceNumber"><null/></property> <!-- Integer -->
+		<property name="messageType" value="Event Type J" />
+		<property name="dataType" value="Object" />
+		<property name="source" value="Publisher" />
+		<property name="destination" value="kafka" />
+		<property name="subdestination" value="kafka topic123" />
+		<property name="replayIndicator" value="false" /> <!-- Boolean -->
+		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
+		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
+		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
+		<property name="preEventState" value="pre state" />
+		<property name="postEventState" value="post state" />
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+	</bean>
+	
+	<bean id="NullDataTypeEvent" class="com.alliancefoundry.model.Event">
+		<property name="parentId" value="18" />
+		<property name="eventName" value="Null Data Type" />
+		<property name="objectId" value="asher456" />
+		<property name="correlationId" value="asher456" />
+		<property name="sequenceNumber" value="1" /> <!-- Integer -->
+		<property name="messageType" value="Event Type K" />
+		<property name="dataType"><null/></property>
+		<property name="source" value="Publisher" />
+		<property name="destination" value="kafka" />
+		<property name="subdestination" value="kafka topic123" />
+		<property name="replayIndicator" value="false" /> <!-- Boolean -->
+		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
+		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
+		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
+		<property name="preEventState" value="pre state" />
+		<property name="postEventState" value="post state" />
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+	</bean>
+	
+	<bean id="NullSourceEvent" class="com.alliancefoundry.model.Event">
+		<property name="parentId" value="18" />
+		<property name="eventName" value="Null Source" />
+		<property name="objectId" value="asher456" />
+		<property name="correlationId" value="asher456" />
+		<property name="sequenceNumber" value="1" /> <!-- Integer -->
+		<property name="messageType" value="Event Type L" />
+		<property name="dataType" value="Object" />
+		<property name="source"><null/></property>
+		<property name="destination" value="kafka" />
+		<property name="subdestination" value="kafka topic123" />
+		<property name="replayIndicator" value="false" /> <!-- Boolean -->
+		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
+		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
+		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
+		<property name="preEventState" value="pre state" />
+		<property name="postEventState" value="post state" />
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+	</bean>
+	
+	<bean id="NullDestinationEvent" class="com.alliancefoundry.model.Event">
+		<property name="parentId" value="18" />
+		<property name="eventName" value="Null Destination" />
+		<property name="objectId" value="asher456" />
+		<property name="correlationId" value="asher456" />
+		<property name="sequenceNumber" value="1" /> <!-- Integer -->
+		<property name="messageType" value="Event Type M" />
+		<property name="dataType" value="Object" />
+		<property name="source" value="kafka" />
+		<property name="destination"><null/></property>
+		<property name="subdestination" value="kafka topic123" />
+		<property name="replayIndicator" value="false" /> <!-- Boolean -->
+		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
+		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
+		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
+		<property name="preEventState" value="pre state" />
+		<property name="postEventState" value="post state" />
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+	</bean>
+	
+	<bean id="NullSubdestinationEvent" class="com.alliancefoundry.model.Event">
+		<property name="parentId" value="18" />
+		<property name="eventName" value="Null Subdestination" />
+		<property name="objectId" value="asher456" />
+		<property name="correlationId" value="asher456" />
+		<property name="sequenceNumber" value="1" /> <!-- Integer -->
+		<property name="messageType" value="Event Type N" />
+		<property name="dataType" value="Object" />
+		<property name="source" value="kafka" />
+		<property name="destination" value="kafka" />
+		<property name="subdestination"><null/></property>
+		<property name="replayIndicator" value="false" /> <!-- Boolean -->
+		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
+		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
+		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
+		<property name="preEventState" value="pre state" />
+		<property name="postEventState" value="post state" />
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+	</bean>
+	
+	<bean id="NullPreEventStateEvent" class="com.alliancefoundry.model.Event">
+		<property name="parentId" value="18" />
+		<property name="eventName" value="Null Pre Event State" />
+		<property name="objectId" value="asher456" />
+		<property name="correlationId" value="asher456" />
+		<property name="sequenceNumber" value="1" /> <!-- Integer -->
+		<property name="messageType" value="Event Type O" />
+		<property name="dataType" value="Object" />
+		<property name="source" value="kafka" />
+		<property name="destination" value="kafka" />
+		<property name="subdestination" value="kafka topic 123" />
+		<property name="replayIndicator" value="false" /> <!-- Boolean -->
+		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
+		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
+		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
+		<property name="preEventState"><null/></property>
+		<property name="postEventState" value="post state" />
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+	</bean>
+	
+	<bean id="NullPostEventStateEvent" class="com.alliancefoundry.model.Event">
+		<property name="parentId" value="18" />
+		<property name="eventName" value="Null Pre Event State" />
+		<property name="objectId" value="asher456" />
+		<property name="correlationId" value="asher456" />
+		<property name="sequenceNumber" value="1" /> <!-- Integer -->
+		<property name="messageType" value="Event Type P" />
+		<property name="dataType" value="Object" />
+		<property name="source" value="kafka" />
+		<property name="destination" value="kafka" />
+		<property name="subdestination" value="kafka topic 123" />
+		<property name="replayIndicator" value="false" /> <!-- Boolean -->
+		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
+		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
+		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
+		<property name="preEventState" value="pre state" />
+		<property name="postEventState"><null/></property>
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+	</bean>
+	
 </beans>
