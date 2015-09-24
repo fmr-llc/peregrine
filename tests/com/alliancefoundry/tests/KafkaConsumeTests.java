@@ -45,7 +45,7 @@ public class KafkaConsumeTests {
 		event7.setEventId("207");
 	
 		simpleEvent = ctx.getBean("simpleEvent", Event.class);
-				
+		
 		ctx.close();
 		
 		AbstractApplicationContext pubctx;
@@ -55,7 +55,7 @@ public class KafkaConsumeTests {
 		// setup publiher
 		publisher = pubctx.getBean("eventPublisherservice", EventServicePublisher.class);
 		pubctx.close();
-
+		
 	}
 
 	// Publish and Consume 1 event.
@@ -155,6 +155,8 @@ public class KafkaConsumeTests {
 			
 			Event expected = simpleEvent;
 			
+			System.out.println("Event before publish: " + expected);
+			
 			publisher.connectPublishers();
 			publisher.publishEventByMapper(expected);
 			
@@ -162,6 +164,7 @@ public class KafkaConsumeTests {
 			String event = kafkaSubscriber.consumeEvent();
 			ObjectMapper mapper = new ObjectMapper(); 
 			Event actual = mapper.readValue(event, Event.class);
+			System.out.println("Event After Consume: " + actual);
 			
 			assertEquals(expected, actual);
 		}

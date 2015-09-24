@@ -14,14 +14,20 @@ import java.util.Properties;
 import java.util.UUID;
 
 import org.joda.time.DateTime;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
+import com.alliancefoundry.publisher.EventServicePublisher;
 import com.mysql.jdbc.PreparedStatement;
 
 public class JDBCDAOimpl implements DAO {
-static Connection conn;
+	
+	static Connection conn;
+	EventServicePublisher publisher;
+	AbstractApplicationContext pubctx;
 	
 	private  void getConnection() throws IOException{
 		try {
@@ -65,10 +71,11 @@ static Connection conn;
 	 		String payloadSql = "INSERT INTO event_payload VALUES ( ?,?,?,? )";
 	 		try {
 	 			String eventId = UUID.randomUUID().toString();
+	 			event.setEventId(eventId);
 	 			PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
 	 			//set the value of each column for the row being inserted other
 	 			//than eventId
-	 			ps.setString(1, eventId);
+	 			ps.setString(1, event.getEventId());
 	 			ps.setString(2, event.getParentId());
 	 			ps.setString(3, event.getEventName());
 	 			ps.setString(4, event.getObjectId());
@@ -133,6 +140,24 @@ static Connection conn;
 	 				payloadPs.setString(3, event.getCustomPayload().get(key).getValue());
 	 				payloadPs.setString(4, event.getCustomPayload().get(key).getDataType());
 	 				payloadPs.executeUpdate();
+	 			}
+	 			
+	 			if(event.getIsPublishable() == true){
+	 				
+	 				pubctx = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
+	 				pubctx.registerShutdownHook();
+
+	 				// setup publiher
+	 				publisher = pubctx.getBean("eventPublisherservice", EventServicePublisher.class);
+	 				pubctx.close();
+	 				
+	 				publisher.connectPublishers();
+	 				publisher.publishEventByMapper(event);
+	 				System.out.println("Event: " + event.getEventId()+ " was published");
+	 							
+	 			}
+	 			else{
+	 				System.out.println("Event: " + event.getEventId()+ " was not published");
 	 			}
 	 			
 	 			return eventId;

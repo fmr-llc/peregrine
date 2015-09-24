@@ -56,7 +56,7 @@
 		<property name="objectId" value="some child object id" />
 		<property name="correlationId" value="some child correlation id" />
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="kafka - testJaneDoe344" />
+		<property name="messageType" value="Event Type F" />
 		<property name="dataType" value="Object" />
 		<property name="source" value="some child source" />
 		<property name="destination" value="Kafka" />

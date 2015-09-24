@@ -23,8 +23,6 @@ public class ActiveMQPublisher implements PublisherInterface {
 	private String password;
 	private ConnectionFactory connectionFactory;
 	private boolean usingLoginCredentials = false;
-	private String destType;
-
 	
 	// required for bean
 	public ActiveMQPublisher() {
@@ -77,14 +75,6 @@ public class ActiveMQPublisher implements PublisherInterface {
 		this.usingLoginCredentials = usingLoginCredentials;
 	}
 	
-	public String getDestType() {
-		return destType;
-	}
-
-	public void setDestType(String destType) {
-		this.destType = destType;
-	}
-
 	@Override
 	public void publishEvent(Event event, String Topic) {
 		
