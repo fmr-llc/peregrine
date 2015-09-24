@@ -22,6 +22,8 @@ public class ActiveMQSubscriber {
 	Session session = null;
 	MessageConsumer consumer = null;
 
+	public ActiveMQSubscriber(){
+	}
 	
 	public ActiveMQSubscriber(String brokerUrl, String name){
 		this.brokerUrl = brokerUrl;
@@ -90,4 +92,19 @@ public class ActiveMQSubscriber {
 
 	}
 
+	public String getBrokerUrl() {
+		return brokerUrl;
+	}
+
+	public void setBrokerUrl(String brokerUrl) {
+		this.brokerUrl = brokerUrl;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }

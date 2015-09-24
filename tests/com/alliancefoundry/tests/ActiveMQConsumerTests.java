@@ -15,6 +15,8 @@ import javax.jms.TextMessage;
 
 import org.joda.time.DateTime;
 import org.junit.*;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.publisher.EventServicePublisher;
@@ -33,27 +35,29 @@ public class ActiveMQConsumerTests {
 	EventServicePublisher manager;
 	MessageListener listener;
 	Event eventFromListener;
+	ActiveMQSubscriber subscriber;
 	
 	@Before
 	public void setUp() {
-		event1 = new Event(null, "Event Message", "17", "17", 1, "Insert Message", 
-				"String", "Event Messenger", "ActiveMQ", "test", false, 
-				new DateTime("2015-09-10T15:42:43.285-0400"), 
-				new DateTime("2015-09-10T15:42:43.285-0400"), 
-				new DateTime("2015-09-17T15:42:43.285-0400"), 
-				"preState", "postState", true, new DateTime("2015-09-10T15:42:43.285-0400"));
-		event1.setEventId("42");
+		AbstractApplicationContext ctx;
+		ctx = new ClassPathXmlApplicationContext("activemq-mock-events.xml");
+		ctx.registerShutdownHook();
+
+		event1 = ctx.getBean("mockEvent1", Event.class);
+		event2 = ctx.getBean("mockEvent2", Event.class);
 		
-		event2 = new Event("42", "Event Update", "18", "18", 1, "Update Message", 
-				"String", "Event Messenger", "ActiveMQ", "test", false, 
-				new DateTime("2015-09-18T15:42:43.285-0400"), 
-				new DateTime("2015-09-18T15:42:43.285-0400"), 
-				new DateTime("2015-09-25T15:42:43.285-0400"), 
-				"preStateFor43", "postStateFor43", true, new DateTime("2015-09-18T15:42:43.285-0400"));
-		event2.setEventId("43");
+		ctx.close();
 		
+		ctx = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
+		ctx.registerShutdownHook();
+		// Create subscribers/consumers
+		subscriber = ctx.getBean("activemqSubscriber1", ActiveMQSubscriber.class);
+		manager = ctx.getBean("eventPublisherservice", EventServicePublisher.class);
+		ctx.close();
+
+		subscriber.subscribeTopic("topic1");
 		
-		listener = new MessageListener() {	
+		listener = new MessageListener() {
 			public void onMessage(Message message) {
 				if(message instanceof TextMessage){
 					TextMessage txt = (TextMessage)message;
@@ -78,21 +82,15 @@ public class ActiveMQConsumerTests {
 		
 		configs = new HashMap<String, String>();
 		
-		manager = new EventServicePublisher();
-		manager.setupPublishersViaAppContext();
+		manager.connectPublishers();
 	}
 	
 	// Base Test 1
 	@Test
 	public void baseTest1() {
-		ActiveMQSubscriber subscriber = new ActiveMQSubscriber("tcp://localhost:61616", "Test Subscriber");
-		
 		subscriber.setConsumerListener(listener);
-		
-		configs.put(EventServicePublisher.TOPIC_KEY, "topic1");
-		configs.put(EventServicePublisher.DESTINATION_KEY, EventServicePublisher.ACTIVEMQ_KEY);
-		
-		manager.publishEvent(event1, configs);
+				
+		manager.publishEventByMapper(event1);
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
