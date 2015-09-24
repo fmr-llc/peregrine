@@ -1,13 +1,11 @@
 package com.alliancefoundry.controller;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
-import javax.ws.rs.Consumes;
-
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +16,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alliancefoundry.dao.JDBCDAOimpl;
+import com.alliancefoundry.dao.DAO;
+import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
 
@@ -33,26 +32,29 @@ import com.alliancefoundry.model.EventsRequest;
 public class EventServiceController  {
 	
 	static final Logger log = LoggerFactory.getLogger(EventServiceController.class);
-	JDBCDAOimpl dao = new JDBCDAOimpl();
+
+	@Autowired
+	DAO dao;
+	public void setDao(DAO dao) {
+		this.dao = dao;
+	}
 
 	/**
 	 * Creates a new event
 	 * 
-	 * @param evt
-	 * @return
+	 * @param evt	the event to be created
+	 * @return		the id of the created event
 	 */
 	@RequestMapping(value="/event", method = RequestMethod.POST)
-	@Consumes("application/json")
 	public String setEvent(@RequestBody Event evt){
 		String eventId = "";
-		evt.setEventId(UUID.randomUUID().toString());
 		evt.setReceivedTimeStamp(DateTime.now());
 		try {
 			eventId = dao.insertEvent(evt);
 			log.debug("created event with event id " + eventId);
 			return eventId;
-		} catch (SQLException e) {
-			log.debug("Error inserting an event: " + e.getMessage());
+		} catch (DataIntegrityViolationException e) {
+			log.debug("Error inserting an event: " + e.getCause().getMessage());
 			return null;
 		}
 	}
@@ -60,24 +62,25 @@ public class EventServiceController  {
 	/**
 	 * Creates new events
 	 * 
-	 * @param evts
-	 * @return
+	 * @param evts	the list of events to be created
+	 * @return		the list of ids of the created events
 	 */
 	@RequestMapping(value="/events", method = RequestMethod.POST)
-	public String setEvents(@RequestBody List<Event> evts){
+	public List<String> setEvents(@RequestBody List<Event> evts){
 		List<String> eventIds = new ArrayList<String>();
 		try {
+			for(Event e : evts){
+				e.setReceivedTimeStamp(DateTime.now());
+			}
 			eventIds = dao.insertEvents(evts);
-			String eventIdStr = "";
-			for(String l : eventIds){
-				eventIdStr += "\n" + l;
+			if (eventIds.size() > 0){
+			    log.debug("Created events with event id[s]" + eventIds.stream().collect(Collectors.joining("\n")));
+			} else {
+				log.debug("No events provided to insert");
 			}
-			if(!eventIdStr.equals("")){
-				log.debug("created events with event id[s] " + eventIdStr);
-			}
-			return eventIdStr;
-		} catch (SQLException eSQL) {
-			log.debug("Error inserting an event: " + eSQL.getMessage());
+			return eventIds;
+		} catch (DataIntegrityViolationException e) {
+			log.debug("Error inserting an event: " + e.getCause().getMessage() + ".  None of the events were inserted");
 			return null;
 		}
 	}
@@ -85,8 +88,8 @@ public class EventServiceController  {
 	/**
 	 * Gets information about an event
 	 * 
-	 * @param id
-	 * @return
+	 * @param id	of the event to be retrieved
+	 * @return		the event with the corresponding event id
 	 */
     @RequestMapping(value="/event/{id}", method = RequestMethod.GET)
     public Event getEvent(@PathVariable String id){
@@ -98,12 +101,24 @@ public class EventServiceController  {
 	        	log.debug("No event could be retrieved with the specified id");
 	        }
 	        return eventFromDb;
-		} catch (SQLException e) {
+		} catch (EventNotFoundException e) {
 			log.debug("Error retrieving event: " + e.getMessage());
 			return null;
 		}
     }
     
+    /**
+     * Gets information about multiple events
+     * 
+     * @param createdAfter		timestamp after which an event was created
+     * @param createdBefore		timestamp before which an event was created
+     * @param source			of an event
+     * @param objectId			of an event
+     * @param correlationId		of an event
+     * @param eventName			of an event
+     * @param generations		maximum depth in a tree to retrieve events
+     * @return					list of events with values matching params
+     */
     @RequestMapping(value="/events", method = RequestMethod.GET)
     public List<Event> getEvents(
     		@RequestParam(value="createdAfter", required=false) String createdAfter,
@@ -111,7 +126,7 @@ public class EventServiceController  {
     		@RequestParam(value="source", required=false) String source,	
     		@RequestParam(value="objectId", required=false) String objectId,
     		@RequestParam(value="correlationId", required=false) String correlationId,
-    		@RequestParam(value="name", required=false) String name,
+    		@RequestParam(value="eventName", required=false) String eventName,
 			@RequestParam(value="generations", required=false) Integer generations){
     	DateTime createdAfterVal;
     	DateTime createdBeforeVal;
@@ -126,38 +141,47 @@ public class EventServiceController  {
     		createdBeforeVal = new DateTime(createdBefore);
     	}
     	EventsRequest req = new EventsRequest(createdAfterVal, createdBeforeVal, source, objectId,
-    			correlationId, name, generations);
+    			correlationId, eventName, generations);
     	List<Event> eventsFromDb = new ArrayList<Event>();
+    	List<String> eventIds = new ArrayList<String>();
     	try{
     		eventsFromDb = dao.getEvents(req);
-    		String eventIdStr = "";
     		for(Event e : eventsFromDb){
-    			eventIdStr += "\n" + e.getEventId();
+    			eventIds.add(e.getEventId());
     		}
-    		if(!eventIdStr.equals("")){
-    			log.debug("retrieved events with event id[s] " + eventIdStr);
+    		if(eventIds.size() > 0){
+    			log.debug("retrieved events with event id[s] " + eventIds.stream().collect(Collectors.joining("\n")));
     		} else {
     			log.debug("No events match the specified request parameters");
     		}
     		return eventsFromDb;
     	} catch(IllegalArgumentException e){
-    		log.debug("Incorrect or missing request parameter");
+    		log.debug("Incorrect or missing request parameter: " + e.getMessage());
     		return null;
-    	} catch(SQLException eSQL) {
-    		log.debug("Error retrieving an event: " + eSQL.getMessage());
+    	} catch(EventNotFoundException e) {
+    		log.debug("Error retrieving an event: " + e.getMessage());
     		return null;
     	}
     }
 
+    /**
+     * Gets information about the latest event with the requested params
+     * 
+     * @param source			of an event
+     * @param objectId			of an event
+     * @param correlationId		of an event
+     * @param eventName			of an event
+     * @return					the event with values matching the params
+     */
     @RequestMapping(value="/latest-event", method = RequestMethod.GET)
     public Event getLatestEvent(
     		@RequestParam(value="source", required=false) String source,	
     		@RequestParam(value="objectId", required=false) String objectId,
     		@RequestParam(value="correlationId", required=false) String correlationId,
-    		@RequestParam(value="name", required=false) String name){
+    		@RequestParam(value="eventName", required=false) String eventName){
 
     	EventsRequest req = new EventsRequest(null, null, source, objectId,
-    			correlationId, name, null);
+    			correlationId, eventName, null);
     	Event event;
 		try {
 			event = dao.getLatestEvent(req);
@@ -167,7 +191,10 @@ public class EventServiceController  {
 	    		log.debug("No event matches the specified request parameters");
 	    	}
 			return event;
-		} catch (SQLException e) {
+		} catch(IllegalArgumentException e){
+    		log.debug("Incorrect or missing request parameter: " + e.getMessage());
+    		return null;
+		} catch (EventNotFoundException e) {
 			log.debug("Error retrieving event: " + e.getMessage());
 			return null;
 		}
