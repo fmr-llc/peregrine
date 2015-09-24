@@ -32,12 +32,9 @@ import junit.framework.Assert;
 public class ActiveMQTests {
 	
 	ActiveMQSubscriber subscriber1;
-	ActiveMQSubscriber subscriber2;
 	ActiveMQPublisher publisher;
 	EventServicePublisher manager;
-	Event event = new Event("parentId", "Event numba1", "Object Id", "correlation Id", 12, "Message Type", 
-			"data type numba 1", "Source numba 1", "destination 1", "sub destination 1", false, new DateTime(876543223321L), 
-			new DateTime(1176543223321L), new DateTime(2876543223321L), "pre", "post", false, new DateTime(676543223321L) );
+	Event event;
 	
 	private boolean eventTestPass1 = false;
 	
@@ -45,17 +42,31 @@ public class ActiveMQTests {
 
 	@Before
 	public void setUp() throws Exception {
+		AbstractApplicationContext ctx;
+		ctx = new ClassPathXmlApplicationContext("activemq-mock-events.xml");
+		ctx.registerShutdownHook();
+
+		event = ctx.getBean("mockEvent1", Event.class);
+
+		ctx.close();
 		
+		ctx = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
+		ctx.registerShutdownHook();
 		// Create subscribers/consumers
-		subscriber1 = new ActiveMQSubscriber("tcp://localhost:61616", "Sam");
-		subscriber1.subscribeTopic("Topic Numba 1");
-		subscriber2 = new ActiveMQSubscriber("tcp://localhost:61616", "Tim");
-		subscriber2.subscribeTopic("topic1");
+		subscriber1 = ctx.getBean("activemqSubscriber1", ActiveMQSubscriber.class);
+		ctx.close();
+
+		subscriber1.subscribeTopic("topic1");
 		
 		//  Create publisher
-		publisher = new ActiveMQPublisher();
-		manager = new EventServicePublisher();
-		manager.setupPublishersViaAppContext();
+		ctx = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
+		ctx.registerShutdownHook();
+
+		// setup publiher
+		manager = ctx.getBean("eventPublisherservice", EventServicePublisher.class);
+		ctx.close();
+		
+		manager.connectPublishers();
 		
 	}
 
@@ -63,7 +74,6 @@ public class ActiveMQTests {
 	public void tearDown() throws Exception {
 		
 		subscriber1.Shutdown();
-		subscriber2.Shutdown();
 	}
 
 	@Test
@@ -99,16 +109,12 @@ public class ActiveMQTests {
 		};
 		
 		// attach listener to subscriber
-		subscriber2.setConsumerListener(listener);
+		subscriber1.setConsumerListener(listener);
 
 
 		event.setSequenceNumber(customEventId);
-		
-		Map<String, String> config = new HashMap<String, String>();
-		config.put(EventServicePublisher.TOPIC_KEY, "topic1");
-		config.put(EventServicePublisher.DESTINATION_KEY, EventServicePublisher.ACTIVEMQ_KEY);
-		
-		manager.publishEvent(event, config);
+
+		manager.publishEventByMapper(event);
 		
 		// need to wait so that we have time to subscribe and publish
 		try {
@@ -119,29 +125,6 @@ public class ActiveMQTests {
 		
 		Assert.assertTrue("Event id should be 44",eventTestPass1);
 		
-	}
-	
-	public void setupPublishersViaAppContext(){
-		
-		
-		KafkaPublisher kafkaPublshisher;
-		ActiveMQPublisher mqPublisher;
-
-		AbstractApplicationContext ctx;
-		ctx = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
-		ctx.registerShutdownHook();
-
-		kafkaPublshisher = ctx.getBean("kafkaPublisher", KafkaPublisher.class);
-		mqPublisher = ctx.getBean("activemqPublisher", ActiveMQPublisher.class);
-		
-		mqPublisher.connect();
-		
-		publishers.add(mqPublisher);
-		publishers.add(kafkaPublshisher);
-		
-		ctx.close();
-
-}
-	
+	}	
 	
 }

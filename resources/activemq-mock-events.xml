@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+		
+	<bean id="publishDateTime1" class="org.joda.time.DateTime">
+	    	<constructor-arg type="java.lang.Object" value="2015-09-18T15:42:43.285-0400" />
+	</bean>
+	<bean id="receivedDateTime1" class="org.joda.time.DateTime">
+	    	<constructor-arg type="java.lang.Object" value="2015-09-18T15:42:43.285-0400" />
+	</bean>
+	<bean id="experiationDateTime1" class="org.joda.time.DateTime">
+	    	<constructor-arg type="java.lang.Object" value="2015-09-25T15:42:43.285-0400" />
+	</bean>
+	<bean id="insertDateTime1" class="org.joda.time.DateTime">
+	    	<constructor-arg type="java.lang.Object" value="2015-09-18T15:42:43.285-0400" />
+	</bean>
+	<bean id="publishDateTime2" class="org.joda.time.DateTime">
+	    	<constructor-arg type="java.lang.Object" value="2015-09-08T13:40:47.285-0400" />
+	</bean>
+	<bean id="receivedDateTime2" class="org.joda.time.DateTime">
+	    	<constructor-arg type="java.lang.Object" value="2015-09-09T10:07:18.285-0400" />
+	</bean>
+	<bean id="experiationDateTime2" class="org.joda.time.DateTime">
+	    	<constructor-arg type="java.lang.Object" value="2015-09-16T10:07:18.285-0400" />
+	</bean>
+	<bean id="insertDateTime2" class="org.joda.time.DateTime">
+	    	<constructor-arg type="java.lang.Object" value="2015-09-09T10:07:18.285-0400" />
+	</bean>
+	
+  	<bean id="mockEvent1" class="com.alliancefoundry.model.Event">
+		<property name="eventId"><null/></property>
+		<property name="parentId" value="44" />
+		<property name="eventName" value="Event Update" />
+		<property name="objectId" value="17" />
+		<property name="correlationId" value="17" />
+		<property name="sequenceNumber" value="1" /> <!-- Integer -->
+		<property name="messageType" value="activemq - topic1" />
+		<property name="dataType" value="String" />
+		<property name="source" value="Event Messenger" />
+		<property name="destination" value="ActiveMQ" />
+		<property name="subdestination" value="test" />
+		<property name="replayIndicator" value="false" /> <!-- Boolean -->
+		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
+		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
+		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
+		<property name="preEventState" value="preStateFor43" />
+		<property name="postEventState" value="postStateFor43" />
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+	</bean>
+	
+  	<bean id="mockEvent2" class="com.alliancefoundry.model.Event">
+		<property name="eventId"><null/></property>
+		<property name="parentId" value="42" />
+		<property name="eventName" value="Event Update" />
+		<property name="objectId" value="18" />
+		<property name="correlationId" value="18" />
+		<property name="sequenceNumber" value="1" /> <!-- Integer -->
+		<property name="messageType" value="activemq - topic1" />
+		<property name="dataType" value="String" />
+		<property name="source" value="Event Messenger" />
+		<property name="destination" value="ActiveMQ" />
+		<property name="subdestination" value="test" />
+		<property name="replayIndicator" value="false" /> <!-- Boolean -->
+		<property name="publishTimeStamp" ref="publishDateTime1" /> <!-- DateTime -->
+		<property name="receivedTimeStamp" ref="receivedDateTime1" /> <!-- DateTime --> 
+		<property name="expirationTimeStamp" ref="experiationDateTime1" /> <!-- DateTime -->
+		<property name="preEventState" value="preStateFor43" />
+		<property name="postEventState" value="postStateFor43" />
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="insertTimeStamp" ref="insertDateTime1" /> <!-- DateTime -->
+	</bean>
+	
+	
+	
+</beans>
