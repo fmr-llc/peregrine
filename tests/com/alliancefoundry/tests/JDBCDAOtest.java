@@ -2,27 +2,27 @@ package com.alliancefoundry.tests;
 
 import static org.junit.Assert.*;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.dao.DataIntegrityViolationException;
 
-import com.alliancefoundry.dao.JDBCDAOimpl;
+import com.alliancefoundry.dao.DAO;
+import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
 
 public class JDBCDAOtest {
 	
-	JDBCDAOimpl dao;
+	DAO dao;
+	AbstractApplicationContext ctx;
 	Event event;
 	String eventId;
 	Event eventFromDb;
@@ -46,7 +46,8 @@ public class JDBCDAOtest {
 	
 	@Before
 	public void setUp() throws Exception {
-		dao = new JDBCDAOimpl();
+		ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
+		dao = ctx.getBean("dao", DAO.class);
 
 		createdAfter = new DateTime(0);
 		createdBefore = DateTime.now();
@@ -72,26 +73,23 @@ public class JDBCDAOtest {
 	}
 	
 	/**************************
-	 *Testing getLatestEvent()
-	 * @throws SQLException *
+	 *Testing getLatestEvent()*
 	 **************************/
 	
-	@Test
-	public void getLatestEventFromDbNoParamsTest() throws SQLException {
+	@Test(expected=IllegalArgumentException.class)
+	public void getLatestEventFromDbNoParamsTest() throws IllegalArgumentException, EventNotFoundException {
 		EventsRequest req = new EventsRequest(null,null,null,null,null,null,null);
-		long actual = dao.getLatestEvent(req).getInsertTimeStamp().getMillis();
-		long expected = getEvent3.getInsertTimeStamp().getMillis();
-		assertEquals(expected,actual);
+		dao.getLatestEvent(req);
 	}
 	
-	@Test(expected=SQLException.class)
-	public void getLatestEventFromDbNoMatchingParamsTest() throws SQLException {
+	@Test(expected=EventNotFoundException.class)
+	public void getLatestEventFromDbNoMatchingParamsTest() throws IllegalArgumentException, EventNotFoundException {
 		EventsRequest req = new EventsRequest(null,null,"","","","",null);
 		dao.getLatestEvent(req);
 	}
 	
 	@Test
-	public void getLatestEventFromDbMultipleMatchingParamsTest() throws SQLException {
+	public void getLatestEventFromDbMultipleMatchingParamsTest() throws IllegalArgumentException, EventNotFoundException {
 		EventsRequest req = new EventsRequest(null,null,
 				getEvent2.getSource(),
 				getEvent2.getObjectId(),
@@ -104,45 +102,42 @@ public class JDBCDAOtest {
 	}
 	
 	/********************
-	 *Testing getEvent()
-	 * @throws SQLException *
+	 *Testing getEvent()*
 	 ********************/
 	
 	@Test
-	public void getFromDbTest() throws SQLException {
+	public void getFromDbTest() throws EventNotFoundException {
 		eventFromDb = dao.getEvent(child1EventId);
 		String expected = child1EventId;
 		String actual = eventFromDb.getEventId();
 		assertEquals(expected,actual);
 	}
 	
-	@Test(expected=SQLException.class)
-	public void EventNotFoundInDbTest() throws SQLException {
+	@Test(expected=EventNotFoundException.class)
+	public void EventNotFoundInDbTest() throws EventNotFoundException {
 		//there shouldn't be an event with eventId of ""
 		eventId = "";
 		dao.getEvent(eventId);
 	}
 	
 	/*********************
-	 *Testing getEvents()
-	 * @throws SQLException 
-	 * @throws IllegalArgumentException *
+	 *Testing getEvents()*
 	 *********************/
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void getMultipleEventsFromDbOnlyGenParamAndCreatedAfterParamTest() throws IllegalArgumentException, SQLException {
+	public void getMultipleEventsFromDbOnlyGenParamAndCreatedAfterParamTest() throws IllegalArgumentException, EventNotFoundException  {
 		EventsRequest req = new EventsRequest(createdAfter,null,null,null,null,null,generations);
 		dao.getEvents(req);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void getMultipleEventsFromDbNoParamsTest() throws IllegalArgumentException, SQLException {
+	public void getMultipleEventsFromDbNoParamsTest() throws IllegalArgumentException, EventNotFoundException {
 		EventsRequest req = new EventsRequest(null,null,null,null,null,null,null);
 		dao.getEvents(req);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void getMultipleEventsFromDbOneParamTest() throws IllegalArgumentException, SQLException {
+	public void getMultipleEventsFromDbOneParamTest() throws IllegalArgumentException, EventNotFoundException {
 		EventsRequest req = new EventsRequest(createdAfter,null,null,null,null,null,null);
 		List<Event> eventList = new ArrayList<Event>();
 		eventList = dao.getEvents(req);
@@ -156,9 +151,9 @@ public class JDBCDAOtest {
 			assert(true);
 		}
 	}
-	
+
 	@Test
-	public void getMultipleEventsFromDbMultipleParamTest() throws IllegalArgumentException, SQLException {
+	public void getMultipleEventsFromDbMultipleParamTest() throws IllegalArgumentException, EventNotFoundException {
 		EventsRequest req = new EventsRequest(createdAfter,null,null,objectId,null,name,null);
 		List<Event> eventList = new ArrayList<Event>();
 		eventList = dao.getEvents(req);
@@ -176,7 +171,7 @@ public class JDBCDAOtest {
 	}
 	
 	@Test
-	public void getMultipleEventsFromDbAllParamTest() throws IllegalArgumentException, SQLException {
+	public void getMultipleEventsFromDbAllParamTest() throws IllegalArgumentException, EventNotFoundException {
 		EventsRequest req = new EventsRequest(createdAfter,createdBefore,source,objectId,correlationId,name,generations);
 		List<Event> eventList = new ArrayList<Event>();
 		eventList = dao.getEvents(req);
@@ -197,14 +192,12 @@ public class JDBCDAOtest {
 	}
 	
 	/***********************
-	 *Testing insertEvent()
-	 * @throws SQLException *
+	 *Testing insertEvent()*
 	 ***********************/
 	
 	@Test
-	public void insertToDbTest() throws SQLException {
+	public void insertToDbTest() throws EventNotFoundException {
 		event = getEvent2;
-		event.setEventId(UUID.randomUUID().toString());
 		Map<String,String> headers = new HashMap<String,String>();
 		Map<String,DataItem> payload = new HashMap<String,DataItem>();
 		
@@ -216,11 +209,7 @@ public class JDBCDAOtest {
 		event.setCustomHeaders(headers);
 		event.setCustomPayload(payload);
 		
-		try {
-			eventId = dao.insertEvent(event);
-		} catch (SQLException e) {
-			System.out.println("There was a SQL issue when inserting the event into the database");
-		}
+		eventId = dao.insertEvent(event);
 		eventFromDb = dao.getEvent(eventId);
 		String expected = eventId;
 		String actual = eventFromDb.getEventId();
@@ -228,16 +217,11 @@ public class JDBCDAOtest {
 	}
 	
 	@Test
-	public void insertToAndRetrieveFromDbDateTimeTest() throws SQLException {
+	public void insertToAndRetrieveFromDbDateTimeTest() throws EventNotFoundException {
 		DateTime datetime = DateTime.now();
 		event = getEvent2;
-		event.setEventId(UUID.randomUUID().toString());
 		event.setPublishTimeStamp(datetime);
-		try {
-			eventId = dao.insertEvent(event);
-		} catch (SQLException e) {
-			System.out.println("There was a SQL issue when attempting to validate datetimes are inserted properly to the database");
-		}
+		eventId = dao.insertEvent(event);
 		eventFromDb = dao.getEvent(eventId);
 		//datetime before insert into one of the DateTime fields
 		String expected = datetime.toString();
@@ -246,26 +230,37 @@ public class JDBCDAOtest {
 		assertEquals(expected, actual);
 	}
 	
-	/***********************
-	 *Testing insertEvents()
-	 * @throws SQLException *
-	 ***********************/
+	@Test(expected=DataIntegrityViolationException.class)
+	public void insertToDbObjectIdNullTest() throws EventNotFoundException, DataIntegrityViolationException {
+		Event event2 = getEvent2;
+		event2.setObjectId(null);
+		Map<String,String> headers = new HashMap<String,String>();
+		Map<String,DataItem> payload = new HashMap<String,DataItem>();
+		
+		headers.put("some key", "some value");
+		payload.put("some key", new DataItem("some data type","some value"));
+		headers.put("some other key", "some other value");
+		payload.put("some other key", new DataItem("some other data type","some other value"));
+		
+		event2.setCustomHeaders(headers);
+		event2.setCustomPayload(payload);
+		
+		eventId = dao.insertEvent(event2);		
+	}
+	
+	/************************
+	 *Testing insertEvents()*
+	 ************************/
 	
 	@Test
-	public void insertMultipleEventsToDbTest() throws SQLException {
+	public void insertMultipleEventsToDbTest() throws EventNotFoundException {
 		event = getEvent2;
 		Event event2 = getEvent3;
-		event.setEventId(UUID.randomUUID().toString());
-		event2.setEventId(UUID.randomUUID().toString());
 		List<Event> events = new ArrayList<Event>();
 		events.add(event);
 		events.add(event2);
 		List<String> expected = new ArrayList<String>();
-		try {
-			expected = dao.insertEvents(events);
-		} catch (SQLException e) {
-			System.out.println("There was a SQL issue when attempting to insert multiple events to the database");
-		}
+		expected = dao.insertEvents(events);
 		List<String> actual = new ArrayList<String>();
 		for(String id : expected){
 			actual.add((dao.getEvent(id)).getEventId());
@@ -273,12 +268,11 @@ public class JDBCDAOtest {
 		assertEquals(expected, actual);
 	}
 	
-	@Test(expected=SQLException.class)
-	public void insertMultipleEventsToDbInvalidEventTest() throws SQLException{
+	//FIX THIS. FIRST EVENT IS STILL BEING INSERTED.
+	@Test(expected=DataIntegrityViolationException.class)
+	public void insertMultipleEventsToDbInvalidEventTest() {
 		event = getEvent2;
 		Event event2 = getEvent3;
-		event.setEventId("multiple insert test");
-		event2.setEventId("multiple insert test (2)");
 		event2.setObjectId(null);
 		List<Event> events = new ArrayList<Event>();
 		events.add(event);

@@ -31,61 +31,103 @@ public class EventsRequest {
 		this.eventName = eventName;
 		this.generations = generations;
 	}
-	
-	public DateTime getCreatedAfter(){
+
+	/**
+	 * @return the createdAfter
+	 */
+	public DateTime getCreatedAfter() {
 		return createdAfter;
 	}
-	
-	public void setCreatedAfter(DateTime param){
-		createdAfter = param;
+
+	/**
+	 * @param createdAfter the createdAfter to set
+	 */
+	public void setCreatedAfter(DateTime createdAfter) {
+		this.createdAfter = createdAfter;
 	}
-	
-	public DateTime getCreatedBefore(){
+
+	/**
+	 * @return the createdBefore
+	 */
+	public DateTime getCreatedBefore() {
 		return createdBefore;
 	}
-	
-	public void setCreatedBefore(DateTime param){
-		createdBefore = param;
+
+	/**
+	 * @param createdBefore the createdBefore to set
+	 */
+	public void setCreatedBefore(DateTime createdBefore) {
+		this.createdBefore = createdBefore;
 	}
-	
-	public String getSource(){
+
+	/**
+	 * @return the source
+	 */
+	public String getSource() {
 		return source;
 	}
-	
-	public void setSource(String param){
-		source = param;
+
+	/**
+	 * @param source the source to set
+	 */
+	public void setSource(String source) {
+		this.source = source;
 	}
-	
-	public String getObjectId(){
+
+	/**
+	 * @return the objectId
+	 */
+	public String getObjectId() {
 		return objectId;
 	}
-	
-	public void setObjectId(String param){
-		objectId = param;
+
+	/**
+	 * @param objectId the objectId to set
+	 */
+	public void setObjectId(String objectId) {
+		this.objectId = objectId;
 	}
-	
-	public String getCorrelationId(){
+
+	/**
+	 * @return the correlationId
+	 */
+	public String getCorrelationId() {
 		return correlationId;
 	}
-	
-	public void setCorrelationId(String param){
-		correlationId = param;
+
+	/**
+	 * @param correlationId the correlationId to set
+	 */
+	public void setCorrelationId(String correlationId) {
+		this.correlationId = correlationId;
 	}
-	
-	public String getEventName(){
+
+	/**
+	 * @return the eventName
+	 */
+	public String getEventName() {
 		return eventName;
 	}
-	
-	public void setEventName(String param){
-		eventName = param;
+
+	/**
+	 * @param eventName the eventName to set
+	 */
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
 	}
-	
-	public Integer getGenerations(){
+
+	/**
+	 * @return the generations
+	 */
+	public Integer getGenerations() {
 		return generations;
 	}
-	
-	public void setGenerations(Integer param){
-		generations = param;
+
+	/**
+	 * @param generations the generations to set
+	 */
+	public void setGenerations(Integer generations) {
+		this.generations = generations;
 	}
 
 }

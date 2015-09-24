@@ -1,10 +1,11 @@
 package com.alliancefoundry.controller;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +16,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alliancefoundry.dao.JDBCDAOimpl;
+import com.alliancefoundry.dao.DAO;
+import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
 
@@ -30,13 +32,18 @@ import com.alliancefoundry.model.EventsRequest;
 public class EventServiceController  {
 	
 	static final Logger log = LoggerFactory.getLogger(EventServiceController.class);
-	JDBCDAOimpl dao = new JDBCDAOimpl();
+
+	@Autowired
+	DAO dao;
+	public void setDao(DAO dao) {
+		this.dao = dao;
+	}
 
 	/**
 	 * Creates a new event
 	 * 
-	 * @param evt
-	 * @return
+	 * @param evt	the event to be created
+	 * @return		the id of the created event
 	 */
 	@RequestMapping(value="/event", method = RequestMethod.POST)
 	public String setEvent(@RequestBody Event evt){
@@ -46,8 +53,8 @@ public class EventServiceController  {
 			eventId = dao.insertEvent(evt);
 			log.debug("created event with event id " + eventId);
 			return eventId;
-		} catch (SQLException e) {
-			log.debug("Error inserting an event: " + e.getMessage());
+		} catch (DataIntegrityViolationException e) {
+			log.debug("Error inserting an event: " + e.getCause().getMessage());
 			return null;
 		}
 	}
@@ -55,8 +62,8 @@ public class EventServiceController  {
 	/**
 	 * Creates new events
 	 * 
-	 * @param evts
-	 * @return
+	 * @param evts	the list of events to be created
+	 * @return		the list of ids of the created events
 	 */
 	@RequestMapping(value="/events", method = RequestMethod.POST)
 	public List<String> setEvents(@RequestBody List<Event> evts){
@@ -72,8 +79,8 @@ public class EventServiceController  {
 				log.debug("No events provided to insert");
 			}
 			return eventIds;
-		} catch (SQLException e) {
-			log.debug("Error inserting an event: " + e.getMessage());
+		} catch (DataIntegrityViolationException e) {
+			log.debug("Error inserting an event: " + e.getCause().getMessage() + ".  None of the events were inserted");
 			return null;
 		}
 	}
@@ -81,8 +88,8 @@ public class EventServiceController  {
 	/**
 	 * Gets information about an event
 	 * 
-	 * @param id
-	 * @return
+	 * @param id	of the event to be retrieved
+	 * @return		the event with the corresponding event id
 	 */
     @RequestMapping(value="/event/{id}", method = RequestMethod.GET)
     public Event getEvent(@PathVariable String id){
@@ -94,12 +101,24 @@ public class EventServiceController  {
 	        	log.debug("No event could be retrieved with the specified id");
 	        }
 	        return eventFromDb;
-		} catch (SQLException e) {
+		} catch (EventNotFoundException e) {
 			log.debug("Error retrieving event: " + e.getMessage());
 			return null;
 		}
     }
     
+    /**
+     * Gets information about multiple events
+     * 
+     * @param createdAfter		timestamp after which an event was created
+     * @param createdBefore		timestamp before which an event was created
+     * @param source			of an event
+     * @param objectId			of an event
+     * @param correlationId		of an event
+     * @param eventName			of an event
+     * @param generations		maximum depth in a tree to retrieve events
+     * @return					list of events with values matching params
+     */
     @RequestMapping(value="/events", method = RequestMethod.GET)
     public List<Event> getEvents(
     		@RequestParam(value="createdAfter", required=false) String createdAfter,
@@ -139,12 +158,21 @@ public class EventServiceController  {
     	} catch(IllegalArgumentException e){
     		log.debug("Incorrect or missing request parameter: " + e.getMessage());
     		return null;
-    	} catch(SQLException e) {
+    	} catch(EventNotFoundException e) {
     		log.debug("Error retrieving an event: " + e.getMessage());
     		return null;
     	}
     }
 
+    /**
+     * Gets information about the latest event with the requested params
+     * 
+     * @param source			of an event
+     * @param objectId			of an event
+     * @param correlationId		of an event
+     * @param eventName			of an event
+     * @return					the event with values matching the params
+     */
     @RequestMapping(value="/latest-event", method = RequestMethod.GET)
     public Event getLatestEvent(
     		@RequestParam(value="source", required=false) String source,	
@@ -166,7 +194,7 @@ public class EventServiceController  {
 		} catch(IllegalArgumentException e){
     		log.debug("Incorrect or missing request parameter: " + e.getMessage());
     		return null;
-		} catch (SQLException e) {
+		} catch (EventNotFoundException e) {
 			log.debug("Error retrieving event: " + e.getMessage());
 			return null;
 		}

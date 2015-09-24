@@ -110,174 +110,301 @@ public class Event {
 		this.isPublishable = isPublishable;
 		this.insertTimeStamp = insertTimeStamp;
 	}
-	
-	public Map<String, String> getCustomHeaders() {
-		return customHeaders;
+
+	/**
+	 * @return the eventId
+	 */
+	public String getEventId() {
+		return eventId;
 	}
 
-	public void setCustomHeaders(Map<String, String> customHeaders) {
-		this.customHeaders = customHeaders;
+	/**
+	 * @param eventId the eventId to set
+	 */
+	public void setEventId(String eventId) {
+		this.eventId = eventId;
 	}
 
-	public Map<String, DataItem> getCustomPayload() {
-		return customPayload;
-	}
-
-	public void setCustomPayload(Map<String, DataItem> customPayload) {
-		this.customPayload = customPayload;
-	}
-
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
-	}
-
-	public void setEventName(String eventName) {
-		this.eventName = eventName;
-	}
-
-	public void setObjectId(String objectId) {
-		this.objectId = objectId;
-	}
-
-	public void setCorrelationId(String correlationId) {
-		this.correlationId = correlationId;
-	}
-
-	public void setSequenceNumber(Integer sequenceNumber) {
-		this.sequenceNumber = sequenceNumber;
-	}
-
-	public void setMessageType(String messageType) {
-		this.messageType = messageType;
-	}
-
-	public void setDataType(String dataType) {
-		this.dataType = dataType;
-	}
-
-	public void setSource(String source) {
-		this.source = source;
-	}
-
-	public void setDestination(String destination) {
-		this.destination = destination;
-	}
-
-	public void setSubdestination(String subdestination) {
-		this.subdestination = subdestination;
-	}
-
-	public void setReplayIndicator(boolean replayIndicator) {
-		this.replayIndicator = replayIndicator;
-	}
-
-	public void setPublishTimeStamp(DateTime publishTimeStamp) {
-		this.publishTimeStamp = publishTimeStamp;
-	}
-
-	public void setReceivedTimeStamp(DateTime receivedTimeStamp) {
-		this.receivedTimeStamp = receivedTimeStamp;
-	}
-
-	public void setExpirationTimeStamp(DateTime expirationTimeStamp) {
-		this.expirationTimeStamp = expirationTimeStamp;
-	}
-
-	public void setPreEventState(String preEventState) {
-		this.preEventState = preEventState;
-	}
-
-	public void setPostEventState(String postEventState) {
-		this.postEventState = postEventState;
-	}
-
-	public void setIsPublishable(boolean isPublishable) {
-		this.isPublishable = isPublishable;
-	}
-
-	public void setInsertTimeStamp(DateTime insertTimeStamp) {
-		this.insertTimeStamp = insertTimeStamp;
-	}
-
-	public void setEventId(String id){
-        eventId = id;
-    }
-
-    public String getEventId(){
-        return eventId;
-    }
-
+	/**
+	 * @return the parentId
+	 */
 	public String getParentId() {
 		return parentId;
 	}
 
+	/**
+	 * @param parentId the parentId to set
+	 */
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
+	}
+
+	/**
+	 * @return the eventName
+	 */
 	public String getEventName() {
 		return eventName;
 	}
 
+	/**
+	 * @param eventName the eventName to set
+	 */
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
+	}
+
+	/**
+	 * @return the objectId
+	 */
 	public String getObjectId() {
 		return objectId;
 	}
 
+	/**
+	 * @param objectId the objectId to set
+	 */
+	public void setObjectId(String objectId) {
+		this.objectId = objectId;
+	}
+
+	/**
+	 * @return the correlationId
+	 */
 	public String getCorrelationId() {
 		return correlationId;
 	}
 
+	/**
+	 * @param correlationId the correlationId to set
+	 */
+	public void setCorrelationId(String correlationId) {
+		this.correlationId = correlationId;
+	}
+
+	/**
+	 * @return the sequenceNumber
+	 */
 	public Integer getSequenceNumber() {
 		return sequenceNumber;
 	}
 
+	/**
+	 * @param sequenceNumber the sequenceNumber to set
+	 */
+	public void setSequenceNumber(Integer sequenceNumber) {
+		this.sequenceNumber = sequenceNumber;
+	}
+
+	/**
+	 * @return the messageType
+	 */
 	public String getMessageType() {
 		return messageType;
 	}
 
+	/**
+	 * @param messageType the messageType to set
+	 */
+	public void setMessageType(String messageType) {
+		this.messageType = messageType;
+	}
+
+	/**
+	 * @return the dataType
+	 */
 	public String getDataType() {
 		return dataType;
 	}
 
+	/**
+	 * @param dataType the dataType to set
+	 */
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
+	}
+
+	/**
+	 * @return the source
+	 */
 	public String getSource() {
 		return source;
 	}
 
+	/**
+	 * @param source the source to set
+	 */
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	/**
+	 * @return the destination
+	 */
 	public String getDestination() {
 		return destination;
 	}
 
+	/**
+	 * @param destination the destination to set
+	 */
+	public void setDestination(String destination) {
+		this.destination = destination;
+	}
+
+	/**
+	 * @return the subdestination
+	 */
 	public String getSubdestination() {
 		return subdestination;
 	}
 
+	/**
+	 * @param subdestination the subdestination to set
+	 */
+	public void setSubdestination(String subdestination) {
+		this.subdestination = subdestination;
+	}
+
+	/**
+	 * @return the replayIndicator
+	 */
 	public boolean isReplayIndicator() {
 		return replayIndicator;
 	}
 
+	/**
+	 * @param replayIndicator the replayIndicator to set
+	 */
+	public void setReplayIndicator(boolean replayIndicator) {
+		this.replayIndicator = replayIndicator;
+	}
+
+	/**
+	 * @return the publishTimeStamp
+	 */
 	public DateTime getPublishTimeStamp() {
 		return publishTimeStamp;
 	}
 
+	/**
+	 * @param publishTimeStamp the publishTimeStamp to set
+	 */
+	public void setPublishTimeStamp(DateTime publishTimeStamp) {
+		this.publishTimeStamp = publishTimeStamp;
+	}
+
+	/**
+	 * @return the receivedTimeStamp
+	 */
 	public DateTime getReceivedTimeStamp() {
 		return receivedTimeStamp;
 	}
 
+	/**
+	 * @param receivedTimeStamp the receivedTimeStamp to set
+	 */
+	public void setReceivedTimeStamp(DateTime receivedTimeStamp) {
+		this.receivedTimeStamp = receivedTimeStamp;
+	}
+
+	/**
+	 * @return the expirationTimeStamp
+	 */
 	public DateTime getExpirationTimeStamp() {
 		return expirationTimeStamp;
 	}
 
+	/**
+	 * @param expirationTimeStamp the expirationTimeStamp to set
+	 */
+	public void setExpirationTimeStamp(DateTime expirationTimeStamp) {
+		this.expirationTimeStamp = expirationTimeStamp;
+	}
+
+	/**
+	 * @return the customHeaders
+	 */
+	public Map<String, String> getCustomHeaders() {
+		return customHeaders;
+	}
+
+	/**
+	 * @param customHeaders the customHeaders to set
+	 */
+	public void setCustomHeaders(Map<String, String> customHeaders) {
+		this.customHeaders = customHeaders;
+	}
+
+	/**
+	 * @return the customPayload
+	 */
+	public Map<String, DataItem> getCustomPayload() {
+		return customPayload;
+	}
+
+	/**
+	 * @param customPayload the customPayload to set
+	 */
+	public void setCustomPayload(Map<String, DataItem> customPayload) {
+		this.customPayload = customPayload;
+	}
+
+	/**
+	 * @return the preEventState
+	 */
 	public String getPreEventState() {
 		return preEventState;
 	}
 
+	/**
+	 * @param preEventState the preEventState to set
+	 */
+	public void setPreEventState(String preEventState) {
+		this.preEventState = preEventState;
+	}
+
+	/**
+	 * @return the postEventState
+	 */
 	public String getPostEventState() {
 		return postEventState;
 	}
 
+	/**
+	 * @param postEventState the postEventState to set
+	 */
+	public void setPostEventState(String postEventState) {
+		this.postEventState = postEventState;
+	}
+	
+	/**
+	 * @return the isPublishable
+	 */
 	public boolean getIsPublishable() {
 		return isPublishable;
 	}
+	
+	/**
+	 * @param isPublishable the isPublishable to set
+	 */
+	public void setIsPublishable(boolean isPublishable) {
+		this.isPublishable = isPublishable;
+	}
 
+	/**
+	 * @return the insertTimeStamp
+	 */
 	public DateTime getInsertTimeStamp() {
 		return insertTimeStamp;
 	}
+
+	/**
+	 * @param insertTimeStamp the insertTimeStamp to set
+	 */
+	public void setInsertTimeStamp(DateTime insertTimeStamp) {
+		this.insertTimeStamp = insertTimeStamp;
+	}
+
 
 	@Override
 	public int hashCode() {
