@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.joda.time.DateTime;
-
+import org.joda.time.DateTimeZone;
 import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
@@ -355,7 +355,7 @@ public class JdbcTemplateDaoImpl implements DAO {
 			if(genCount < maxGens){
 				genList.add(n.getEvent());
 				if(n.getChildren() != null){
-					putGenerationsInList(n.getChildren(), genList, ++genCount, maxGens);
+					putGenerationsInList(n.getChildren(), genList, genCount + 1, maxGens);
 				}
 			}
 		}
@@ -374,9 +374,9 @@ public class JdbcTemplateDaoImpl implements DAO {
 		public Event mapRow(ResultSet rs, int index) throws SQLException {
 			Integer sequenceNumber = rs.getInt("sequenceNumber");
 			if (rs.wasNull()) sequenceNumber = null;
-			DateTime publishTimeStamp = new DateTime(rs.getLong("publishTimeStamp"));
+			DateTime publishTimeStamp = new DateTime(rs.getLong("publishTimeStamp"),DateTimeZone.UTC);
 			if (rs.wasNull()) publishTimeStamp = null;
-			DateTime expirationTimeStamp = new DateTime(rs.getLong("expirationTimeStamp"));
+			DateTime expirationTimeStamp = new DateTime(rs.getLong("expirationTimeStamp"),DateTimeZone.UTC);
 			if (rs.wasNull()) expirationTimeStamp = null;
 			
 			String eventId = rs.getString("eventId");
@@ -390,12 +390,11 @@ public class JdbcTemplateDaoImpl implements DAO {
 			String destination = rs.getString("destination");
 			String subdestination = rs.getString("subdestination");
 			boolean replayIndicator = rs.getBoolean("replayIndicator");
-			DateTime receivedTimeStamp = new DateTime(rs.getLong("receivedTimeStamp"));
+			DateTime receivedTimeStamp = new DateTime((rs.getLong("receivedTimeStamp")),DateTimeZone.UTC);
 			String preEventState = rs.getString("preEventState");
 			String postEventState = rs.getString("postEventState");
 			boolean isPublishable = rs.getBoolean("isPublishable");
-			DateTime insertTimeStamp = new DateTime(rs.getLong("insertTimeStamp"));
-			
+			DateTime insertTimeStamp = new DateTime(rs.getLong("insertTimeStamp"),DateTimeZone.UTC);
 			String headersSql = sql.getHeader();
 			List<String[]> headers = jdbcTemplate.query(headersSql,
 				new PreparedStatementSetter() {
