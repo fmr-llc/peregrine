@@ -48,6 +48,7 @@ public class KafkaConsumeTests {
 		event7.setEventId("207");
 	
 		simpleEvent = ctx.getBean("simpleEvent", Event.class);
+
 		nullParentEvent = ctx.getBean("NullParentEvent", Event.class);
 		nullEventNameEvent = ctx.getBean("NullEventNameEvent", Event.class);
 		nullCorrelationIdEvent = ctx.getBean("NullCorrelationIdEvent", Event.class);
@@ -62,13 +63,13 @@ public class KafkaConsumeTests {
 		ctx.close();
 		
 		AbstractApplicationContext pubctx;
-		pubctx = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
+		pubctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
 		pubctx.registerShutdownHook();
 
 		// setup publiher
 		publisher = pubctx.getBean("eventPublisherservice", EventServicePublisher.class);
 		pubctx.close();
-
+		
 	}
 
 	// Publish and Consume 1 event.
@@ -168,6 +169,8 @@ public class KafkaConsumeTests {
 			
 			Event expected = simpleEvent;
 			
+			System.out.println("Event before publish: " + expected);
+			
 			publisher.connectPublishers();
 			publisher.publishEventByMapper(expected);
 			
@@ -175,6 +178,7 @@ public class KafkaConsumeTests {
 			String event = kafkaSubscriber.consumeEvent();
 			ObjectMapper mapper = new ObjectMapper(); 
 			Event actual = mapper.readValue(event, Event.class);
+			System.out.println("Event After Consume: " + actual);
 			
 			assertEquals(expected, actual);
 		}
@@ -188,7 +192,7 @@ public class KafkaConsumeTests {
 			publisher.publishEventByMapper(event1);
 			
 			AbstractApplicationContext pubctx2;
-			pubctx2 = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
+			pubctx2 = new ClassPathXmlApplicationContext("eventservice-beans.xml");
 			pubctx2.registerShutdownHook();
 
 			publisher2 = pubctx2.getBean("eventPublisherservice", EventServicePublisher.class);
