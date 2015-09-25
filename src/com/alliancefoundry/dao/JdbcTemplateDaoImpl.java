@@ -14,6 +14,8 @@ import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
+import com.alliancefoundry.publisher.EventServicePublisher;
+
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -29,6 +31,7 @@ public class JdbcTemplateDaoImpl implements DAO {
 	private JdbcTemplate jdbcTemplate;
 	private AbstractApplicationContext ctx;
 	private SqlQuery sql;
+	EventServicePublisher publisher;
 	public JdbcTemplateDaoImpl(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 		ctx = new ClassPathXmlApplicationContext("queries.xml");
@@ -90,6 +93,24 @@ public class JdbcTemplateDaoImpl implements DAO {
 						event.getCustomPayload().get(key).getValue(),
 						event.getCustomPayload().get(key).getDataType());
 			}
+			
+			if(event.getIsPublishable() == true){
+ 				
+ 				ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
+ 				ctx.registerShutdownHook();
+
+ 				EventServicePublisher publisher = ctx.getBean("eventPublisherservice", EventServicePublisher.class);
+ 				ctx.close();
+ 				
+ 				publisher.connectPublishers();
+ 				publisher.publishEventByMapper(event);
+ 				System.out.println("Event: " + event.getEventId()+ " was published");
+ 							
+ 			}
+ 			else{
+ 				System.out.println("Event: " + event.getEventId()+ " was not published");
+ 			}
+				
 			return eventId;
 		} catch(DataIntegrityViolationException e) {
 			throw e;
@@ -153,6 +174,28 @@ public class JdbcTemplateDaoImpl implements DAO {
 				}
 				eventIds.add(eventId);
 			}
+			
+			for (Event event : events) {
+				
+				if(event.getIsPublishable() == true){
+	 				
+	 				ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
+	 				ctx.registerShutdownHook();
+
+	 				EventServicePublisher publisher = ctx.getBean("eventPublisherservice", EventServicePublisher.class);
+	 				ctx.close();
+	 				
+	 				publisher.connectPublishers();
+	 				publisher.publishEventByMapper(event);
+	 				System.out.println("Event: " + event.getEventId()+ " was published");
+	 							
+	 			}
+	 			else{
+	 				System.out.println("Event: " + event.getEventId()+ " was not published");
+	 			}
+				
+			}
+				
 			return eventIds;
 		} catch(DataIntegrityViolationException e) {
 			throw e;

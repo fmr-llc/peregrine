@@ -34,6 +34,7 @@
 			<list>
 				<value>classpath:broker.properties</value>
 				<value>classpath:db.properties</value>
+				<value>classpath:broker-config.properties</value>
 			</list>
 		</property>
 	</bean>
@@ -47,12 +48,10 @@
 	 
 	 <bean id="kafkaPublisher" class="com.alliancefoundry.publisher.KafkaPublisher">
 		<property name="brokerUrl" value="${kafka.url}" />
-		<!--  <property name="destType" value="${dest.kafka}" />-->
 	</bean>
 	
 	<bean id="activemqPublisher" class="com.alliancefoundry.publisher.ActiveMQPublisher">
 		<property name="brokerUrl" value="${activemq.url}" />
-		<!--  <property name="destType" value="${dest.activemq}" />-->
 	</bean>
 	
 	<bean id="activemqSubscriber1" class="com.alliancefoundry.tests.ActiveMQSubscriber">
@@ -61,6 +60,11 @@
 	</bean>
 	
 	<bean id="activemqSubscriber2" class="com.alliancefoundry.tests.ActiveMQSubscriber">
+		<property name="brokerUrl" value="${activemq.url}" />
+		<property name="name" value="${activemq.name2}" />
+	</bean>
+	
+	<bean id="activemqSubscriber3" class="com.alliancefoundry.tests.ActiveMQSubscriber">
 		<property name="brokerUrl" value="${activemq.url}" />
 		<property name="name" value="${activemq.name2}" />
 	</bean>
