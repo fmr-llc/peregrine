@@ -37,8 +37,8 @@ public class ActiveMQConsumerTests {
 	Map<String, String> configs;
 	EventServicePublisher manager;
 	MessageListener listener;
-	Event eventFromListener;
-	ActiveMQSubscriber subscriber, secondSubscriber;
+	Event eventFromListener, secondEvent;
+	ActiveMQSubscriber subscriber, secondSubscriber, thirdSubscriber;
 	
 	@Before
 	public void setUp() {
@@ -51,7 +51,7 @@ public class ActiveMQConsumerTests {
 		event3 = ctx.getBean("mockEvent3", Event.class);
 		nullEvent = ctx.getBean("nullMockEvent", Event.class);
 		nullParentIdEvent = ctx.getBean("nullParentIdEvent", Event.class);
-		nullEventNameEvent = ctx.getBean("nullEventnameEvent", Event.class);
+		nullEventNameEvent = ctx.getBean("nullEventNameEvent", Event.class);
 		nullCorrelationIdEvent = ctx.getBean("nullCorrelationIdEvent", Event.class);
 		nullSequenceNumberEvent = ctx.getBean("nullSequenceNumberEvent", Event.class);
 		nullDataTypeEvent = ctx.getBean("nullDataTypeEvent", Event.class);
@@ -63,15 +63,18 @@ public class ActiveMQConsumerTests {
 		
 		ctx.close();
 		
-		ctx = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
+		ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
 		ctx.registerShutdownHook();
 		// Create subscribers/consumers
 		subscriber = ctx.getBean("activemqSubscriber1", ActiveMQSubscriber.class);
+		secondSubscriber = ctx.getBean("activemqSubscriber2", ActiveMQSubscriber.class);
+		thirdSubscriber = ctx.getBean("activemqSubscriber3", ActiveMQSubscriber.class);
 		manager = ctx.getBean("eventPublisherservice", EventServicePublisher.class);
 		ctx.close();
 
 		subscriber.subscribeTopic("topic1");
 		secondSubscriber.subscribeTopic("topic2");
+		thirdSubscriber.subscribeTopic("topic1");
 		
 		listener = new MessageListener() {
 			public void onMessage(Message message) {
@@ -141,7 +144,7 @@ public class ActiveMQConsumerTests {
 	@Test
 	public void consumeTwoEventsTest() {
 		List<Event> actual = new ArrayList<Event>();
-		Event tempEvent;
+//		final Event tempEvent;
 		MessageListener listener2;
 		listener2 = new MessageListener() {
 			public void onMessage(Message message) {
@@ -151,7 +154,7 @@ public class ActiveMQConsumerTests {
 						String eventAsJson = txt.getText();
 						// turn json string back into event object
 						ObjectMapper mapper = new ObjectMapper(); 
-						tempEvent = mapper.readValue(eventAsJson, Event.class);
+						Event tempEvent = mapper.readValue(eventAsJson, Event.class);
 						actual.add(tempEvent);
 					} catch (JsonParseException e) {
 						System.out.println("Error converting JSON to an Object.");
@@ -187,7 +190,7 @@ public class ActiveMQConsumerTests {
 	@Test
 	public void consumeMultipleEventsTest() {
 		List<Event> actual = new ArrayList<Event>();
-		Event tempEvent1;
+//		Event tempEvent1;
 		MessageListener listener2;
 		listener2 = new MessageListener() {
 			public void onMessage(Message message) {
@@ -197,7 +200,7 @@ public class ActiveMQConsumerTests {
 						String eventAsJson = txt.getText();
 						// turn json string back into event object
 						ObjectMapper mapper = new ObjectMapper(); 
-						tempEvent1 = mapper.readValue(eventAsJson, Event.class);
+						Event tempEvent = mapper.readValue(eventAsJson, Event.class);
 						actual.add(tempEvent);
 					} catch (JsonParseException e) {
 						System.out.println("Error converting JSON to an Object.");
@@ -233,7 +236,6 @@ public class ActiveMQConsumerTests {
 	// Multiple subscribers consume the same event
 	@Test
 	public void consumeEventMultipleSubscribersTest() {
-		Event tempEvent;
 		MessageListener listener2;
 		listener2 = new MessageListener() {
 			public void onMessage(Message message) {
@@ -243,7 +245,7 @@ public class ActiveMQConsumerTests {
 						String eventAsJson = txt.getText();
 						// turn json string back into event object
 						ObjectMapper mapper = new ObjectMapper(); 
-						tempEvent = mapper.readValue(eventAsJson, Event.class);
+						secondEvent = mapper.readValue(eventAsJson, Event.class);
 					} catch (JsonParseException e) {
 						System.out.println("Error converting JSON to an Object.");
 					} catch (JsonMappingException e) {
@@ -259,7 +261,7 @@ public class ActiveMQConsumerTests {
 		};
 		
 		subscriber.setConsumerListener(listener);
-		secondSubscriber.setConsumerListener(listener2);
+		thirdSubscriber.setConsumerListener(listener2);
 		
 		manager.publishEventByMapper(event3);
 		try {
@@ -269,8 +271,7 @@ public class ActiveMQConsumerTests {
 		}
 		
 		Event expected = eventFromListener;
-		Event actual = tempEvent;
-		
+		Event actual = secondEvent;
 		assertEquals(expected.toString(), actual.toString());
 	}
 	

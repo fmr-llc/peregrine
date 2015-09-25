@@ -80,7 +80,7 @@
 		<property name="objectId" value="32174219" />
 		<property name="correlationId" value="32174219" />
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="activemq - topic2" />
+		<property name="messageType" value="activemq - topic1" />
 		<property name="dataType" value="String" />
 		<property name="source" value="Event Messenger" />
 		<property name="destination" value="ActiveMQ" />
