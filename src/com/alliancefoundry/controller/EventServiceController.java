@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,12 +134,12 @@ public class EventServiceController  {
     	if(createdAfter == null){
     		createdAfterVal = null;
     	} else {
-    		createdAfterVal = new DateTime(createdAfter);
+    		createdAfterVal = new DateTime(createdAfter,DateTimeZone.UTC);
     	}
     	if(createdBefore == null){
     		createdBeforeVal = null;
     	} else {
-    		createdBeforeVal = new DateTime(createdBefore);
+    		createdBeforeVal = new DateTime(createdBefore,DateTimeZone.UTC);
     	}
     	EventsRequest req = new EventsRequest(createdAfterVal, createdBeforeVal, source, objectId,
     			correlationId, eventName, generations);
