@@ -36,7 +36,7 @@
 		<property name="objectId" value="17" />
 		<property name="correlationId" value="17" />
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="activemq - topic1" />
+		<property name="messageType" value="Event Type 1" />
 		<property name="dataType" value="String" />
 		<property name="source" value="Event Messenger" />
 		<property name="destination" value="ActiveMQ" />
@@ -47,7 +47,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preStateFor43" />
 		<property name="postEventState" value="postStateFor43" />
-		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -58,7 +58,7 @@
 		<property name="objectId" value="18" />
 		<property name="correlationId" value="18" />
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="activemq - topic1" />
+		<property name="messageType" value="Event Type 1" />
 		<property name="dataType" value="String" />
 		<property name="source" value="Event Messenger" />
 		<property name="destination" value="ActiveMQ" />
@@ -69,7 +69,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime1" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
-		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime1" /> <!-- DateTime -->
 	</bean>
 	
@@ -80,7 +80,7 @@
 		<property name="objectId" value="32174219" />
 		<property name="correlationId" value="32174219" />
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="activemq - topic1" />
+		<property name="messageType" value="Event Type 1" />
 		<property name="dataType" value="String" />
 		<property name="source" value="Event Messenger" />
 		<property name="destination" value="ActiveMQ" />
@@ -91,7 +91,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime1" /> <!-- DateTime -->
 		<property name="preEventState" value="preStateFor43" />
 		<property name="postEventState" value="postStateFor43" />
-		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime1" /> <!-- DateTime -->
 	</bean>
 	
@@ -102,7 +102,7 @@
 		<property name="objectId" value="18" />
 		<property name="correlationId"><null/></property>
 		<property name="sequenceNumber"><null/></property> <!-- Integer -->
-		<property name="messageType" value="activemq - topic1" />
+		<property name="messageType" value="Event Type 1" />
 		<property name="dataType"><null/></property>
 		<property name="source"><null/></property>
 		<property name="destination"><null/></property>
@@ -113,7 +113,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
-		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -124,7 +124,7 @@
 		<property name="objectId" value="32" />
 		<property name="correlationId" value="32" />
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="activemq - topic1" />
+		<property name="messageType" value="Event Type 1" />
 		<property name="dataType" value="Object" />
 		<property name="source" value="FitNesse" />
 		<property name="destination" value="activemq" />
@@ -135,7 +135,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -146,7 +146,7 @@
 		<property name="objectId" value="32" />
 		<property name="correlationId" value="32" />
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="activemq - topic1" />
+		<property name="messageType" value="Event Type 1" />
 		<property name="dataType" value="Object" />
 		<property name="source" value="FitNesse" />
 		<property name="destination" value="activemq" />
@@ -157,7 +157,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -168,7 +168,7 @@
 		<property name="objectId" value="32" />
 		<property name="correlationId"><null/></property>
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="activemq - topic1" />
+		<property name="messageType" value="Event Type 1" />
 		<property name="dataType" value="Object" />
 		<property name="source" value="FitNesse" />
 		<property name="destination" value="activemq" />
@@ -179,7 +179,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -190,7 +190,7 @@
 		<property name="objectId" value="32" />
 		<property name="correlationId" value="32" />
 		<property name="sequenceNumber"><null/></property> <!-- Integer -->
-		<property name="messageType" value="activemq - topic1" />
+		<property name="messageType" value="Event Type 1" />
 		<property name="dataType" value="Object" />
 		<property name="source" value="FitNesse" />
 		<property name="destination" value="activemq" />
@@ -201,7 +201,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -212,7 +212,7 @@
 		<property name="objectId" value="32" />
 		<property name="correlationId" value="32" />
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="activemq - topic1" />
+		<property name="messageType" value="Event Type 1" />
 		<property name="dataType"><null/></property>
 		<property name="source" value="FitNesse" />
 		<property name="destination" value="activemq" />
@@ -223,7 +223,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -234,7 +234,7 @@
 		<property name="objectId" value="32" />
 		<property name="correlationId" value="32" />
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="activemq - topic1" />
+		<property name="messageType" value="Event Type 1" />
 		<property name="dataType" value="Object" />
 		<property name="source"><null/></property>
 		<property name="destination" value="activemq" />
@@ -245,7 +245,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -256,7 +256,7 @@
 		<property name="objectId" value="32" />
 		<property name="correlationId" value="32" />
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="activemq - topic1" />
+		<property name="messageType" value="Event Type 1" />
 		<property name="dataType" value="Object" />
 		<property name="source" value="FitNesse" />
 		<property name="destination"><null/></property>
@@ -267,7 +267,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -278,7 +278,7 @@
 		<property name="objectId" value="32" />
 		<property name="correlationId" value="32" />
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="activemq - topic1" />
+		<property name="messageType" value="Event Type 1" />
 		<property name="dataType" value="Object" />
 		<property name="source" value="FitNesse" />
 		<property name="destination" value="activemq" />
@@ -289,7 +289,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -300,7 +300,7 @@
 		<property name="objectId" value="32" />
 		<property name="correlationId" value="32" />
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="activemq - topic1" />
+		<property name="messageType" value="Event Type 1" />
 		<property name="dataType" value="Object" />
 		<property name="source" value="FitNesse" />
 		<property name="destination" value="activemq" />
@@ -311,7 +311,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -322,7 +322,7 @@
 		<property name="objectId" value="32" />
 		<property name="correlationId" value="32" />
 		<property name="sequenceNumber" value="1" /> <!-- Integer -->
-		<property name="messageType" value="activemq - topic1" />
+		<property name="messageType" value="Event Type 1" />
 		<property name="dataType" value="Object" />
 		<property name="source" value="FitNesse" />
 		<property name="destination" value="activemq" />
@@ -333,7 +333,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="postState" />
 		<property name="postEventState"><null/></property>
-		<property name="isPublishable" value="true" /> <!-- Boolean -->
+		<property name="isPublishable" value="false" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
