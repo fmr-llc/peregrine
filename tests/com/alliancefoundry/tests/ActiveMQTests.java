@@ -122,12 +122,8 @@ public class ActiveMQTests {
 		try {
 			manager.publishEventByMapper(event);
 		} catch (PeregrineException ex) {
-			// TODO Auto-generated catch block
+			System.out.println("Log - Error parsing input source");
 			ex.printStackTrace();
-			
-			if(ex.getErrorCode() == PeregrineErrorCodes.INPUT_SOURCE_ERROR){
-				System.out.println("Log - Error parsing input source");
-			}
 		}
 		
 		// need to wait so that we have time to subscribe and publish
