@@ -12,22 +12,21 @@ public class EventServicePublisher {
 
 	@Autowired
 	private Map<String, PublisherInterface> publishers;
-	private BrokerConfig mapper = new KafkaActivemqImpl();
+	private IMapEvents mapper = new MapEventsImpl();
 	
-	public void setEventMapper(BrokerConfig mapper){
+	public void setEventMapper(IMapEvents mapper){
 		this.mapper = mapper;
 	}
 	
 	public void publishEventByMapper(Event event){
 		
-		Map<String, String> eventConfig = mapper.getConfigForEvent(event);
+		Map<String, String> eventConfig = mapper.getConfigFromEvent(event);
 		if(eventConfig == null){
-			throw new RuntimeException("Event's topic and destination could not be determined");
+			System.out.println("Event's topic and destination could not be determined");
+			return; // do nothing 
 		}
-		
-		
-		String destination = eventConfig.get(BrokerConfig.DESTINATION_KEY);
-		String topic = eventConfig.get(BrokerConfig.TOPIC_KEY);
+		String destination = eventConfig.get(IMapEvents.DESTINATION_KEY);
+		String topic = eventConfig.get(IMapEvents.TOPIC_KEY);
 		
 		PublisherInterface publisher = publishers.get(destination);
 		if(publisher != null){
@@ -50,6 +49,13 @@ public class EventServicePublisher {
 			publishers.get(key).connect();
 		}
 		
+<<<<<<< HEAD
+		mqPublisher.connect();
+		
+		publishers.add(mqPublisher);
+		publishers.add(kafkaPublshisher);
+=======
+>>>>>>> da3a22cf1fbd2a0caad189c3b076154b68eb117f
 		
 	}
 	

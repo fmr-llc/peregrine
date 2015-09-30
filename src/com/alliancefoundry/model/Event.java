@@ -1,15 +1,14 @@
 package com.alliancefoundry.model;
 
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-
 import org.joda.time.DateTime;
 
-import com.alliancefoundry.serializer.CustomJsonDateDeserializer;
-import com.alliancefoundry.serializer.MyDateTimeSerializer;
+import com.alliancefoundry.serializer.JsonDateTimeSerializer;
+import com.alliancefoundry.serializer.JsonDateTimeDeserializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -19,6 +18,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * Created by Paul Bernard
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(Include.NON_NULL)
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class Event {
 
     // Headers
@@ -33,15 +34,15 @@ public class Event {
     private String source;
     private String destination;
     private String subdestination;
-    private Boolean replayIndicator;
-    @JsonSerialize(using = MyDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    private boolean replayIndicator;
+    @JsonSerialize(using = JsonDateTimeSerializer.class)
+    @JsonDeserialize(using = JsonDateTimeDeserializer.class)
     private DateTime publishTimeStamp;
-    @JsonSerialize(using = MyDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    @JsonSerialize(using = JsonDateTimeSerializer.class)
+    @JsonDeserialize(using = JsonDateTimeDeserializer.class)
     private DateTime receivedTimeStamp;
-    @JsonSerialize(using = MyDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    @JsonSerialize(using = JsonDateTimeSerializer.class)
+    @JsonDeserialize(using = JsonDateTimeDeserializer.class)
     private DateTime expirationTimeStamp;
 
     // other
@@ -49,19 +50,15 @@ public class Event {
     private Map<String, DataItem> customPayload;
     private String preEventState;
     private String postEventState;
-    private Boolean isPublishable;
-    @JsonSerialize(using = MyDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    private boolean isPublishable;
+    @JsonSerialize(using = JsonDateTimeSerializer.class)
+    @JsonDeserialize(using = JsonDateTimeDeserializer.class)
     private DateTime insertTimeStamp;
 
+
     public Event(){
-    	UUID uuid = UUID.randomUUID();
-		eventId = uuid.toString();
-    	
-    	receivedTimeStamp = DateTime.now();
     	customHeaders = new HashMap<String, String>();
     	customPayload = new HashMap<String, DataItem>();
-    	insertTimeStamp = DateTime.now();
     }
 	
 	/**
@@ -84,6 +81,7 @@ public class Event {
 	 * @param isPublishable
 	 * @param insertTimeStamp
 	 */
+    
 	public Event(String parentId, String eventName, String objectId, String correlationId,
 			Integer sequenceNumber, String messageType, String dataType, String source, String destination,
 			String subdestination, boolean replayIndicator, DateTime publishTimeStamp, DateTime receivedTimeStamp,
@@ -112,421 +110,452 @@ public class Event {
 		this.isPublishable = isPublishable;
 		this.insertTimeStamp = insertTimeStamp;
 	}
-	
-	public Map<String, String> getCustomHeaders() {
-		return customHeaders;
+
+	/**
+	 * @return the eventId
+	 */
+	public String getEventId() {
+		return eventId;
 	}
 
-	public void setCustomHeaders(Map<String, String> customHeaders) {
-		this.customHeaders = customHeaders;
+	/**
+	 * @param eventId the eventId to set
+	 */
+	public void setEventId(String eventId) {
+		this.eventId = eventId;
 	}
 
-	public Map<String, DataItem> getCustomPayload() {
-		return customPayload;
-	}
-
-	public void setCustomPayload(Map<String, DataItem> customPayload) {
-		this.customPayload = customPayload;
-	}
-
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
-	}
-
-	public void setEventName(String eventName) {
-		this.eventName = eventName;
-	}
-
-	public void setObjectId(String objectId) {
-		this.objectId = objectId;
-	}
-
-	public void setCorrelationId(String correlationId) {
-		this.correlationId = correlationId;
-	}
-
-	public void setSequenceNumber(int sequenceNumber) {
-		this.sequenceNumber = sequenceNumber;
-	}
-
-	public void setMessageType(String messageType) {
-		this.messageType = messageType;
-	}
-
-	public void setDataType(String dataType) {
-		this.dataType = dataType;
-	}
-
-	public void setSource(String source) {
-		this.source = source;
-	}
-
-	public void setDestination(String destination) {
-		this.destination = destination;
-	}
-
-	public void setSubdestination(String subdestination) {
-		this.subdestination = subdestination;
-	}
-
-	public void setReplayIndicator(boolean replayIndicator) {
-		this.replayIndicator = replayIndicator;
-	}
-
-	public void setPublishTimeStamp(DateTime publishTimeStamp) {
-		this.publishTimeStamp = publishTimeStamp;
-	}
-
-	public void setReceivedTimeStamp(DateTime receivedTimeStamp) {
-		this.receivedTimeStamp = receivedTimeStamp;
-	}
-
-	public void setExpirationTimeStamp(DateTime expirationTimeStamp) {
-		this.expirationTimeStamp = expirationTimeStamp;
-	}
-
-	public void setPreEventState(String preEventState) {
-		this.preEventState = preEventState;
-	}
-
-	public void setPostEventState(String postEventState) {
-		this.postEventState = postEventState;
-	}
-
-	public void setPublishable(boolean isPublishable) {
-		this.isPublishable = isPublishable;
-	}
-
-	public void setInsertTimeStamp(DateTime insertTimeStamp) {
-		this.insertTimeStamp = insertTimeStamp;
-	}
-
-	public void setEventId(String id){
-        eventId = id;
-    }
-
-    public String getEventId(){
-        return eventId;
-    }
-
+	/**
+	 * @return the parentId
+	 */
 	public String getParentId() {
 		return parentId;
 	}
 
+	/**
+	 * @param parentId the parentId to set
+	 */
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
+	}
+
+	/**
+	 * @return the eventName
+	 */
 	public String getEventName() {
 		return eventName;
 	}
 
+	/**
+	 * @param eventName the eventName to set
+	 */
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
+	}
+
+	/**
+	 * @return the objectId
+	 */
 	public String getObjectId() {
 		return objectId;
 	}
 
+	/**
+	 * @param objectId the objectId to set
+	 */
+	public void setObjectId(String objectId) {
+		this.objectId = objectId;
+	}
+
+	/**
+	 * @return the correlationId
+	 */
 	public String getCorrelationId() {
 		return correlationId;
 	}
 
-	public int getSequenceNumber() {
+	/**
+	 * @param correlationId the correlationId to set
+	 */
+	public void setCorrelationId(String correlationId) {
+		this.correlationId = correlationId;
+	}
+
+	/**
+	 * @return the sequenceNumber
+	 */
+	public Integer getSequenceNumber() {
 		return sequenceNumber;
 	}
 
+	/**
+	 * @param sequenceNumber the sequenceNumber to set
+	 */
+	public void setSequenceNumber(Integer sequenceNumber) {
+		this.sequenceNumber = sequenceNumber;
+	}
+
+	/**
+	 * @return the messageType
+	 */
 	public String getMessageType() {
 		return messageType;
 	}
 
+	/**
+	 * @param messageType the messageType to set
+	 */
+	public void setMessageType(String messageType) {
+		this.messageType = messageType;
+	}
+
+	/**
+	 * @return the dataType
+	 */
 	public String getDataType() {
 		return dataType;
 	}
 
+	/**
+	 * @param dataType the dataType to set
+	 */
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
+	}
+
+	/**
+	 * @return the source
+	 */
 	public String getSource() {
 		return source;
 	}
 
+	/**
+	 * @param source the source to set
+	 */
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	/**
+	 * @return the destination
+	 */
 	public String getDestination() {
 		return destination;
 	}
 
+	/**
+	 * @param destination the destination to set
+	 */
+	public void setDestination(String destination) {
+		this.destination = destination;
+	}
+
+	/**
+	 * @return the subdestination
+	 */
 	public String getSubdestination() {
 		return subdestination;
 	}
 
+	/**
+	 * @param subdestination the subdestination to set
+	 */
+	public void setSubdestination(String subdestination) {
+		this.subdestination = subdestination;
+	}
+
+	/**
+	 * @return the replayIndicator
+	 */
 	public boolean isReplayIndicator() {
 		return replayIndicator;
 	}
 
+	/**
+	 * @param replayIndicator the replayIndicator to set
+	 */
+	public void setReplayIndicator(boolean replayIndicator) {
+		this.replayIndicator = replayIndicator;
+	}
+
+	/**
+	 * @return the publishTimeStamp
+	 */
 	public DateTime getPublishTimeStamp() {
 		return publishTimeStamp;
 	}
 
+	/**
+	 * @param publishTimeStamp the publishTimeStamp to set
+	 */
+	public void setPublishTimeStamp(DateTime publishTimeStamp) {
+		this.publishTimeStamp = publishTimeStamp;
+	}
+
+	/**
+	 * @return the receivedTimeStamp
+	 */
 	public DateTime getReceivedTimeStamp() {
 		return receivedTimeStamp;
 	}
 
+	/**
+	 * @param receivedTimeStamp the receivedTimeStamp to set
+	 */
+	public void setReceivedTimeStamp(DateTime receivedTimeStamp) {
+		this.receivedTimeStamp = receivedTimeStamp;
+	}
+
+	/**
+	 * @return the expirationTimeStamp
+	 */
 	public DateTime getExpirationTimeStamp() {
 		return expirationTimeStamp;
 	}
 
+	/**
+	 * @param expirationTimeStamp the expirationTimeStamp to set
+	 */
+	public void setExpirationTimeStamp(DateTime expirationTimeStamp) {
+		this.expirationTimeStamp = expirationTimeStamp;
+	}
+
+	/**
+	 * @return the customHeaders
+	 */
+	public Map<String, String> getCustomHeaders() {
+		return customHeaders;
+	}
+
+	/**
+	 * @param customHeaders the customHeaders to set
+	 */
+	public void setCustomHeaders(Map<String, String> customHeaders) {
+		this.customHeaders = customHeaders;
+	}
+
+	/**
+	 * @return the customPayload
+	 */
+	public Map<String, DataItem> getCustomPayload() {
+		return customPayload;
+	}
+
+	/**
+	 * @param customPayload the customPayload to set
+	 */
+	public void setCustomPayload(Map<String, DataItem> customPayload) {
+		this.customPayload = customPayload;
+	}
+
+	/**
+	 * @return the preEventState
+	 */
 	public String getPreEventState() {
 		return preEventState;
 	}
 
+	/**
+	 * @param preEventState the preEventState to set
+	 */
+	public void setPreEventState(String preEventState) {
+		this.preEventState = preEventState;
+	}
+
+	/**
+	 * @return the postEventState
+	 */
 	public String getPostEventState() {
 		return postEventState;
 	}
 
-	public boolean isPublishable() {
+	/**
+	 * @param postEventState the postEventState to set
+	 */
+	public void setPostEventState(String postEventState) {
+		this.postEventState = postEventState;
+	}
+	
+	/**
+	 * @return the isPublishable
+	 */
+	public boolean getIsPublishable() {
 		return isPublishable;
 	}
+	
+	/**
+	 * @param isPublishable the isPublishable to set
+	 */
+	public void setIsPublishable(boolean isPublishable) {
+		this.isPublishable = isPublishable;
+	}
 
+	/**
+	 * @return the insertTimeStamp
+	 */
 	public DateTime getInsertTimeStamp() {
 		return insertTimeStamp;
 	}
 
-	
+	/**
+	 * @param insertTimeStamp the insertTimeStamp to set
+	 */
+	public void setInsertTimeStamp(DateTime insertTimeStamp) {
+		this.insertTimeStamp = insertTimeStamp;
+	}
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((correlationId == null) ? 0 : correlationId.hashCode());
+		result = prime * result + ((customHeaders == null) ? 0 : customHeaders.hashCode());
+		result = prime * result + ((customPayload == null) ? 0 : customPayload.hashCode());
+		result = prime * result + ((dataType == null) ? 0 : dataType.hashCode());
+		result = prime * result + ((destination == null) ? 0 : destination.hashCode());
+		result = prime * result + ((eventId == null) ? 0 : eventId.hashCode());
+		result = prime * result + ((eventName == null) ? 0 : eventName.hashCode());
+		result = prime * result + ((expirationTimeStamp == null) ? 0 : expirationTimeStamp.hashCode());
+		result = prime * result + ((insertTimeStamp == null) ? 0 : insertTimeStamp.hashCode());
+		result = prime * result + (isPublishable ? 1231 : 1237);
+		result = prime * result + ((messageType == null) ? 0 : messageType.hashCode());
+		result = prime * result + ((objectId == null) ? 0 : objectId.hashCode());
+		result = prime * result + ((parentId == null) ? 0 : parentId.hashCode());
+		result = prime * result + ((postEventState == null) ? 0 : postEventState.hashCode());
+		result = prime * result + ((preEventState == null) ? 0 : preEventState.hashCode());
+		result = prime * result + ((publishTimeStamp == null) ? 0 : publishTimeStamp.hashCode());
+		result = prime * result + ((receivedTimeStamp == null) ? 0 : receivedTimeStamp.hashCode());
+		result = prime * result + (replayIndicator ? 1231 : 1237);
+		result = prime * result + ((sequenceNumber == null) ? 0 : sequenceNumber.hashCode());
+		result = prime * result + ((source == null) ? 0 : source.hashCode());
+		result = prime * result + ((subdestination == null) ? 0 : subdestination.hashCode());
+		return result;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
-		// if object isnt an event object use normal equals comparison
-		if(!(obj instanceof Event)){
-			return super.equals(obj);
-		}
-		Event e2 = (Event)obj;
-		
-		// test eventid
-		if(eventId != e2.eventId){
+		if (this == obj)
+			return true;
+		if (obj == null)
 			return false;
-		}
-		
-		// test parentid
-		if(parentId != null && e2.parentId != null){
-			// perform test
-			if(!parentId.equals(e2.parentId)){
+		if (getClass() != obj.getClass())
+			return false;
+		Event other = (Event) obj;
+		if (correlationId == null) {
+			if (other.correlationId != null)
 				return false;
-			}
-		}else if(parentId == null && e2.parentId == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!correlationId.equals(other.correlationId))
 			return false;
-		}
-		
-		// test eventName
-		if(eventName != null && e2.eventName != null){
-			// perform test
-			if(!eventName.equals(e2.eventName)){
+		if (customHeaders == null) {
+			if (other.customHeaders != null)
 				return false;
-			}
-		}else if(eventName == null && e2.eventName == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!customHeaders.equals(other.customHeaders))
 			return false;
-		}
-		
-		// test objectId
-		if(objectId != null && e2.objectId != null){
-			// perform test
-			if(!objectId.equals(e2.objectId)){
+		if (customPayload == null) {
+			if (other.customPayload != null)
 				return false;
-			}
-		}else if(objectId == null && e2.objectId == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!customPayload.equals(other.customPayload))
 			return false;
-		}
-		
-		// test correlationId
-		if(correlationId != null && e2.correlationId != null){
-			// perform test
-			if(!correlationId.equals(e2.correlationId)){
+		if (dataType == null) {
+			if (other.dataType != null)
 				return false;
-			}
-		}else if(correlationId == null && e2.correlationId == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!dataType.equals(other.dataType))
 			return false;
-		}
-		
-		// test sequenceNumber
-		if(sequenceNumber != null && e2.sequenceNumber != null){
-			// perform test
-			if(!sequenceNumber.equals(e2.sequenceNumber)){
+		if (destination == null) {
+			if (other.destination != null)
 				return false;
-			}
-		}else if(sequenceNumber == null && e2.sequenceNumber == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!destination.equals(other.destination))
 			return false;
-		}
-		
-		// test messageType
-		if(messageType != null && e2.messageType != null){
-			// perform test
-			if(!messageType.equals(e2.messageType)){
+		if (eventId == null) {
+			if (other.eventId != null)
 				return false;
-			}
-		}else if(messageType == null && e2.messageType == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!eventId.equals(other.eventId))
 			return false;
-		}
-		
-		// test source
-		if(source != null && e2.source != null){
-			// perform test
-			if(!source.equals(e2.source)){
+		if (eventName == null) {
+			if (other.eventName != null)
 				return false;
-			}
-		}else if(source == null && e2.source == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!eventName.equals(other.eventName))
 			return false;
-		}
-		
-		// test destination
-		if(destination != null && e2.destination != null){
-			// perform test
-			if(!destination.equals(e2.destination)){
+		if (expirationTimeStamp == null) {
+			if (other.expirationTimeStamp != null)
 				return false;
-			}
-		}else if(destination == null && e2.destination == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!expirationTimeStamp.equals(other.expirationTimeStamp))
 			return false;
-		}
-		
-		// test subdestination
-		if(subdestination != null && e2.subdestination != null){
-			// perform test
-			if(!subdestination.equals(e2.subdestination)){
+		if (insertTimeStamp == null) {
+			if (other.insertTimeStamp != null)
 				return false;
-			}
-		}else if(subdestination == null && e2.subdestination == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!insertTimeStamp.equals(other.insertTimeStamp))
 			return false;
-		}
-		
-		// test replayIndicator
-		if (replayIndicator != e2.replayIndicator){
+		if (isPublishable != other.isPublishable)
 			return false;
-		}
-		
-		// test publishedTimeStamp
-		if(publishTimeStamp != null && e2.publishTimeStamp != null){
-			// perform test
-			if(publishTimeStamp.getMillis() != e2.publishTimeStamp.getMillis()){
+		if (messageType == null) {
+			if (other.messageType != null)
 				return false;
-			}
-		}else if(publishTimeStamp == null && e2.publishTimeStamp == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!messageType.equals(other.messageType))
 			return false;
-		}
-		
-		// test receivedTimeStamp
-		if(receivedTimeStamp != null && e2.receivedTimeStamp != null){
-			// perform test
-			if(receivedTimeStamp.getMillis() != e2.receivedTimeStamp.getMillis()){
+		if (objectId == null) {
+			if (other.objectId != null)
 				return false;
-			}
-		}else if(receivedTimeStamp == null && e2.receivedTimeStamp == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!objectId.equals(other.objectId))
 			return false;
-		}
-		
-		// test expirationTimeStamp
-		if(expirationTimeStamp != null && e2.expirationTimeStamp != null){
-			// perform test
-			if(expirationTimeStamp.getMillis() != e2.expirationTimeStamp.getMillis()){
+		if (parentId == null) {
+			if (other.parentId != null)
 				return false;
-			}
-		}else if(expirationTimeStamp == null && e2.expirationTimeStamp == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!parentId.equals(other.parentId))
 			return false;
-		}
-		
-		// test customHeaders
-		if(customHeaders != null && e2.customHeaders != null){
-			// perform test
-			if(customHeaders.size() != e2.customHeaders.size()){
+		if (postEventState == null) {
+			if (other.postEventState != null)
 				return false;
-			}
-		}else if(customHeaders == null && e2.customHeaders == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!postEventState.equals(other.postEventState))
 			return false;
-		}
-		
-		// test payload
-		if(customPayload != null && e2.customPayload != null){
-			// perform test
-			if(customPayload.size() != e2.customPayload.size()){
+		if (preEventState == null) {
+			if (other.preEventState != null)
 				return false;
-			}
-		}else if(customPayload == null && e2.customPayload == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!preEventState.equals(other.preEventState))
 			return false;
-		}
-		
-		// test preEventState
-		if(preEventState != null && e2.preEventState != null){
-			// perform test
-			if(!preEventState.equals(e2.preEventState)){
+		if (publishTimeStamp == null) {
+			if (other.publishTimeStamp != null)
 				return false;
-			}
-		}else if(preEventState == null && e2.preEventState == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!publishTimeStamp.equals(other.publishTimeStamp))
 			return false;
-		}
-		
-		// test postEventState
-		if(postEventState != null && e2.postEventState != null){
-			// perform test
-			if(!postEventState.equals(e2.postEventState)){
+		if (receivedTimeStamp == null) {
+			if (other.receivedTimeStamp != null)
 				return false;
-			}
-		}else if(postEventState == null && e2.postEventState == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!receivedTimeStamp.equals(other.receivedTimeStamp))
 			return false;
-		}
-		
-		// test isPublishable
-		if (isPublishable != e2.isPublishable){
+		if (replayIndicator != other.replayIndicator)
 			return false;
-		}
-
-		
-		// test insertTimeStamp
-		if(insertTimeStamp != null && e2.insertTimeStamp != null){
-			// perform test
-			if(insertTimeStamp.getMillis() != e2.insertTimeStamp.getMillis()){
+		if (sequenceNumber == null) {
+			if (other.sequenceNumber != null)
 				return false;
-			}
-		}else if(insertTimeStamp == null && e2.insertTimeStamp == null){
-		}else{
-			// not the same, either one or the other is null but not both
+		} else if (!sequenceNumber.equals(other.sequenceNumber))
 			return false;
-		}	    // other
-		
+		if (source == null) {
+			if (other.source != null)
+				return false;
+		} else if (!source.equals(other.source))
+			return false;
+		if (subdestination == null) {
+			if (other.subdestination != null)
+				return false;
+		} else if (!subdestination.equals(other.subdestination))
+			return false;
 		return true;
 	}
-    
-    public static void main(String[] a){
-    	
-    	// test the equals method
-    	Event e1 = new Event();
-    	e1.setCorrelationId("core1");
-    	
-    	Event e2 = new Event();
-    	e2.setCorrelationId("core2");
-    	
-    	Event e3 = new Event();
-    	e3.setCorrelationId("core1");
-    	
-    	System.out.println(e1.equals(e2));
-    	System.out.println(e1.equals(e3));
-    }
 
+	@Override
+	public String toString() {
+		return "Event [getCustomHeaders()=" + getCustomHeaders() + ", getCustomPayload()=" + getCustomPayload()
+				+ ", getEventId()=" + getEventId() + ", getParentId()=" + getParentId() + ", getEventName()="
+				+ getEventName() + ", getObjectId()=" + getObjectId() + ", getCorrelationId()=" + getCorrelationId()
+				+ ", getSequenceNumber()=" + getSequenceNumber() + ", getMessageType()=" + getMessageType()
+				+ ", getDataType()=" + getDataType() + ", getSource()=" + getSource() + ", getDestination()="
+				+ getDestination() + ", getSubdestination()=" + getSubdestination() + ", isReplayIndicator()="
+				+ isReplayIndicator() + ", getPublishTimeStamp()=" + getPublishTimeStamp() + ", getReceivedTimeStamp()="
+				+ getReceivedTimeStamp() + ", getExpirationTimeStamp()=" + getExpirationTimeStamp()
+				+ ", getPreEventState()=" + getPreEventState() + ", getPostEventState()=" + getPostEventState()
+				+ ", isPublishable()=" + getIsPublishable() + ", getInsertTimeStamp()=" + getInsertTimeStamp() + "]";
+	}
 }

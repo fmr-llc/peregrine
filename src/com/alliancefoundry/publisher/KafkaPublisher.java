@@ -1,11 +1,9 @@
 package com.alliancefoundry.publisher;
 
-import java.util.Map;
 import java.util.Properties;
 
 import com.alliancefoundry.model.Event;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alliancefoundry.serializer.JsonEventSerializer;
 
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
@@ -15,9 +13,7 @@ public class KafkaPublisher implements PublisherInterface {
 
 	private Producer<String, String> producer;
 	private String brokerUrl;
-	private String destType;
 
-	
 	public KafkaPublisher() {
 		
 	}
@@ -43,39 +39,13 @@ public class KafkaPublisher implements PublisherInterface {
 	}
 	
 	@Override
-	public void publishEvent(Event event, Map<String, String> eventConfig) {
+	public void publishEvent(Event event, String Topic) {
 		
-		ObjectMapper mapper = new ObjectMapper();
-		String jsonEvent = null;
-		
-		try {
-			jsonEvent = mapper.writeValueAsString(event);
-		} 
-		catch (JsonProcessingException e) {
-		
-			e.printStackTrace();
-		}
+		JsonEventSerializer serializer = new JsonEventSerializer();
+		String jsonEvent = serializer.convertToJSON(event);
 
-		String topic = (String)eventConfig.get(EventServicePublisher.TOPIC_KEY);
+		String topic = Topic;
 		KeyedMessage<String, String> jsonData = new KeyedMessage<String, String>(topic, jsonEvent);
-		producer.send(jsonData);
-		
-		System.out.println(jsonData);
-		
-		producer.close();
-
+		producer.send(jsonData);		
 	}
-	
-	public String getDestType() {
-		return destType;
-	}
-
-	public void setDestType(String destType) {
-		this.destType = destType;
-	}
-
-	
-	
 }
-
-
