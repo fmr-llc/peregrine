@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.publisher.ActiveMQPublisher;
@@ -78,7 +79,7 @@ public class ActiveMQTests {
 	}
 
 	@Test
-	public void testSendEventJsonToSubscribersViaManager() throws JsonProcessingException, PeregrineException {
+	public void testSendEventJsonToSubscribersViaManager() throws JsonProcessingException {
 //		fail("Not yet implemented");
 		
 		final int customEventId = 44;
@@ -87,6 +88,7 @@ public class ActiveMQTests {
 		MessageListener listener = new MessageListener() {
 			
 			public void onMessage(Message message) {
+				PeregrineException exception = null;
 				if(message instanceof TextMessage){
 					TextMessage txt = (TextMessage)message;
 					try {
@@ -96,16 +98,22 @@ public class ActiveMQTests {
 						Event event = mapper.readValue(eventAsJson, Event.class);
 						eventTestPass1 = customEventId == event.getSequenceNumber();
 					} catch (JsonParseException e) {
-						System.out.println("Error converting JSON to an Object.");
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error converting JSON to an Object.", e);
 					} catch (JsonMappingException e) {
-						System.out.println("Error mapping JSON to Object.");
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error mapping JSON to Object.", e);
 					} catch (IOException e) {
-						System.out.println("Error parsing input source.");
+						exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error parsing input source", e);
 					} catch (JMSException e) {
-						System.out.println("An internal error occurred, preventing "
-								+ "the JMS provider from retrieving the text.");
+						exception = new PeregrineException(PeregrineErrorCodes.JMS_INTERNAL_ERROR, "An internal error occurred", e);
 					}
-				}				
+					
+					if(exception != null){
+						// Cannot throw exception here,
+						// Just log it
+						System.out.println("An error has occured, replace with a log");
+					}
+
+				}
 			}
 		};
 		
@@ -115,7 +123,16 @@ public class ActiveMQTests {
 
 		event.setSequenceNumber(customEventId);
 
-		manager.publishEventByMapper(event);
+		try {
+			manager.publishEventByMapper(event);
+		} catch (PeregrineException ex) {
+			// TODO Auto-generated catch block
+			ex.printStackTrace();
+			
+			if(ex.getErrorCode() == PeregrineErrorCodes.INPUT_SOURCE_ERROR){
+				System.out.println("Log - Error parsing input source");
+			}
+		}
 		
 		// need to wait so that we have time to subscribe and publish
 		try {

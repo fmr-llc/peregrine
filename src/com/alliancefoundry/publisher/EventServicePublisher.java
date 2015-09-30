@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 
@@ -24,7 +25,7 @@ public class EventServicePublisher {
 		Map<String, String> eventConfig = mapper.getConfigFromEvent(event);
 		if(eventConfig == null){
 			System.out.println("Event's topic and destination could not be determined");
-			return; // do nothing 
+			throw new PeregrineException(PeregrineErrorCodes.INVALID_DESTINATION_OR_TOPIC, "Event's topic and destination could not be determined");
 		}
 		String destination = eventConfig.get(IMapEvents.DESTINATION_KEY);
 		String topic = eventConfig.get(IMapEvents.TOPIC_KEY);

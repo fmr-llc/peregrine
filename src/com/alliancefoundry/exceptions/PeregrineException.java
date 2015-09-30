@@ -2,8 +2,8 @@ package com.alliancefoundry.exceptions;
 
 public class PeregrineException extends Exception {
 	
-	PeregrineErrorCodes errorCode = PeregrineErrorCodes.NOT_AN_ERROR;
-	
+	PeregrineErrorCodes errorCode;
+
 	public PeregrineException(PeregrineErrorCodes errorCode) {
 		this.errorCode = errorCode;
 	}
@@ -29,5 +29,12 @@ public class PeregrineException extends Exception {
 	}
 	
 	
-	
+	public PeregrineErrorCodes getErrorCode() {
+		return errorCode;
+	}
+
+	public void setErrorCode(PeregrineErrorCodes errorCode) {
+		this.errorCode = errorCode;
+	}
+
 }

@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import javax.ws.rs.Consumes;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,8 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alliancefoundry.dao.JDBCDAOimpl;
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
+import com.alliancefoundry.publisher.EventServicePublisher;
 
 
 
@@ -34,6 +37,9 @@ public class EventServiceController  {
 	
 	static final Logger log = LoggerFactory.getLogger(EventServiceController.class);
 	JDBCDAOimpl dao = new JDBCDAOimpl();
+	
+	@Autowired
+	private EventServicePublisher publisher;
 
 	/**
 	 * Creates a new event
@@ -172,5 +178,40 @@ public class EventServiceController  {
 			return null;
 		}
     }
+    
+    
+	/**
+	 * Replays a event
+	 * 
+	 * @param eventId - Id of event to replay
+	 * @return whether or not the replay was successful
+	 */
+	@RequestMapping(value="/event", method = RequestMethod.GET)
+	public String ReplayEvent(
+			@RequestParam(value="eventid", required=false) String eventId){
+		String message = String.format("Successfully replayed Event - Event Id: %s", eventId);
+		
+		try {
+			Event eventFromDb = dao.getEvent(eventId);
+			publisher.publishEventByMapper(eventFromDb);
+		} catch (SQLException e) {
+			log.debug("Error inserting an event: " + e.getMessage());
+			message = String.format("Event could not be found. Event Id: %s", eventId);
+		} catch (PeregrineException e) {
+			log.debug("Error replaying event");
+			log.debug("Error Message: " + e.getMessage());
+			message = String.format("Event could not be replayed. Event Id: %s", eventId);
+		}
+		return message;
+	}
 
+	public EventServicePublisher getPublisher() {
+		return publisher;
+	}
+
+	public void setPublisher(EventServicePublisher publisher) {
+		this.publisher = publisher;
+	}
+	
+	
 }

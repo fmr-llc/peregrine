@@ -94,7 +94,7 @@ public class ActiveMQPublisher implements PublisherInterface {
 	}
 
 	@Override
-	public void publishEvent(Event event, String topicName)  {
+	public void publishEvent(Event event, String topicName) throws PeregrineException  {
 		PeregrineException exception = null;
 		
 		
