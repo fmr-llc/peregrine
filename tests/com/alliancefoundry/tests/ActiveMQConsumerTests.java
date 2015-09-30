@@ -144,7 +144,6 @@ public class ActiveMQConsumerTests {
 	@Test
 	public void consumeTwoEventsTest() {
 		List<Event> actual = new ArrayList<Event>();
-//		final Event tempEvent;
 		MessageListener listener2;
 		listener2 = new MessageListener() {
 			public void onMessage(Message message) {
@@ -190,7 +189,6 @@ public class ActiveMQConsumerTests {
 	@Test
 	public void consumeMultipleEventsTest() {
 		List<Event> actual = new ArrayList<Event>();
-//		Event tempEvent1;
 		MessageListener listener2;
 		listener2 = new MessageListener() {
 			public void onMessage(Message message) {
@@ -471,10 +469,7 @@ public class ActiveMQConsumerTests {
 		Event actual = eventFromListener;
 		
 		assertEquals(expected.toString(), actual.toString());
-	}
-	
-	// Publish event to multiple topics???
-	
+	}	
 	
 	public boolean compareLists(List<Event> list1, List<Event> list2) {
 		if (list1.size() == list2.size()) {

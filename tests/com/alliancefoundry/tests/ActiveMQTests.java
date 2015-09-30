@@ -50,7 +50,7 @@ public class ActiveMQTests {
 
 		ctx.close();
 		
-		ctx = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
+		ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
 		ctx.registerShutdownHook();
 		// Create subscribers/consumers
 		subscriber1 = ctx.getBean("activemqSubscriber1", ActiveMQSubscriber.class);
@@ -59,7 +59,7 @@ public class ActiveMQTests {
 		subscriber1.subscribeTopic("topic1");
 		
 		//  Create publisher
-		ctx = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
+		ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
 		ctx.registerShutdownHook();
 
 		// setup publiher
