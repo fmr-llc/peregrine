@@ -1,0 +1,16 @@
+package com.alliancefoundry.exceptions;
+
+public enum PeregrineErrorCodes {
+	
+	JSON_PARSE_ERROR,
+	JSM_SEND_ERROR,
+	JMS_INTERNAL_ERROR,
+	JMS_RECEIVE_ERROR,
+	MSG_FORMAT_ERROR,
+	
+	INVALID_DESTINATION,
+	DESTINATION_NOT_SUPPLIED,
+	
+	NOT_AN_ERROR
+	
+}

@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.publisher.ActiveMQPublisher;
 import com.alliancefoundry.publisher.EventServicePublisher;
@@ -77,7 +78,7 @@ public class ActiveMQTests {
 	}
 
 	@Test
-	public void testSendEventJsonToSubscribersViaManager() throws JsonProcessingException {
+	public void testSendEventJsonToSubscribersViaManager() throws JsonProcessingException, PeregrineException {
 //		fail("Not yet implemented");
 		
 		final int customEventId = 44;

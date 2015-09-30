@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 
 public class EventServicePublisher {
@@ -18,7 +19,7 @@ public class EventServicePublisher {
 		this.mapper = mapper;
 	}
 	
-	public void publishEventByMapper(Event event){
+	public void publishEventByMapper(Event event) throws PeregrineException{
 		
 		Map<String, String> eventConfig = mapper.getConfigFromEvent(event);
 		if(eventConfig == null){
@@ -35,7 +36,7 @@ public class EventServicePublisher {
 
 	}
 	
-	public void publishEventByMapper(List<Event> events) {
+	public void publishEventByMapper(List<Event> events) throws PeregrineException {
 		
 		for(Event event : events){
 			publishEventByMapper(event);

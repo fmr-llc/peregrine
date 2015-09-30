@@ -18,6 +18,7 @@ import org.junit.*;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.publisher.EventServicePublisher;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -87,7 +88,7 @@ public class ActiveMQConsumerTests {
 	
 	// Base Test 1
 	@Test
-	public void baseTest1() {
+	public void baseTest1() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 				
 		manager.publishEventByMapper(event1);

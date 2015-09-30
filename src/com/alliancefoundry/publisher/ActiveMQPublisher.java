@@ -15,6 +15,8 @@ import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
+import com.alliancefoundry.exceptions.PeregrineErrorCodes;
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.serializer.JsonEventSerializer;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -92,79 +94,47 @@ public class ActiveMQPublisher implements PublisherInterface {
 	}
 
 	@Override
-	public void publishEvent(Event event, String Topic) {
+	public void publishEvent(Event event, String topicName)  {
+		PeregrineException exception = null;
 		
-		// create connection
-				Connection connection = null;
-				Session session = null;
-				MessageProducer producer = null;
-				
-				String topicName = Topic;
-				
-				JsonEventSerializer serializer = new JsonEventSerializer();
-				String jsonMessage = serializer.convertToJSON(event);
-				
-				// create connection
-				try {
-					connection = connectionFactory.createConnection();
-				} catch (JMSException e) {
-					System.out.println("An internal error occurred, preventing the "
-							+ "publisher from connecting to the ActiveMQ server.");
-				}
-				
-				// create session
-				try {
-					session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-				} catch (JMSException e) {
-					System.out.println("An internal error occurred, preventing the "
-							+ "Connection object from creating a session.");
-				}
-				
-				Destination destination = null;
-				try {
-					destination = session.createTopic(topicName);
-				} catch (JMSException e) {
-					System.out.println("An internal error occurred, preventing the "
-							+ "session from creating a topic.");
-				}
-				
-				// create producer
-				try {
-					producer = session.createProducer(destination);
-				} catch (JMSException e) {
-					System.out.println("An internal error occurred, preventing the "
-							+ "session from creating a MessageProducer.");
-				}
-				try {
-					producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-				} catch (JMSException e) {
-					System.out.println("An internal error occurred, preventing the "
-							+ "JMS provider from setting the delivery mode.");
-				}
-				
-				TextMessage txtMessage = null;
-				try {
-					txtMessage = session.createTextMessage(jsonMessage);
-				} catch (JMSException e) {
-					System.out.println("An internal error occurred, preventing the " 
-							+ "JMS provider from creating the text message.");
-				}
-				
-				// publish topic to subscribers
-				try {
-					producer.send(txtMessage);
-				} catch (MessageFormatException e) {
-					System.out.println("The producer tried to send an invalid message.");
-				} catch (InvalidDestinationException e) {
-					System.out.println("The producer tried to send a message with an "
-							+ "invalid destination.");
-				} catch (UnsupportedOperationException e) {
-					System.out.println("The destination for the message was not specified "
-							+ "at creation time.");
-				} catch (JMSException e) {
-					System.out.println("An internal error occurred, preventing the " 
-							+ "producer from sending the message.");
-				}
+		
+		
+		JsonEventSerializer serializer = new JsonEventSerializer();
+		String jsonMessage = serializer.convertToJSON(event);
+		
+		try {
+			// create connection
+			Connection connection = connectionFactory.createConnection();
+			
+			// create session
+			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			
+			Destination destination = session.createTopic(topicName);
+			
+			
+			// create producer
+			MessageProducer producer = session.createProducer(destination);
+			producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+			
+			
+			TextMessage txtMessage = session.createTextMessage(jsonMessage);
+			
+			// publish topic to subscribers
+			producer.send(txtMessage);
+		} 
+		catch (MessageFormatException e) {
+			exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "The producer tried to send an invalid message.", e);
+		} catch (InvalidDestinationException e) {
+			exception = new PeregrineException(PeregrineErrorCodes.INVALID_DESTINATION, "The producer tried to send a message with an invalid destination.", e);
+		} catch (UnsupportedOperationException e) {
+			exception = new PeregrineException(PeregrineErrorCodes.DESTINATION_NOT_SUPPLIED, "The destination for the message was not specified at creation time.", e);
+		} catch (JMSException e) {
+			exception = new PeregrineException(PeregrineErrorCodes.JMS_INTERNAL_ERROR, "An internal error occurred, preventing the operation from occuring", e);
 		}
-
+		
+		if(exception != null){
+			// if anything bad occured, throw the exception
+			throw exception;
+		}
+	}
 }
