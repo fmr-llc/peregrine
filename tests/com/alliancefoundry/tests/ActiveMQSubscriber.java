@@ -5,11 +5,9 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.InvalidDestinationException;
 import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 
 import org.apache.activemq.spring.ActiveMQConnectionFactory;
 

@@ -1,16 +1,13 @@
 package com.alliancefoundry.tests;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
-import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +17,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.publisher.ActiveMQPublisher;
 import com.alliancefoundry.publisher.EventServicePublisher;
-import com.alliancefoundry.publisher.KafkaPublisher;
 import com.alliancefoundry.publisher.PublisherInterface;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
