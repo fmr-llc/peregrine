@@ -1,16 +1,13 @@
 package com.alliancefoundry.tests;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
-import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +19,6 @@ import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.publisher.ActiveMQPublisher;
 import com.alliancefoundry.publisher.EventServicePublisher;
-import com.alliancefoundry.publisher.KafkaPublisher;
 import com.alliancefoundry.publisher.PublisherInterface;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -52,7 +48,7 @@ public class ActiveMQTests {
 
 		ctx.close();
 		
-		ctx = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
+		ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
 		ctx.registerShutdownHook();
 		// Create subscribers/consumers
 		subscriber1 = ctx.getBean("activemqSubscriber1", ActiveMQSubscriber.class);
@@ -61,7 +57,7 @@ public class ActiveMQTests {
 		subscriber1.subscribeTopic("topic1");
 		
 		//  Create publisher
-		ctx = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
+		ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
 		ctx.registerShutdownHook();
 
 		// setup publiher

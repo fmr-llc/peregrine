@@ -3,18 +3,22 @@
  */
 package com.alliancefoundry.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
-import org.joda.time.DateTime;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -153,7 +157,6 @@ public class ActiveMQConsumerTests {
 	@Test
 	public void consumeTwoEventsTest() {
 		List<Event> actual = new ArrayList<Event>();
-//		final Event tempEvent;
 		MessageListener listener2;
 		listener2 = new MessageListener() {
 			public void onMessage(Message message) {
@@ -199,7 +202,6 @@ public class ActiveMQConsumerTests {
 	@Test
 	public void consumeMultipleEventsTest() {
 		List<Event> actual = new ArrayList<Event>();
-//		Event tempEvent1;
 		MessageListener listener2;
 		listener2 = new MessageListener() {
 			public void onMessage(Message message) {
@@ -480,10 +482,7 @@ public class ActiveMQConsumerTests {
 		Event actual = eventFromListener;
 		
 		assertEquals(expected.toString(), actual.toString());
-	}
-	
-	// Publish event to multiple topics???
-	
+	}	
 	
 	public boolean compareLists(List<Event> list1, List<Event> list2) {
 		if (list1.size() == list2.size()) {
