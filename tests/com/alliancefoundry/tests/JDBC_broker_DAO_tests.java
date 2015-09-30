@@ -35,11 +35,11 @@ public class JDBC_broker_DAO_tests {
 	public void setUp() throws Exception {
 		
 		AbstractApplicationContext ctx;
-		ctx = new ClassPathXmlApplicationContext("db-mock-events.xml");
+		ctx = new ClassPathXmlApplicationContext("kafka-mock-events.xml");
 
-		getEvent1 = ctx.getBean("parentEvent", Event.class);
-		getEvent2 = ctx.getBean("childEvent1", Event.class);
-		getEvent3 = ctx.getBean("childEvent2", Event.class);
+		getEvent1 = ctx.getBean("event8", Event.class);
+		getEvent2 = ctx.getBean("event9", Event.class);
+		getEvent3 = ctx.getBean("event10", Event.class);
 		
 		ctx.close(); 
 		
