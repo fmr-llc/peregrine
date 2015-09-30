@@ -14,21 +14,23 @@ public class EventServicePublisher {
 
 	@Autowired
 	private Map<String, PublisherInterface> publishers;
-	private IMapEvents mapper = new MapEventsImpl();
+	private BrokerConfig mapper = new KafkaActivemqImpl();
 	
-	public void setEventMapper(IMapEvents mapper){
+	public void setEventMapper(BrokerConfig mapper){
 		this.mapper = mapper;
 	}
 	
 	public void publishEventByMapper(Event event) throws PeregrineException{
 		
-		Map<String, String> eventConfig = mapper.getConfigFromEvent(event);
+		Map<String, String> eventConfig = mapper.getConfigForEvent(event);
 		if(eventConfig == null){
 			System.out.println("Event's topic and destination could not be determined");
 			throw new PeregrineException(PeregrineErrorCodes.INVALID_DESTINATION_OR_TOPIC, "Event's topic and destination could not be determined");
 		}
-		String destination = eventConfig.get(IMapEvents.DESTINATION_KEY);
-		String topic = eventConfig.get(IMapEvents.TOPIC_KEY);
+		
+		
+		String destination = eventConfig.get(BrokerConfig.DESTINATION_KEY);
+		String topic = eventConfig.get(BrokerConfig.TOPIC_KEY);
 		
 		PublisherInterface publisher = publishers.get(destination);
 		if(publisher != null){

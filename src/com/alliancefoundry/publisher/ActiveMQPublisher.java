@@ -85,14 +85,6 @@ public class ActiveMQPublisher implements PublisherInterface {
 		this.usingLoginCredentials = usingLoginCredentials;
 	}
 	
-	public String getDestType() {
-		return destType;
-	}
-
-	public void setDestType(String destType) {
-		this.destType = destType;
-	}
-
 	@Override
 	public void publishEvent(Event event, String topicName) throws PeregrineException  {
 		PeregrineException exception = null;

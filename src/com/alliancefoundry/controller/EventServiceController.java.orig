@@ -4,9 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+<<<<<<< HEAD
+import javax.ws.rs.Consumes;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
+=======
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
+>>>>>>> 421a38f4440c8bb6654938d765b6d664268eb0b9
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +23,13 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alliancefoundry.dao.DAO;
+<<<<<<< HEAD
+import com.alliancefoundry.dao.JDBCDAOimpl;
 import com.alliancefoundry.exceptions.PeregrineException;
+=======
+import com.alliancefoundry.dao.DAO;
+import com.alliancefoundry.exceptions.EventNotFoundException;
+>>>>>>> 421a38f4440c8bb6654938d765b6d664268eb0b9
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
 import com.alliancefoundry.publisher.EventServicePublisher;
@@ -34,15 +45,19 @@ import com.alliancefoundry.publisher.EventServicePublisher;
 public class EventServiceController  {
 	
 	static final Logger log = LoggerFactory.getLogger(EventServiceController.class);
+<<<<<<< HEAD
+	JDBCDAOimpl dao = new JDBCDAOimpl();
+	
+	@Autowired
+	private EventServicePublisher publisher;
+=======
 
 	@Autowired
 	DAO dao;
 	public void setDao(DAO dao) {
 		this.dao = dao;
 	}
-	
-	@Autowired
-	private EventServicePublisher publisher;
+>>>>>>> 421a38f4440c8bb6654938d765b6d664268eb0b9
 
 	/**
 	 * Creates a new event
