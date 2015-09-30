@@ -133,7 +133,259 @@ public class ActiveMQTests {
 			System.out.println("Error sleep interrupted.");
 		}
 		
-		Assert.assertTrue("Event id should be 44",eventTestPass1);
+		Assert.assertTrue("Event id should be "+customEventId,eventTestPass1);
+		
+	}	
+	
+	@Test
+	public void testSameTopic1() throws JsonProcessingException {
+//		fail("Not yet implemented");
+		
+		final int customEventId = 46;
+		
+		// create customer messageListener
+		MessageListener listener = new MessageListener() {
+			
+			public void onMessage(Message message) {
+				PeregrineException exception = null;
+				if(message instanceof TextMessage){
+					TextMessage txt = (TextMessage)message;
+					try {
+						String eventAsJson = txt.getText();
+						// turn json string back into event object
+						ObjectMapper mapper = new ObjectMapper(); 
+						Event event = mapper.readValue(eventAsJson, Event.class);
+						eventTestPass1 = customEventId == event.getSequenceNumber();
+					} catch (JsonParseException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error converting JSON to an Object.", e);
+					} catch (JsonMappingException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error mapping JSON to Object.", e);
+					} catch (IOException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error parsing input source", e);
+					} catch (JMSException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.JMS_INTERNAL_ERROR, "An internal error occurred", e);
+					}
+					
+					if(exception != null){
+						// Cannot throw exception here,
+						// Just log it
+						System.out.println("An error has occured, replace with a log");
+					}
+
+				}
+			}
+		};
+		
+		// attach listener to subscriber
+		subscriber1.setConsumerListener(listener);
+
+
+		event.setSequenceNumber(customEventId);
+
+		try {
+			manager.publishEventByMapper(event);
+		} catch (PeregrineException ex) {
+			System.out.println("Log - Error parsing input source");
+			ex.printStackTrace();
+		}
+		
+		// need to wait so that we have time to subscribe and publish
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			System.out.println("Error sleep interrupted.");
+		}
+		
+		Assert.assertTrue("Event id should be "+customEventId,eventTestPass1);
+		
+	}	
+	
+	@Test
+	public void testSameTopic2() throws JsonProcessingException {
+//		fail("Not yet implemented");
+		
+		final int customEventId = 100;
+		
+		// create customer messageListener
+		MessageListener listener = new MessageListener() {
+			
+			public void onMessage(Message message) {
+				PeregrineException exception = null;
+				if(message instanceof TextMessage){
+					TextMessage txt = (TextMessage)message;
+					try {
+						String eventAsJson = txt.getText();
+						// turn json string back into event object
+						ObjectMapper mapper = new ObjectMapper(); 
+						Event event = mapper.readValue(eventAsJson, Event.class);
+						eventTestPass1 = customEventId == event.getSequenceNumber();
+					} catch (JsonParseException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error converting JSON to an Object.", e);
+					} catch (JsonMappingException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error mapping JSON to Object.", e);
+					} catch (IOException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error parsing input source", e);
+					} catch (JMSException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.JMS_INTERNAL_ERROR, "An internal error occurred", e);
+					}
+					
+					if(exception != null){
+						// Cannot throw exception here,
+						// Just log it
+						System.out.println("An error has occured, replace with a log");
+					}
+
+				}
+			}
+		};
+		
+		// attach listener to subscriber
+		subscriber1.setConsumerListener(listener);
+
+
+		event.setSequenceNumber(customEventId);
+
+		try {
+			manager.publishEventByMapper(event);
+		} catch (PeregrineException ex) {
+			System.out.println("Log - Error parsing input source");
+			ex.printStackTrace();
+		}
+		
+		// need to wait so that we have time to subscribe and publish
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			System.out.println("Error sleep interrupted.");
+		}
+		
+		Assert.assertTrue("Event id should be "+customEventId,eventTestPass1);
+		
+	}	
+	
+	@Test
+	public void testSameTopic3() throws JsonProcessingException {
+//		fail("Not yet implemented");
+		
+		final int customEventId = 987;
+		
+		// create customer messageListener
+		MessageListener listener = new MessageListener() {
+			
+			public void onMessage(Message message) {
+				PeregrineException exception = null;
+				if(message instanceof TextMessage){
+					TextMessage txt = (TextMessage)message;
+					try {
+						String eventAsJson = txt.getText();
+						// turn json string back into event object
+						ObjectMapper mapper = new ObjectMapper(); 
+						Event event = mapper.readValue(eventAsJson, Event.class);
+						eventTestPass1 = customEventId == event.getSequenceNumber();
+					} catch (JsonParseException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error converting JSON to an Object.", e);
+					} catch (JsonMappingException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error mapping JSON to Object.", e);
+					} catch (IOException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error parsing input source", e);
+					} catch (JMSException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.JMS_INTERNAL_ERROR, "An internal error occurred", e);
+					}
+					
+					if(exception != null){
+						// Cannot throw exception here,
+						// Just log it
+						System.out.println("An error has occured, replace with a log");
+					}
+
+				}
+			}
+		};
+		
+		// attach listener to subscriber
+		subscriber1.setConsumerListener(listener);
+
+
+		event.setSequenceNumber(customEventId);
+
+		try {
+			manager.publishEventByMapper(event);
+		} catch (PeregrineException ex) {
+			System.out.println("Log - Error parsing input source");
+			ex.printStackTrace();
+		}
+		
+		// need to wait so that we have time to subscribe and publish
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			System.out.println("Error sleep interrupted.");
+		}
+		
+		Assert.assertTrue("Event id should be "+customEventId,eventTestPass1);
+		
+	}	
+	
+	@Test
+	public void testSameTopic4() throws JsonProcessingException {
+//		fail("Not yet implemented");
+		
+		final int customEventId = 45;
+		
+		// create customer messageListener
+		MessageListener listener = new MessageListener() {
+			
+			public void onMessage(Message message) {
+				PeregrineException exception = null;
+				if(message instanceof TextMessage){
+					TextMessage txt = (TextMessage)message;
+					try {
+						String eventAsJson = txt.getText();
+						// turn json string back into event object
+						ObjectMapper mapper = new ObjectMapper(); 
+						Event event = mapper.readValue(eventAsJson, Event.class);
+						eventTestPass1 = customEventId == event.getSequenceNumber();
+					} catch (JsonParseException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error converting JSON to an Object.", e);
+					} catch (JsonMappingException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error mapping JSON to Object.", e);
+					} catch (IOException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error parsing input source", e);
+					} catch (JMSException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.JMS_INTERNAL_ERROR, "An internal error occurred", e);
+					}
+					
+					if(exception != null){
+						// Cannot throw exception here,
+						// Just log it
+						System.out.println("An error has occured, replace with a log");
+					}
+
+				}
+			}
+		};
+		
+		// attach listener to subscriber
+		subscriber1.setConsumerListener(listener);
+
+
+		event.setSequenceNumber(customEventId);
+
+		try {
+			manager.publishEventByMapper(event);
+		} catch (PeregrineException ex) {
+			System.out.println("Log - Error parsing input source");
+			ex.printStackTrace();
+		}
+		
+		// need to wait so that we have time to subscribe and publish
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			System.out.println("Error sleep interrupted.");
+		}
+		
+		Assert.assertTrue("Event id should be "+customEventId,eventTestPass1);
 		
 	}	
 	
