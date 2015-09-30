@@ -152,6 +152,20 @@ public class JdbcTemplateDaoTest {
 			assert(true);
 		}
 	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void getMultipleEventsFromDbInvalidGenCountTest() throws IllegalArgumentException, EventNotFoundException  {
+		generations = 0;
+		EventsRequest req = new EventsRequest(createdAfter,null,null,null,null,null,generations);
+		dao.getEvents(req);
+	}
+	
+	@Test(expected=EventNotFoundException.class)
+	public void getMultipleEventsFromDbNoMatchingParamsTest() throws IllegalArgumentException, EventNotFoundException  {
+		//there shouldn't be any events with params matching ""
+		EventsRequest req = new EventsRequest(createdAfter,null,"","","","",generations);
+		dao.getEvents(req);
+	}
 
 	@Test
 	public void getMultipleEventsFromDbMultipleParamTest() throws IllegalArgumentException, EventNotFoundException {

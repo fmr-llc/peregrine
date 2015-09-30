@@ -141,6 +141,11 @@ public class EventServiceController  {
     	} else {
     		createdBeforeVal = new DateTime(createdBefore,DateTimeZone.UTC);
     	}
+    	if(generations != null && generations < 1){
+    		//TODO: Refactor how this condition is handled
+    		log.debug("Invalid value for generations.  Must be greater than 0");
+    		return null;
+    	}
     	EventsRequest req = new EventsRequest(createdAfterVal, createdBeforeVal, source, objectId,
     			correlationId, eventName, generations);
     	List<Event> eventsFromDb = new ArrayList<Event>();
