@@ -80,7 +80,7 @@ public class JDBC_broker_DAO_tests {
 		String expected = eventId;
 		String actual = eventFromDb.getEventId();
 		
-		KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testJaneDoe345");
+		KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testJaneDoe347");
 		String event_json = kafkaSubscriber.consumeEvent();
 		ObjectMapper mapper = new ObjectMapper(); 
 		Event actual2 = mapper.readValue(event_json, Event.class);
@@ -124,7 +124,7 @@ public class JDBC_broker_DAO_tests {
 		
 		//db insert check
 		assertEquals(expected,actual);	
-				
+		
 		//broker check
 		for(String evid : expected){
 			assertTrue(actual2.contains(evid));
