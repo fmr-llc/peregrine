@@ -9,17 +9,31 @@ public class Node {
 	private Event event;
 	private List<Node> children;
 	
+	/**
+	 * @param event	stored in the node
+	 */
 	public Node(Event event){
 		this.event = event;
 	}
 	
-	public Event getEvent(){
-		return this.event;
+	/**
+	 * @return the event
+	 */
+	public Event getEvent() {
+		return event;
 	}
-	public List<Node> getChildren(){
-		return this.children;
+
+	/**
+	 * @return the children
+	 */
+	public List<Node> getChildren() {
+		return children;
 	}
-	
+
+	/**
+	 * @param	event to be contained in the child node
+	 * @return	true if the child node was added, false if otherwise
+	 */
 	protected boolean insertNode(Event event){
 		if(event.getParentId() != null && event.getParentId().equals(this.event.getEventId())){
 			if(this.children == null) children = new ArrayList<Node>();
