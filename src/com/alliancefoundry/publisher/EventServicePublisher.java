@@ -12,7 +12,7 @@ public class EventServicePublisher {
 
 	@Autowired
 	private Map<String, PublisherInterface> publishers;
-	private BrokerConfig mapper = new KafkaActivemqImpl();
+	private BrokerConfig mapper = new BrokerConfigImpl();
 	
 	public void setEventMapper(BrokerConfig mapper){
 		this.mapper = mapper;

@@ -9,7 +9,7 @@ import java.util.Properties;
 
 import com.alliancefoundry.model.Event;
 
-public class KafkaActivemqImpl implements BrokerConfig {
+public class BrokerConfigImpl implements BrokerConfig {
 
 	@Override
 	public Map<String, String> getConfigForEvent(Event ev) {
