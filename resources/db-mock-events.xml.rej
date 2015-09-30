@@ -1,0 +1,10 @@
+diff a/resources/db-mock-events.xml b/resources/db-mock-events.xml	(rejected hunks)
+@@ -46,7 +46,7 @@
+ 		<property name="expirationTimeStamp" ref="expirationDateTime1" /> <!-- DateTime -->
+ 		<property name="preEventState" value="pre" />
+ 		<property name="postEventState" value="post" />
+-		<property name="isPublishable" value="true" /> <!-- Boolean -->
++		<property name="isPublishable" value="false" /> <!-- Boolean -->
+ 		<property name="insertTimeStamp" ref="insertDateTime1" /> <!-- DateTime -->
+ 	</bean>
+ 	
