@@ -2,6 +2,10 @@ package com.alliancefoundry.model;
 
 import org.joda.time.DateTime;
 
+/**
+ * Created by: Bobby Writtenberry
+ *
+ */
 public class EventsRequest {
 	
 	private DateTime createdAfter;
