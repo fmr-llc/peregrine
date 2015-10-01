@@ -28,7 +28,7 @@ import com.alliancefoundry.publisher.EventServicePublisher;
 
 
 /**
- * Created by: Paul Bernard
+ * Created by: Paul Bernard, Robert Coords
  * 
  *
  */
@@ -214,7 +214,7 @@ public class EventServiceController  {
 	 * @param eventId - Id of event to replay
 	 * @return whether or not the replay was successful
 	 */
-	@RequestMapping(value="/event", method = RequestMethod.GET)
+	@RequestMapping(value="/replay/{id}", method = RequestMethod.POST)
 	public String ReplayEvent(
 			@RequestParam(value="eventid", required=false) String eventId){
 		String message = String.format("Successfully replayed Event - Event Id: %s", eventId);
