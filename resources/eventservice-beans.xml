@@ -32,7 +32,6 @@
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
-				<value>classpath:broker.properties</value>
 				<value>classpath:db.properties</value>
 				<value>classpath:broker-config.properties</value>
 			</list>
@@ -46,11 +45,17 @@
 	 	<property name="password" value="${db.password}"/>
 	</bean>
 	 
-	 <bean id="kafkaPublisher" class="com.alliancefoundry.publisher.KafkaPublisher">
-		<property name="brokerUrl" value="${kafka.url}" />
+	 <bean id="kafkaPublisher" class="com.alliancefoundry.publisher.kafka.KafkaPublisher">
+		  <property name="properties">
+			<props>
+				<prop key="metadata.broker.list">${kafka.url}</prop>
+	            <prop key="serializer.class">${kafka.serializer.encoder}</prop>
+	            <prop key="request.required.acks">${kafka.producer.acknowledgement}</prop>
+			</props>
+		</property>
 	</bean>
 	
-	<bean id="activemqPublisher" class="com.alliancefoundry.publisher.ActiveMQPublisher">
+	<bean id="activemqPublisher" class="com.alliancefoundry.publisher.activemq.ActiveMQPublisher">
 		<property name="brokerUrl" value="${activemq.url}" />
 	</bean>
 	
@@ -69,7 +74,7 @@
 		<property name="name" value="${activemq.name2}" />
 	</bean>
 	
-	<bean id="eventPublisherservice" class="com.alliancefoundry.publisher.EventServicePublisher">
+	<bean id="eventPublisherservice" class="com.alliancefoundry.publisher.PublisherRouter">
 		<property name="publishers">
 			<bean class="org.springframework.beans.factory.config.MapFactoryBean">
 				<property name="targetMapClass">
@@ -83,6 +88,7 @@
 				</property>
 			</bean>
 		</property>
+		<property name="configFile" value="broker-destination.properties" />
 	</bean>
 	
     <mvc:annotation-driven />
@@ -91,7 +97,7 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 	
-	<bean id="dao" class="com.alliancefoundry.dao.JdbcTemplateDaoImpl">
+	<bean id="dao" class="com.alliancefoundry.dao.JdbcTemplateDao.JdbcTemplateDaoImpl">
 		<constructor-arg ref="jdbcTemplate" />
 	</bean>
 	
