@@ -74,7 +74,7 @@
 		<property name="name" value="${activemq.name2}" />
 	</bean>
 	
-	<bean id="eventPublisherservice" class="com.alliancefoundry.publisher.EventServicePublisher">
+	<bean id="eventPublisherservice" class="com.alliancefoundry.publisher.PublisherRouter">
 		<property name="publishers">
 			<bean class="org.springframework.beans.factory.config.MapFactoryBean">
 				<property name="targetMapClass">

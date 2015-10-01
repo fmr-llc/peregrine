@@ -20,9 +20,16 @@ import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
+import com.alliancefoundry.publisher.PublisherRouter;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+/**
+ * Created by: Paul Fahey
+ * 
+ *
+ */
 
 public class JDBC_broker_DAO_tests {
 	
@@ -34,6 +41,8 @@ public class JDBC_broker_DAO_tests {
 	Event getEvent1, getEvent2, getEvent3;
 	
 	List<Event> singleEventInsertList = new ArrayList<Event>();
+	
+	PublisherRouter publisher;
 
 	@Before
 	public void setUp() throws Exception {
@@ -52,6 +61,14 @@ public class JDBC_broker_DAO_tests {
 		dao = ctx.getBean("dao", IDAO.class);
 
 		ctx.close();
+		
+		AbstractApplicationContext pubctx;
+		pubctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
+		pubctx.registerShutdownHook();
+
+		// setup publiher
+		publisher = pubctx.getBean("eventPublisherservice", PublisherRouter.class);
+		pubctx.close();
 	}
 	
 	/***********************
@@ -80,6 +97,9 @@ public class JDBC_broker_DAO_tests {
 		
 		singleEventInsertList.add(event);
 		String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		
+		publisher.attemptPublishEvent(singleEventInsertList);
+		
 		singleEventInsertList.remove(0);
 	
 		eventFromDb = dao.getEvent(eventId);
@@ -120,6 +140,8 @@ public class JDBC_broker_DAO_tests {
 		List<String> expected = new ArrayList<String>();
 		expected = dao.insertEvents(events);
 		
+		publisher.attemptPublishEvent(events);
+	
 		List<String> actual = new ArrayList<String>();
 		
 		//for broker testing

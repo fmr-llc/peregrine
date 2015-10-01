@@ -9,6 +9,12 @@ import java.util.Properties;
 
 import com.alliancefoundry.model.Event;
 
+/**
+ * Created by: Paul Fahey, Curtis Robinson
+ * 
+ *
+ */
+
 public class BrokerConfigImpl implements IBrokerConfig {
 
 	@Override

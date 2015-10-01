@@ -19,6 +19,12 @@ import com.alliancefoundry.model.Event;
 import com.alliancefoundry.publisher.IPublisher;
 import com.alliancefoundry.serializer.JsonEventSerializer;
 
+/**
+ * Created by: Curtis Robinson
+ * 
+ *
+ */
+
 public class ActiveMQPublisher implements IPublisher {
 	
 	private String brokerUrl;

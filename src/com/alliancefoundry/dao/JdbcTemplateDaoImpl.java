@@ -10,22 +10,20 @@ import java.util.UUID;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-
-import com.alliancefoundry.exceptions.EventNotFoundException;
-import com.alliancefoundry.exceptions.PeregrineException;
-import com.alliancefoundry.model.DataItem;
-import com.alliancefoundry.model.Event;
-import com.alliancefoundry.model.EventsRequest;
-import com.alliancefoundry.publisher.EventServicePublisher;
-
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.jdbc.core.RowMapper;
+
+import com.alliancefoundry.exceptions.EventNotFoundException;
+import com.alliancefoundry.model.DataItem;
+import com.alliancefoundry.model.Event;
+import com.alliancefoundry.model.EventsRequest;
+import com.alliancefoundry.publisher.PublisherRouter;
 
 /**
  * Created by: Bobby Writtenberry
@@ -37,7 +35,7 @@ public class JdbcTemplateDaoImpl implements IDAO {
 	private JdbcTemplate jdbcTemplate;
 	private AbstractApplicationContext ctx;
 	private SqlQuery sql;
-	EventServicePublisher publisher;
+	PublisherRouter publisher;
 	public JdbcTemplateDaoImpl(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 		ctx = new ClassPathXmlApplicationContext("queries.xml");
@@ -71,10 +69,6 @@ public class JdbcTemplateDaoImpl implements IDAO {
 				insertIntoEventPayloadTable(payloadSql, event);
 				
 				eventIds.add(eventId);
-			}
-			for (Event event : events) {
-				//try to publish the event
-				attemptPublishEvent(event);
 			}
 				
 			return eventIds;
@@ -228,34 +222,6 @@ public class JdbcTemplateDaoImpl implements IDAO {
 					event.getCustomPayload().get(key).getValue(),
 					event.getCustomPayload().get(key).getDataType());
 		}
-	}
-	
-	/**
-	 * 
-	 * @param event		to be published
-	 */
-	private void attemptPublishEvent(Event event){
-		if(event.getIsPublishable() == true){
-				
-				ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
-				ctx.registerShutdownHook();
-
-				EventServicePublisher publisher = ctx.getBean("eventPublisherservice", EventServicePublisher.class);
-				ctx.close();
-				
-				publisher.connectPublishers();
-				try {
-					publisher.publishEventByMapper(event);
-				} catch (PeregrineException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				System.out.println("Event: " + event.getEventId()+ " was published");
-							
-			}
-			else{
-				System.out.println("Event: " + event.getEventId()+ " was not published");
-			}
 	}
 	
 	/**

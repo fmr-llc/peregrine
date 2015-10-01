@@ -10,7 +10,13 @@ import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 
-public class EventServicePublisher {
+/**
+ * Created by: Paul Fahey, Curtis Robinson
+ * 
+ *
+ */
+
+public class PublisherRouter {
 
 	@Autowired
 	private Map<String, IPublisher> publishers;
@@ -39,22 +45,36 @@ public class EventServicePublisher {
 		}
 
 	}
-	
-	public void publishEventByMapper(List<Event> events) throws PeregrineException {
 		
-		for(Event event : events){
-			publishEventByMapper(event);
-		}
-			
-	}
-	
 	public void connectPublishers(){
 		Set<String> keys = publishers.keySet();
 		for( String key : keys){
 			publishers.get(key).connect();
 		}
+			
+	}
+	
+	/**
+	 * 
+	 * @param events Events to be published
+	 * @throws PeregrineException 
+	 */
+	public void attemptPublishEvent(List<Event> events) throws PeregrineException{
 		
-		
+		for(Event event : events){
+			
+			if(event.getIsPublishable() == true){
+					
+				connectPublishers();
+				publishEventByMapper(event);
+
+				System.out.println("Event: " + event.getEventId()+ " was published");
+							
+			}
+			else{
+				System.out.println("Event: " + event.getEventId()+ " was not published");
+			}
+		}
 	}
 	
 	public Map<String, IPublisher> getPublishers() {

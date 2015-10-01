@@ -17,7 +17,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
-import com.alliancefoundry.publisher.EventServicePublisher;
+import com.alliancefoundry.publisher.PublisherRouter;
 import com.alliancefoundry.publisher.IPublisher;
 import com.alliancefoundry.publisher.activemq.ActiveMQPublisher;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -31,7 +31,7 @@ public class ActiveMQTests {
 	
 	ActiveMQSubscriber subscriber1;
 	ActiveMQPublisher publisher;
-	EventServicePublisher manager;
+	PublisherRouter manager;
 	Event event;
 	
 	private boolean eventTestPass1 = false;
@@ -61,7 +61,7 @@ public class ActiveMQTests {
 		ctx.registerShutdownHook();
 
 		// setup publiher
-		manager = ctx.getBean("eventPublisherservice", EventServicePublisher.class);
+		manager = ctx.getBean("eventPublisherservice", PublisherRouter.class);
 		ctx.close();
 		
 		manager.connectPublishers();

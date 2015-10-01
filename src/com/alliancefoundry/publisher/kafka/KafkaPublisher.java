@@ -11,6 +11,12 @@ import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 
+/**
+ * Created by: Paul Fahey
+ * 
+ *
+ */
+
 public class KafkaPublisher implements IPublisher {
 
 	private Producer<String, String> producer;		

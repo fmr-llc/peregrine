@@ -3,6 +3,12 @@ package com.alliancefoundry.publisher;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 
+/**
+ * Created by: Paul Fahey, Curtis Robinson
+ * 
+ *
+ */
+
 public interface IPublisher {
 
 	/**

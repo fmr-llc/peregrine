@@ -2,6 +2,12 @@ package com.alliancefoundry.publisher;
 
 import java.util.Map;
 
+/**
+ * Created by: Paul Fahey, Curtis Robinson
+ * 
+ *
+ */
+
 import com.alliancefoundry.model.Event;
 
 public interface IBrokerConfig {

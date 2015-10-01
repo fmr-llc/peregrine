@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
 /**
- * Created by: Paul Bernard, Bobby Writtenberry
+ * Created by: Paul Bernard, Bobby Writtenberry, Paul Fahey
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
