@@ -32,7 +32,6 @@
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
-				<value>classpath:broker.properties</value>
 				<value>classpath:db.properties</value>
 				<value>classpath:broker-config.properties</value>
 			</list>
@@ -50,8 +49,8 @@
 		  <property name="properties">
 			<props>
 				<prop key="metadata.broker.list">${kafka.url}</prop>
-	            <prop key="serializer.class">kafka.serializer.StringEncoder</prop>
-	            <prop key="request.required.acks">1</prop>
+	            <prop key="serializer.class">${kafka.serializer.encoder}</prop>
+	            <prop key="request.required.acks">${kafka.producer.acknowledgement}</prop>
 			</props>
 		</property>
 	</bean>
@@ -89,6 +88,7 @@
 				</property>
 			</bean>
 		</property>
+		<property name="configFile" value="broker-destination.properties" />
 	</bean>
 	
     <mvc:annotation-driven />

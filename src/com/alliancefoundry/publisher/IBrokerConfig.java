@@ -21,6 +21,6 @@ public interface IBrokerConfig {
 	 * @param ev Event that needs to determine its routing mechanism
 	 * @return Proper configuration mapping is returned for the router to use
 	 */
-	public Map<String, String> getConfigForEvent(Event ev);
+	public Map<String, String> getConfigForEvent(Event ev, String configFile);
 	
 }

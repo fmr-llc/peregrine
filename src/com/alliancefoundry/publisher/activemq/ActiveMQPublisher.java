@@ -1,7 +1,5 @@
 package com.alliancefoundry.publisher.activemq;
 
-import java.util.Map;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
@@ -18,8 +16,6 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.publisher.IPublisher;
 import com.alliancefoundry.serializer.JsonEventSerializer;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ActiveMQPublisher implements IPublisher {
 	
@@ -27,11 +23,8 @@ public class ActiveMQPublisher implements IPublisher {
 	private String username;
 	private String password;
 	private ConnectionFactory connectionFactory;
-	private boolean isConnected;
 	private boolean usingLoginCredentials = false;
-	private String destType;
 
-	
 	// required for bean
 	public ActiveMQPublisher() {
 

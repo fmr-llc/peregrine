@@ -12,6 +12,7 @@ public class EventServicePublisher {
 
 	@Autowired
 	private Map<String, IPublisher> publishers;
+	private String configFile;
 	private IBrokerConfig mapper = new BrokerConfigImpl();
 	
 	public void setEventMapper(IBrokerConfig mapper){
@@ -20,7 +21,7 @@ public class EventServicePublisher {
 	
 	public void publishEventByMapper(Event event){
 		
-		Map<String, String> eventConfig = mapper.getConfigForEvent(event);
+		Map<String, String> eventConfig = mapper.getConfigForEvent(event, this.getConfigFile());
 		if(eventConfig == null){
 			throw new RuntimeException("Event's topic and destination could not be determined");
 		}
@@ -59,6 +60,14 @@ public class EventServicePublisher {
 
 	public void setPublishers(Map<String, IPublisher> publishers) {
 		this.publishers = publishers;
+	}
+
+	public String getConfigFile() {
+		return configFile;
+	}
+
+	public void setConfigFile(String configFile) {
+		this.configFile = configFile;
 	}
 	
 }

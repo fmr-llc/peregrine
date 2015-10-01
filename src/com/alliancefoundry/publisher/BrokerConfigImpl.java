@@ -12,7 +12,7 @@ import com.alliancefoundry.model.Event;
 public class BrokerConfigImpl implements IBrokerConfig {
 
 	@Override
-	public Map<String, String> getConfigForEvent(Event ev) {
+	public Map<String, String> getConfigForEvent(Event ev, String configFile) {
 		
 		Map<String, String> config = null;
 
@@ -21,7 +21,7 @@ public class BrokerConfigImpl implements IBrokerConfig {
 			return null;
 		}
 		
-		List<String>  eventTypeDatas = getEventTypes();
+		List<String>  eventTypeDatas = getEventTypes(configFile);
 
 		for(String typeData : eventTypeDatas){
 			String[] bundle = typeData.split(",");
@@ -40,13 +40,13 @@ public class BrokerConfigImpl implements IBrokerConfig {
 		return config;
 	}
 	
-	public List<String>  getEventTypes(){
+	public List<String>  getEventTypes(String configFile){
 
 		Properties properties = new Properties();
 		List<String> types = new ArrayList<>();
 		
 		try {
-			properties.load(this.getClass().getClassLoader().getResourceAsStream("broker.properties"));
+			properties.load(this.getClass().getClassLoader().getResourceAsStream(configFile));
 		} catch (IOException e) {
 			System.out.println("Could Not Read Properties File");
 		}
