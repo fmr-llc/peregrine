@@ -1,18 +1,13 @@
 package com.alliancefoundry.controller;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-<<<<<<< HEAD
-import javax.ws.rs.Consumes;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.ModelAttribute;
-=======
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
->>>>>>> 421a38f4440c8bb6654938d765b6d664268eb0b9
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,13 +18,9 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-<<<<<<< HEAD
-import com.alliancefoundry.dao.JDBCDAOimpl;
-import com.alliancefoundry.exceptions.PeregrineException;
-=======
 import com.alliancefoundry.dao.DAO;
 import com.alliancefoundry.exceptions.EventNotFoundException;
->>>>>>> 421a38f4440c8bb6654938d765b6d664268eb0b9
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
 import com.alliancefoundry.publisher.EventServicePublisher;
@@ -37,7 +28,11 @@ import com.alliancefoundry.publisher.EventServicePublisher;
 
 
 /**
- * Created by: Paul Bernard
+<<<<<<< HEAD
+ * Created by: Paul Bernard, Robert Coords
+=======
+ * Created by: Paul Bernard, Bobby Writtenberry
+>>>>>>> bc6e4d8ea2bd2a424796bf10bd63d99c1dbc91e1
  * 
  *
  */
@@ -45,19 +40,15 @@ import com.alliancefoundry.publisher.EventServicePublisher;
 public class EventServiceController  {
 	
 	static final Logger log = LoggerFactory.getLogger(EventServiceController.class);
-<<<<<<< HEAD
-	JDBCDAOimpl dao = new JDBCDAOimpl();
-	
-	@Autowired
-	private EventServicePublisher publisher;
-=======
 
 	@Autowired
 	DAO dao;
 	public void setDao(DAO dao) {
 		this.dao = dao;
 	}
->>>>>>> 421a38f4440c8bb6654938d765b6d664268eb0b9
+	
+	@Autowired
+	private EventServicePublisher publisher;
 
 	/**
 	 * Creates a new event
@@ -67,12 +58,14 @@ public class EventServiceController  {
 	 */
 	@RequestMapping(value="/event", method = RequestMethod.POST)
 	public String setEvent(@RequestBody Event evt){
-		String eventId = "";
+		List<Event> events = new ArrayList<Event>();
+		events.add(evt);
+		List<String> eventIds = new ArrayList<String>();
 		evt.setReceivedTimeStamp(DateTime.now());
 		try {
-			eventId = dao.insertEvent(evt);
-			log.debug("created event with event id " + eventId);
-			return eventId;
+			eventIds.add(dao.insertEvents(events).get(0));
+			log.debug("created event with event id " + eventIds.get(0));
+			return eventIds.get(0);
 		} catch (DataIntegrityViolationException e) {
 			log.debug("Error inserting an event: " + e.getCause().getMessage());
 			return null;
@@ -160,6 +153,11 @@ public class EventServiceController  {
     	} else {
     		createdBeforeVal = new DateTime(createdBefore);
     	}
+    	if(generations != null && generations < 1){
+    		//TODO: Refactor how this condition is handled
+    		log.debug("Invalid value for generations.  Must be greater than 0");
+    		return null;
+    	}
     	EventsRequest req = new EventsRequest(createdAfterVal, createdBeforeVal, source, objectId,
     			correlationId, eventName, generations);
     	List<Event> eventsFromDb = new ArrayList<Event>();
@@ -227,7 +225,7 @@ public class EventServiceController  {
 	 * @param eventId - Id of event to replay
 	 * @return whether or not the replay was successful
 	 */
-	@RequestMapping(value="/event", method = RequestMethod.GET)
+	@RequestMapping(value="/replay/{id}", method = RequestMethod.POST)
 	public String ReplayEvent(
 			@RequestParam(value="eventid", required=false) String eventId){
 		String message = String.format("Successfully replayed Event - Event Id: %s", eventId);
@@ -235,13 +233,12 @@ public class EventServiceController  {
 		try {
 			Event eventFromDb = dao.getEvent(eventId);
 			publisher.publishEventByMapper(eventFromDb);
-		} catch (SQLException e) {
-			log.debug("Error inserting an event: " + e.getMessage());
-			message = String.format("Event could not be found. Event Id: %s", eventId);
 		} catch (PeregrineException e) {
 			log.debug("Error replaying event");
 			log.debug("Error Message: " + e.getMessage());
 			message = String.format("Event could not be replayed. Event Id: %s", eventId);
+		} catch (EventNotFoundException e) {
+			log.debug("Event cannot be found.");
 		}
 		return message;
 	}

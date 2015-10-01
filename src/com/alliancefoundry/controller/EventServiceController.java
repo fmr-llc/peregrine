@@ -28,7 +28,7 @@ import com.alliancefoundry.publisher.EventServicePublisher;
 
 
 /**
- * Created by: Paul Bernard, Robert Coords
+ * Created by: Paul Bernard, Bobby Writtenberry, Robert Coords
  * 
  *
  */
@@ -54,12 +54,14 @@ public class EventServiceController  {
 	 */
 	@RequestMapping(value="/event", method = RequestMethod.POST)
 	public String setEvent(@RequestBody Event evt){
-		String eventId = "";
+		List<Event> events = new ArrayList<Event>();
+		events.add(evt);
+		List<String> eventIds = new ArrayList<String>();
 		evt.setReceivedTimeStamp(DateTime.now());
 		try {
-			eventId = dao.insertEvent(evt);
-			log.debug("created event with event id " + eventId);
-			return eventId;
+			eventIds.add(dao.insertEvents(events).get(0));
+			log.debug("created event with event id " + eventIds.get(0));
+			return eventIds.get(0);
 		} catch (DataIntegrityViolationException e) {
 			log.debug("Error inserting an event: " + e.getCause().getMessage());
 			return null;
@@ -146,6 +148,11 @@ public class EventServiceController  {
     		createdBeforeVal = null;
     	} else {
     		createdBeforeVal = new DateTime(createdBefore);
+    	}
+    	if(generations != null && generations < 1){
+    		//TODO: Refactor how this condition is handled
+    		log.debug("Invalid value for generations.  Must be greater than 0");
+    		return null;
     	}
     	EventsRequest req = new EventsRequest(createdAfterVal, createdBeforeVal, source, objectId,
     			correlationId, eventName, generations);

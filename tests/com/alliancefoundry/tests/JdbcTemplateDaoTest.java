@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -20,13 +21,18 @@ import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
 
-public class JDBCDAOtest {
+/**
+ * Created by: Bobby Writtenberry
+ *
+ */
+public class JdbcTemplateDaoTest {
 	
 	DAO dao;
 	AbstractApplicationContext ctx;
 	Event event;
 	String eventId;
 	Event eventFromDb;
+	List<Event> singleEventInsertList = new ArrayList<Event>();
 	
 	Event getEvent1;
 	Event getEvent2;
@@ -62,13 +68,19 @@ public class JDBCDAOtest {
 		ctx = new ClassPathXmlApplicationContext("db-mock-events.xml");
 
 		getEvent1 = ctx.getBean("parentEvent", Event.class);
-		parentEventId = dao.insertEvent(getEvent1);
+		singleEventInsertList.add(getEvent1);
+		parentEventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		singleEventInsertList.remove(0);
 		getEvent2 = ctx.getBean("childEvent1", Event.class);
 		getEvent2.setParentId(parentEventId);
-		child1EventId = dao.insertEvent(getEvent2);
+		singleEventInsertList.add(getEvent2);
+		child1EventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		singleEventInsertList.remove(0);
 		getEvent3 = ctx.getBean("childEvent2", Event.class);
 		getEvent3.setParentId(parentEventId);
-		child2EventId = dao.insertEvent(getEvent3);
+		singleEventInsertList.add(getEvent3);
+		child2EventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		singleEventInsertList.remove(0);
 		
 		ctx.close();
 	}
@@ -152,6 +164,20 @@ public class JDBCDAOtest {
 			assert(true);
 		}
 	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void getMultipleEventsFromDbInvalidGenCountTest() throws IllegalArgumentException, EventNotFoundException  {
+		generations = 0;
+		EventsRequest req = new EventsRequest(createdAfter,null,null,null,null,null,generations);
+		dao.getEvents(req);
+	}
+	
+	@Test(expected=EventNotFoundException.class)
+	public void getMultipleEventsFromDbNoMatchingParamsTest() throws IllegalArgumentException, EventNotFoundException  {
+		//there shouldn't be any events with params matching ""
+		EventsRequest req = new EventsRequest(createdAfter,null,"","","","",generations);
+		dao.getEvents(req);
+	}
 
 	@Test
 	public void getMultipleEventsFromDbMultipleParamTest() throws IllegalArgumentException, EventNotFoundException {
@@ -210,7 +236,9 @@ public class JDBCDAOtest {
 		event.setCustomHeaders(headers);
 		event.setCustomPayload(payload);
 		
-		eventId = dao.insertEvent(event);
+		singleEventInsertList.add(event);
+		eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		singleEventInsertList.remove(0);
 		eventFromDb = dao.getEvent(eventId);
 		String expected = eventId;
 		String actual = eventFromDb.getEventId();
@@ -219,10 +247,12 @@ public class JDBCDAOtest {
 	
 	@Test
 	public void insertToAndRetrieveFromDbDateTimeTest() throws EventNotFoundException {
-		DateTime datetime = DateTime.now();
+		DateTime datetime = DateTime.now().toDateTime(DateTimeZone.UTC);
 		event = getEvent2;
 		event.setPublishTimeStamp(datetime);
-		eventId = dao.insertEvent(event);
+		singleEventInsertList.add(event);
+		eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		singleEventInsertList.remove(0);
 		eventFromDb = dao.getEvent(eventId);
 		//datetime before insert into one of the DateTime fields
 		String expected = datetime.toString();
@@ -246,7 +276,9 @@ public class JDBCDAOtest {
 		event2.setCustomHeaders(headers);
 		event2.setCustomPayload(payload);
 		
-		eventId = dao.insertEvent(event2);		
+		singleEventInsertList.add(event2);
+		eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		singleEventInsertList.remove(0);	
 	}
 	
 	/************************
@@ -269,7 +301,6 @@ public class JDBCDAOtest {
 		assertEquals(expected, actual);
 	}
 	
-	//FIX THIS. FIRST EVENT IS STILL BEING INSERTED.
 	@Test(expected=DataIntegrityViolationException.class)
 	public void insertMultipleEventsToDbInvalidEventTest() {
 		event = getEvent2;
