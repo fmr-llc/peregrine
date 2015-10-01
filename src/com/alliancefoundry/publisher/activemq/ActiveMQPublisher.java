@@ -1,4 +1,4 @@
-package com.alliancefoundry.publisher;
+package com.alliancefoundry.publisher.activemq;
 
 import java.util.Map;
 
@@ -16,6 +16,7 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import com.alliancefoundry.model.Event;
+import com.alliancefoundry.publisher.IPublisher;
 import com.alliancefoundry.serializer.JsonEventSerializer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

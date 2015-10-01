@@ -1,8 +1,9 @@
-package com.alliancefoundry.publisher;
+package com.alliancefoundry.publisher.kafka;
 
 import java.util.Properties;
 
 import com.alliancefoundry.model.Event;
+import com.alliancefoundry.publisher.IPublisher;
 import com.alliancefoundry.serializer.JsonEventSerializer;
 
 import kafka.javaapi.producer.Producer;

@@ -46,7 +46,7 @@
 	 	<property name="password" value="${db.password}"/>
 	</bean>
 	 
-	 <bean id="kafkaPublisher" class="com.alliancefoundry.publisher.KafkaPublisher">
+	 <bean id="kafkaPublisher" class="com.alliancefoundry.publisher.kafka.KafkaPublisher">
 		  <property name="properties">
 			<props>
 				<prop key="metadata.broker.list">${kafka.url}</prop>
@@ -56,7 +56,7 @@
 		</property>
 	</bean>
 	
-	<bean id="activemqPublisher" class="com.alliancefoundry.publisher.ActiveMQPublisher">
+	<bean id="activemqPublisher" class="com.alliancefoundry.publisher.activemq.ActiveMQPublisher">
 		<property name="brokerUrl" value="${activemq.url}" />
 	</bean>
 	
