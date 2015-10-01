@@ -9,8 +9,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+
 import com.alliancefoundry.exceptions.EventNotFoundException;
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
@@ -114,7 +115,11 @@ public class JdbcTemplateDaoImpl implements DAO {
 			return eventId;
 		} catch(DataIntegrityViolationException e) {
 			throw e;
+		} catch (PeregrineException e) {
+			e.printStackTrace();
 		}
+		
+		return null;
 	}
 
 	/**
@@ -186,7 +191,11 @@ public class JdbcTemplateDaoImpl implements DAO {
 	 				ctx.close();
 	 				
 	 				publisher.connectPublishers();
-	 				publisher.publishEventByMapper(event);
+	 				try {
+						publisher.publishEventByMapper(event);
+					} catch (PeregrineException e) {
+						e.printStackTrace();
+					}
 	 				System.out.println("Event: " + event.getEventId()+ " was published");
 	 							
 	 			}
@@ -398,7 +407,7 @@ public class JdbcTemplateDaoImpl implements DAO {
 			if(genCount < maxGens){
 				genList.add(n.getEvent());
 				if(n.getChildren() != null){
-					putGenerationsInList(n.getChildren(), genList, genCount + 1, maxGens);
+					putGenerationsInList(n.getChildren(), genList, ++genCount, maxGens);
 				}
 			}
 		}
@@ -417,9 +426,9 @@ public class JdbcTemplateDaoImpl implements DAO {
 		public Event mapRow(ResultSet rs, int index) throws SQLException {
 			Integer sequenceNumber = rs.getInt("sequenceNumber");
 			if (rs.wasNull()) sequenceNumber = null;
-			DateTime publishTimeStamp = new DateTime(rs.getLong("publishTimeStamp"),DateTimeZone.UTC);
+			DateTime publishTimeStamp = new DateTime(rs.getLong("publishTimeStamp"));
 			if (rs.wasNull()) publishTimeStamp = null;
-			DateTime expirationTimeStamp = new DateTime(rs.getLong("expirationTimeStamp"),DateTimeZone.UTC);
+			DateTime expirationTimeStamp = new DateTime(rs.getLong("expirationTimeStamp"));
 			if (rs.wasNull()) expirationTimeStamp = null;
 			
 			String eventId = rs.getString("eventId");
@@ -433,11 +442,12 @@ public class JdbcTemplateDaoImpl implements DAO {
 			String destination = rs.getString("destination");
 			String subdestination = rs.getString("subdestination");
 			boolean replayIndicator = rs.getBoolean("replayIndicator");
-			DateTime receivedTimeStamp = new DateTime((rs.getLong("receivedTimeStamp")),DateTimeZone.UTC);
+			DateTime receivedTimeStamp = new DateTime(rs.getLong("receivedTimeStamp"));
 			String preEventState = rs.getString("preEventState");
 			String postEventState = rs.getString("postEventState");
 			boolean isPublishable = rs.getBoolean("isPublishable");
-			DateTime insertTimeStamp = new DateTime(rs.getLong("insertTimeStamp"),DateTimeZone.UTC);
+			DateTime insertTimeStamp = new DateTime(rs.getLong("insertTimeStamp"));
+			
 			String headersSql = sql.getHeader();
 			List<String[]> headers = jdbcTemplate.query(headersSql,
 				new PreparedStatementSetter() {
