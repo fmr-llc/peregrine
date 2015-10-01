@@ -47,7 +47,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preStateFor43" />
 		<property name="postEventState" value="postStateFor43" />
-		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -69,7 +69,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime1" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
-		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime1" /> <!-- DateTime -->
 	</bean>
 	
@@ -91,7 +91,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime1" /> <!-- DateTime -->
 		<property name="preEventState" value="preStateFor43" />
 		<property name="postEventState" value="postStateFor43" />
-		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime1" /> <!-- DateTime -->
 	</bean>
 	
@@ -113,7 +113,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
-		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -135,7 +135,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -157,7 +157,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -179,7 +179,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -201,7 +201,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -223,7 +223,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -245,7 +245,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -267,7 +267,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -289,7 +289,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preState" />
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -311,7 +311,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState" value="postState" />
-		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	
@@ -333,7 +333,7 @@
 		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="postState" />
 		<property name="postEventState"><null/></property>
-		<property name="isPublishable" value="false" /> <!-- Boolean -->
+		<property name="isPublishable" value="true" /> <!-- Boolean -->
 		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
 	</bean>
 	

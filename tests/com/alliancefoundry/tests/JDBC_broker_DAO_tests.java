@@ -16,6 +16,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.alliancefoundry.dao.IDAO;
 import com.alliancefoundry.exceptions.EventNotFoundException;
+import com.alliancefoundry.exceptions.PeregrineErrorCodes;
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -30,6 +32,8 @@ public class JDBC_broker_DAO_tests {
 	Event eventFromDb;
 	
 	Event getEvent1, getEvent2, getEvent3;
+	
+	List<Event> singleEventInsertList = new ArrayList<Event>();
 
 	@Before
 	public void setUp() throws Exception {
@@ -55,11 +59,12 @@ public class JDBC_broker_DAO_tests {
 	 * @throws IOException 
 	 * @throws JsonMappingException 
 	 * @throws JsonParseException 
-	 * @throws EventNotFoundException *
+	 * @throws EventNotFoundException 
+	 * @throws PeregrineException *
 	 ***********************/
 	
 	@Test
-	public void insertToDbAndBrokerTest() throws JsonParseException, JsonMappingException, IOException, EventNotFoundException {
+	public void insertToDbAndBrokerTest() throws EventNotFoundException, PeregrineException {
 		event = getEvent2;
 
 		Map<String,String> headers = new HashMap<String,String>();
@@ -73,7 +78,9 @@ public class JDBC_broker_DAO_tests {
 		event.setCustomHeaders(headers);
 		event.setCustomPayload(payload);
 		
-		eventId = dao.insertEvent(event);
+		singleEventInsertList.add(event);
+		String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		singleEventInsertList.remove(0);
 	
 		eventFromDb = dao.getEvent(eventId);
 	
@@ -83,7 +90,16 @@ public class JDBC_broker_DAO_tests {
 		KafkaSubscriber kafkaSubscriber = new KafkaSubscriber("testJaneDoe347");
 		String event_json = kafkaSubscriber.consumeEvent();
 		ObjectMapper mapper = new ObjectMapper(); 
-		Event actual2 = mapper.readValue(event_json, Event.class);
+		Event actual2;
+		try {
+			actual2 = mapper.readValue(event_json, Event.class);
+		} catch (JsonParseException e) {
+			throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
+		} catch (JsonMappingException e) {
+			throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
+		} catch (IOException e) {
+			throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
+		}
 		
 		//db insert check
 		assertEquals(expected,actual);	
@@ -93,7 +109,7 @@ public class JDBC_broker_DAO_tests {
 	}
 	
 	@Test
-	public void insertMultipleEventsToDbTest() throws EventNotFoundException, JsonParseException, JsonMappingException, IOException {
+	public void insertMultipleEventsToDbTest() throws PeregrineException, EventNotFoundException {
 		
 		event = getEvent1;
 		Event event2 = getEvent3;
@@ -117,7 +133,16 @@ public class JDBC_broker_DAO_tests {
 			
 			String eventasString = kafkaSubscriber.consumeEvent();
 			ObjectMapper mapper = new ObjectMapper(); 
-			Event event = mapper.readValue(eventasString, Event.class);
+			Event event;
+			try {
+				event = mapper.readValue(eventasString, Event.class);
+			} catch (JsonParseException e) {
+				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
+			} catch (JsonMappingException e) {
+				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
+			} catch (IOException e) {
+				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
+			}
 
 			actual2.add(event.getEventId());
 		}

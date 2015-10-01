@@ -3,21 +3,27 @@
  */
 package com.alliancefoundry.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
-import org.joda.time.DateTime;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.alliancefoundry.exceptions.PeregrineErrorCodes;
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.publisher.EventServicePublisher;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -78,6 +84,7 @@ public class ActiveMQConsumerTests {
 		
 		listener = new MessageListener() {
 			public void onMessage(Message message) {
+				PeregrineException exception = null;
 				if(message instanceof TextMessage){
 					TextMessage txt = (TextMessage)message;
 					try {
@@ -85,16 +92,22 @@ public class ActiveMQConsumerTests {
 						// turn json string back into event object
 						ObjectMapper mapper = new ObjectMapper(); 
 						eventFromListener = mapper.readValue(eventAsJson, Event.class);
-					} catch (JsonParseException e) {
-						System.out.println("Error converting JSON to an Object.");
+					}  catch (JsonParseException e) {
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error converting JSON to an Object.", e);
 					} catch (JsonMappingException e) {
-						System.out.println("Error mapping JSON to Object.");
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error mapping JSON to Object.", e);
 					} catch (IOException e) {
-						System.out.println("Error parsing input source.");
+						exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error parsing input source", e);
 					} catch (JMSException e) {
-						System.out.println("An internal error occurred, preventing "
-								+ "the JMS provider from retrieving the text.");
+						exception = new PeregrineException(PeregrineErrorCodes.JMS_INTERNAL_ERROR, "An internal error occurred", e);
 					}
+					
+					if(exception != null){
+						// Cannot throw exception here,
+						// Just log it
+						System.out.println("An error has occured, replace with a log");
+					}
+
 				}				
 			}
 		};
@@ -106,7 +119,7 @@ public class ActiveMQConsumerTests {
 	
 	// Base Test 1
 	@Test
-	public void baseTest1() {
+	public void baseTest1() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 				
 		manager.publishEventByMapper(event1);
@@ -124,7 +137,7 @@ public class ActiveMQConsumerTests {
 	
 	// Base Test 2
 	@Test
-	public void baseTest2() {
+	public void baseTest2() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(event2);
@@ -142,9 +155,8 @@ public class ActiveMQConsumerTests {
 	
 	// Publish and consume 2 events from 1 topic
 	@Test
-	public void consumeTwoEventsTest() {
+	public void consumeTwoEventsTest() throws PeregrineException {
 		List<Event> actual = new ArrayList<Event>();
-//		final Event tempEvent;
 		MessageListener listener2;
 		listener2 = new MessageListener() {
 			public void onMessage(Message message) {
@@ -188,9 +200,8 @@ public class ActiveMQConsumerTests {
 	
 	// Publish and consume multiple events from 1 topic
 	@Test
-	public void consumeMultipleEventsTest() {
+	public void consumeMultipleEventsTest() throws PeregrineException {
 		List<Event> actual = new ArrayList<Event>();
-//		Event tempEvent1;
 		MessageListener listener2;
 		listener2 = new MessageListener() {
 			public void onMessage(Message message) {
@@ -235,7 +246,7 @@ public class ActiveMQConsumerTests {
 	
 	// Multiple subscribers consume the same event
 	@Test
-	public void consumeEventMultipleSubscribersTest() {
+	public void consumeEventMultipleSubscribersTest() throws PeregrineException {
 		MessageListener listener2;
 		listener2 = new MessageListener() {
 			public void onMessage(Message message) {
@@ -277,7 +288,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume event with Nulls test
 	@Test
-	public void nullEventTest() {
+	public void nullEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(event2);
@@ -295,7 +306,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null parent id
 	@Test
-	public void nullParentIdEventTest() {
+	public void nullParentIdEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullParentIdEvent);
@@ -313,7 +324,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null event name
 	@Test
-	public void nullEventNameEventTest() {
+	public void nullEventNameEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullEventNameEvent);
@@ -331,7 +342,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null correlation id
 	@Test
-	public void nullCorrelationIdEventTest() {
+	public void nullCorrelationIdEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullCorrelationIdEvent);
@@ -349,7 +360,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null sequence number
 	@Test
-	public void nullSequenceNumberEventTest() {
+	public void nullSequenceNumberEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullSequenceNumberEvent);
@@ -367,7 +378,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null data type
 	@Test
-	public void nullDataTypeEventTest() {
+	public void nullDataTypeEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullDataTypeEvent);
@@ -385,7 +396,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null source
 	@Test
-	public void nullSourceEventTest() {
+	public void nullSourceEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullSourceEvent);
@@ -403,7 +414,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null destination
 	@Test
-	public void nullDestinationEventTest() {
+	public void nullDestinationEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullDestinationEvent);
@@ -421,7 +432,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null subdestination
 	@Test
-	public void nullSubdestinationEventTest() {
+	public void nullSubdestinationEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullSubdestinationEvent);
@@ -439,7 +450,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null preEventState
 	@Test
-	public void nullPreEventStateEventTest() {
+	public void nullPreEventStateEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullPreEventStateEvent);
@@ -457,7 +468,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null postEventState
 	@Test
-	public void nullPostEventStateEventTest() {
+	public void nullPostEventStateEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullPostEventStateEvent);
@@ -471,10 +482,7 @@ public class ActiveMQConsumerTests {
 		Event actual = eventFromListener;
 		
 		assertEquals(expected.toString(), actual.toString());
-	}
-	
-	// Publish event to multiple topics???
-	
+	}	
 	
 	public boolean compareLists(List<Event> list1, List<Event> list2) {
 		if (list1.size() == list2.size()) {

@@ -1,5 +1,6 @@
 package com.alliancefoundry.publisher;
 
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 
 public interface IPublisher {
@@ -13,7 +14,8 @@ public interface IPublisher {
 	 * Publishes to a event topic
 	 * @param event Event object of interest
 	 * @param destination Destination for an event to be published to
+	 * @throws PeregrineException 
 	 */
-	public void publishEvent(Event event, String destination);
-	
+
+	public void publishEvent(Event event, String destination) throws PeregrineException;
 }
