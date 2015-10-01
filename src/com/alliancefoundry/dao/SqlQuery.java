@@ -1,5 +1,9 @@
 package com.alliancefoundry.dao;
 
+/**
+ * Created by: Bobby Writtenberry
+ *
+ */
 public class SqlQuery {
 
 	private String singleEventById;
