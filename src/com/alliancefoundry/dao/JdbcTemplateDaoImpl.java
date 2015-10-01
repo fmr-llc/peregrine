@@ -12,6 +12,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import com.alliancefoundry.exceptions.EventNotFoundException;
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
@@ -243,7 +244,12 @@ public class JdbcTemplateDaoImpl implements DAO {
 				ctx.close();
 				
 				publisher.connectPublishers();
-				publisher.publishEventByMapper(event);
+				try {
+					publisher.publishEventByMapper(event);
+				} catch (PeregrineException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				System.out.println("Event: " + event.getEventId()+ " was published");
 							
 			}
@@ -399,7 +405,7 @@ public class JdbcTemplateDaoImpl implements DAO {
 			if(genCount < maxGens){
 				genList.add(n.getEvent());
 				if(n.getChildren() != null){
-					putGenerationsInList(n.getChildren(), genList, genCount + 1, maxGens);
+					putGenerationsInList(n.getChildren(), genList, ++genCount, maxGens);
 				}
 			}
 		}

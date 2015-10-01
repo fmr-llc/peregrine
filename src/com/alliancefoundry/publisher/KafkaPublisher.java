@@ -2,6 +2,7 @@ package com.alliancefoundry.publisher;
 
 import java.util.Properties;
 
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.serializer.JsonEventSerializer;
 
@@ -39,7 +40,7 @@ public class KafkaPublisher implements PublisherInterface {
 	}
 	
 	@Override
-	public void publishEvent(Event event, String Topic) {
+	public void publishEvent(Event event, String Topic) throws PeregrineException {
 		
 		JsonEventSerializer serializer = new JsonEventSerializer();
 		String jsonEvent = serializer.convertToJSON(event);
