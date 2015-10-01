@@ -10,16 +10,16 @@ import javax.jms.TextMessage;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.Test;	
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
-import com.alliancefoundry.publisher.ActiveMQPublisher;
-import com.alliancefoundry.publisher.EventServicePublisher;
-import com.alliancefoundry.publisher.PublisherInterface;
+import com.alliancefoundry.publisher.PublisherRouter;
+import com.alliancefoundry.publisher.IPublisher;
+import com.alliancefoundry.publisher.activemq.ActiveMQPublisher;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -31,12 +31,12 @@ public class ActiveMQTests {
 	
 	ActiveMQSubscriber subscriber1;
 	ActiveMQPublisher publisher;
-	EventServicePublisher manager;
+	PublisherRouter manager;
 	Event event;
 	
 	private boolean eventTestPass1 = false;
 	
-	List<PublisherInterface> publishers;
+	List<IPublisher> publishers;
 
 	@Before
 	public void setUp() throws Exception {
@@ -61,7 +61,7 @@ public class ActiveMQTests {
 		ctx.registerShutdownHook();
 
 		// setup publiher
-		manager = ctx.getBean("eventPublisherservice", EventServicePublisher.class);
+		manager = ctx.getBean("eventPublisherservice", PublisherRouter.class);
 		ctx.close();
 		
 		manager.connectPublishers();

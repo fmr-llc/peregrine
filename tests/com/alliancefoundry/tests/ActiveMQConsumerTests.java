@@ -25,7 +25,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
-import com.alliancefoundry.publisher.EventServicePublisher;
+import com.alliancefoundry.publisher.PublisherRouter;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,7 +41,7 @@ public class ActiveMQConsumerTests {
 		nullSourceEvent, nullDestinationEvent, nullSubdestinationEvent, 
 		nullPreEventStateEvent, nullPostEventStateEvent;
 	Map<String, String> configs;
-	EventServicePublisher manager;
+	PublisherRouter manager;
 	MessageListener listener;
 	Event eventFromListener, secondEvent;
 	ActiveMQSubscriber subscriber, secondSubscriber, thirdSubscriber;
@@ -75,7 +75,7 @@ public class ActiveMQConsumerTests {
 		subscriber = ctx.getBean("activemqSubscriber1", ActiveMQSubscriber.class);
 		secondSubscriber = ctx.getBean("activemqSubscriber2", ActiveMQSubscriber.class);
 		thirdSubscriber = ctx.getBean("activemqSubscriber3", ActiveMQSubscriber.class);
-		manager = ctx.getBean("eventPublisherservice", EventServicePublisher.class);
+		manager = ctx.getBean("eventPublisherservice", PublisherRouter.class);
 		ctx.close();
 
 		subscriber.subscribeTopic("topic1");

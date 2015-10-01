@@ -11,7 +11,8 @@ import com.alliancefoundry.model.EventsRequest;
  * Created by: Bobby Writtenberry
  *
  */
-public interface DAO {
+public interface IDAO {
+
 	/**
 	 * @param events							list of events to be inserted
 	 * @return									list of event ids of the events that were inserted

@@ -1,35 +1,30 @@
 package com.alliancefoundry.controller;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.alliancefoundry.dao.DAO;
+import com.alliancefoundry.dao.IDAO;
 import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
-import com.alliancefoundry.publisher.EventServicePublisher;
-
-
+import com.alliancefoundry.publisher.PublisherRouter;
 
 /**
- * Created by: Paul Bernard, Bobby Writtenberry, Robert Coords
- * 
+ * Created by: Paul Bernard, Bobby Writtenberry, Paul Fahey, Robert Coords
  *
  */
 @RestController
@@ -38,13 +33,13 @@ public class EventServiceController  {
 	static final Logger log = LoggerFactory.getLogger(EventServiceController.class);
 
 	@Autowired
-	DAO dao;
-	public void setDao(DAO dao) {
+	IDAO dao;
+	public void setDao(IDAO dao) {
 		this.dao = dao;
 	}
 	
 	@Autowired
-	private EventServicePublisher publisher;
+	private PublisherRouter publisher;
 
 	/**
 	 * Creates a new event
@@ -61,9 +56,14 @@ public class EventServiceController  {
 		try {
 			eventIds.add(dao.insertEvents(events).get(0));
 			log.debug("created event with event id " + eventIds.get(0));
+			publisher.attemptPublishEvent(events);
 			return eventIds.get(0);
 		} catch (DataIntegrityViolationException e) {
 			log.debug("Error inserting an event: " + e.getCause().getMessage());
+			return null;
+		}catch (PeregrineException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 			return null;
 		}
 	}
@@ -82,6 +82,9 @@ public class EventServiceController  {
 				e.setReceivedTimeStamp(DateTime.now());
 			}
 			eventIds = dao.insertEvents(evts);
+			
+			publisher.attemptPublishEvent(evts);
+				
 			if (eventIds.size() > 0){
 			    log.debug("Created events with event id[s]" + eventIds.stream().collect(Collectors.joining("\n")));
 			} else {
@@ -90,6 +93,10 @@ public class EventServiceController  {
 			return eventIds;
 		} catch (DataIntegrityViolationException e) {
 			log.debug("Error inserting an event: " + e.getCause().getMessage() + ".  None of the events were inserted");
+			return null;
+		} catch (PeregrineException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 			return null;
 		}
 	}
@@ -225,10 +232,12 @@ public class EventServiceController  {
 	public String ReplayEvent(
 			@RequestParam(value="eventid", required=false) String eventId){
 		String message = String.format("Successfully replayed Event - Event Id: %s", eventId);
+		List<Event> events = new ArrayList<>();
 		
 		try {
 			Event eventFromDb = dao.getEvent(eventId);
-			publisher.publishEventByMapper(eventFromDb);
+			events.add(eventFromDb);
+			publisher.attemptPublishEvent(events);
 		} catch (PeregrineException e) {
 			log.debug("Error replaying event");
 			log.debug("Error Message: " + e.getMessage());
@@ -239,13 +248,11 @@ public class EventServiceController  {
 		return message;
 	}
 
-	public EventServicePublisher getPublisher() {
+	public PublisherRouter getPublisher() {
 		return publisher;
 	}
 
-	public void setPublisher(EventServicePublisher publisher) {
+	public void setPublisher(PublisherRouter publisher) {
 		this.publisher = publisher;
 	}
-	
-	
 }

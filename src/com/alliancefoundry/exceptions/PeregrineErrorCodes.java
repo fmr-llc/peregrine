@@ -1,5 +1,11 @@
 package com.alliancefoundry.exceptions;
 
+/**
+ * Created by: Curtis Robinson
+ * 
+ *
+ */
+
 public enum PeregrineErrorCodes {
 	
 	JSON_PARSE_ERROR,

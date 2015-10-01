@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -15,10 +15,16 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
-import com.alliancefoundry.publisher.EventServicePublisher;
+import com.alliancefoundry.publisher.PublisherRouter;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+/**
+ * Created by: Paul Fahey, Robert Coords
+ * 
+ *
+ */
 
 public class KafkaConsumeTests {
 	
@@ -26,7 +32,7 @@ public class KafkaConsumeTests {
 		nullParentEvent, nullEventNameEvent, nullCorrelationIdEvent, nullSequenceNumEvent, 
 		nullDataTypeEvent, nullSourceEvent, nullDestEvent, nullSubdestEvent, 
 		nullPreStateEvent, nullPostStateEvent;
-	EventServicePublisher publisher, publisher2;
+	PublisherRouter publisher, publisher2;
 
 	@Before
 	public void setUp() throws Exception {
@@ -70,7 +76,7 @@ public class KafkaConsumeTests {
 		pubctx.registerShutdownHook();
 
 		// setup publisher
-		publisher = pubctx.getBean("eventPublisherservice", EventServicePublisher.class);
+		publisher = pubctx.getBean("eventPublisherservice", PublisherRouter.class);
 		pubctx.close();
 		
 	}
@@ -132,9 +138,8 @@ public class KafkaConsumeTests {
 			
 			List<Event> expected = new ArrayList<Event>();
 			expected.add(event3); expected.add(event4);
-	
-			publisher.connectPublishers();
-			publisher.publishEventByMapper(expected);
+			
+			publisher.attemptPublishEvent(expected);
 			
 			List<Event> actual = new ArrayList<>();
 			
@@ -165,9 +170,8 @@ public class KafkaConsumeTests {
 			List<Event> expected = new ArrayList<Event>();
 			expected.add(event5); expected.add(event6); expected.add(event7);
 			
-			publisher.connectPublishers();
-			publisher.publishEventByMapper(expected);
-			
+			publisher.attemptPublishEvent(expected);
+
 			List<Event> actual = new ArrayList<>();
 			
 			for(int i = 0; i < expected.size(); i++){
@@ -236,7 +240,7 @@ public class KafkaConsumeTests {
 			pubctx2 = new ClassPathXmlApplicationContext("eventservice-beans.xml");
 			pubctx2.registerShutdownHook();
 
-			publisher2 = pubctx2.getBean("eventPublisherservice", EventServicePublisher.class);
+			publisher2 = pubctx2.getBean("eventPublisherservice", PublisherRouter.class);
 			pubctx2.close();
 			
 			publisher2.connectPublishers();
