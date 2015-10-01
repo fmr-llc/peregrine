@@ -7,13 +7,11 @@ import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
 
+/**
+ * Created by: Bobby Writtenberry
+ *
+ */
 public interface DAO {
-	/**
-	 * @param event								the event to be inserted
-	 * @return									the eventId of the inserted event
-	 * @throws DataIntegrityViolationException	if insertion data is invalid
-	 */
-	public String insertEvent(Event event) throws DataIntegrityViolationException;
 	/**
 	 * @param events							list of events to be inserted
 	 * @return									list of event ids of the events that were inserted

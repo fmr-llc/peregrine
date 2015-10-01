@@ -5,9 +5,13 @@ import java.util.List;
 
 import com.alliancefoundry.model.Event;
 
+/**
+ * Created by: Bobby Writtenberry
+ *
+ */
 public class Node {
 	private Event event;
-	private List<Node> children;
+	private final List<Node> children = new ArrayList<Node>();
 	private boolean inserted;
 	
 	/**
@@ -46,11 +50,10 @@ public class Node {
 	protected void insertNode(Event event, Node top){
 		top.inserted = false;
 		if(event.getParentId() != null && event.getParentId().equals(this.event.getEventId())){
-			if(this.children == null) children = new ArrayList<Node>();
 			children.add(new Node(event));
 			top.inserted = true;
 			return;
-		} else if(this.children != null){
+		} else {
 			for(Node n : this.children){
 				n.insertNode(event, top);
 			}

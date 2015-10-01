@@ -26,8 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
- * 
- * @author Bobby Writtenberry
+ * Created by: Bobby Writtenberry
  *
  */
 @Component
@@ -46,34 +45,6 @@ public class JdbcTemplateDaoImpl implements DAO {
 
 	public JdbcTemplateDaoImpl() {
 	}
-	
-	/**
-	 * @param event								the event to be inserted
-	 * @return									the eventId of the inserted event
-	 * @throws DataIntegrityViolationException	if insertion data is invalid
-	 */
-	public String insertEvent(Event event) throws DataIntegrityViolationException {
-		String eventSql = sql.getInsertSingleEvent();
-		String headersSql = sql.getInsertHeader();
-		String payloadSql = sql.getInsertPayload();
-		try{
-			//insert into event_store
-			String eventId = insertIntoEventStoreTable(eventSql, event);
-			
-			//insert into event_headers table
-			insertIntoEventHeadersTable(headersSql, event);
-		
-			//insert into event_payload table
-			insertIntoEventPayloadTable(payloadSql, event);
-			
-			//try to publish the event
-			attemptPublishEvent(event);
-				
-			return eventId;
-		} catch(DataIntegrityViolationException e) {
-			throw e;
-		}
-	}
 
 	/**
 	 * @param events							list of events to be inserted
@@ -86,7 +57,6 @@ public class JdbcTemplateDaoImpl implements DAO {
 		String eventSql = sql.getInsertSingleEvent();
 		String headersSql = sql.getInsertHeader();
 		String payloadSql = sql.getInsertPayload();
-		
 		try{
 			for (Event event : events) {
 				//insert into event_store

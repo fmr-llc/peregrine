@@ -1,5 +1,9 @@
 package com.alliancefoundry.model;
 
+/**
+ * Created by: Bobby Writtenberry
+ *
+ */
 public class DataItem {
 	
 	private String dataType;

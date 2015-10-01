@@ -25,7 +25,7 @@ import com.alliancefoundry.model.EventsRequest;
 
 
 /**
- * Created by: Paul Bernard
+ * Created by: Paul Bernard, Bobby Writtenberry
  * 
  *
  */
@@ -48,12 +48,14 @@ public class EventServiceController  {
 	 */
 	@RequestMapping(value="/event", method = RequestMethod.POST)
 	public String setEvent(@RequestBody Event evt){
-		String eventId = "";
+		List<Event> events = new ArrayList<Event>();
+		events.add(evt);
+		List<String> eventIds = new ArrayList<String>();
 		evt.setReceivedTimeStamp(DateTime.now());
 		try {
-			eventId = dao.insertEvent(evt);
-			log.debug("created event with event id " + eventId);
-			return eventId;
+			eventIds.add(dao.insertEvents(events).get(0));
+			log.debug("created event with event id " + eventIds.get(0));
+			return eventIds.get(0);
 		} catch (DataIntegrityViolationException e) {
 			log.debug("Error inserting an event: " + e.getCause().getMessage());
 			return null;

@@ -1,7 +1,8 @@
 package com.alliancefoundry.exceptions;
 
 /**
- * @author Bobby Writtenberry
+ * Created by: Bobby Writtenberry
+ *
  * 
  * Exception to be thrown when an event can not be found
  * 
