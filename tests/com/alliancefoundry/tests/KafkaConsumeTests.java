@@ -69,7 +69,7 @@ public class KafkaConsumeTests {
 		pubctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
 		pubctx.registerShutdownHook();
 
-		// setup publiher
+		// setup publisher
 		publisher = pubctx.getBean("eventPublisherservice", EventServicePublisher.class);
 		pubctx.close();
 		
