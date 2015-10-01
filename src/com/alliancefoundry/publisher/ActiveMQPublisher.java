@@ -20,7 +20,7 @@ import com.alliancefoundry.serializer.JsonEventSerializer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class ActiveMQPublisher implements PublisherInterface {
+public class ActiveMQPublisher implements IPublisher {
 	
 	private String brokerUrl;
 	private String username;
@@ -84,14 +84,14 @@ public class ActiveMQPublisher implements PublisherInterface {
 	}
 	
 	@Override
-	public void publishEvent(Event event, String Topic) {
+	public void publishEvent(Event event, String topic) {
 		
 		// create connection
 				Connection connection = null;
 				Session session = null;
 				MessageProducer producer = null;
 				
-				String topicName = Topic;
+				String topicName = topic;
 				
 				JsonEventSerializer serializer = new JsonEventSerializer();
 				String jsonMessage = serializer.convertToJSON(event);

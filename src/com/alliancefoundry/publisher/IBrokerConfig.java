@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.alliancefoundry.model.Event;
 
-public interface BrokerConfig {
+public interface IBrokerConfig {
 	
 	/**
 	 * Constant to map the broker destination for a given event

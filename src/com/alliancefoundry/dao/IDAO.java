@@ -7,7 +7,7 @@ import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
 
-public interface DAO {
+public interface IDAO {
 	/**
 	 * @param event								the event to be inserted
 	 * @return									the eventId of the inserted event

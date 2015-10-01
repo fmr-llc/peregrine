@@ -2,7 +2,7 @@ package com.alliancefoundry.publisher;
 
 import com.alliancefoundry.model.Event;
 
-public interface PublisherInterface {
+public interface IPublisher {
 
 	/**
 	 * Connection implementation for a given broker
@@ -12,8 +12,8 @@ public interface PublisherInterface {
 	/** 
 	 * Publishes to a event topic
 	 * @param event Event object of interest
-	 * @param Topic Destination for an event to be published to
+	 * @param destination Destination for an event to be published to
 	 */
-	public void publishEvent(Event event, String Topic);
+	public void publishEvent(Event event, String destination);
 	
 }

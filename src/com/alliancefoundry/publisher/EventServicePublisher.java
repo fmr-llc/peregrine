@@ -11,10 +11,10 @@ import com.alliancefoundry.model.Event;
 public class EventServicePublisher {
 
 	@Autowired
-	private Map<String, PublisherInterface> publishers;
-	private BrokerConfig mapper = new BrokerConfigImpl();
+	private Map<String, IPublisher> publishers;
+	private IBrokerConfig mapper = new BrokerConfigImpl();
 	
-	public void setEventMapper(BrokerConfig mapper){
+	public void setEventMapper(IBrokerConfig mapper){
 		this.mapper = mapper;
 	}
 	
@@ -26,10 +26,10 @@ public class EventServicePublisher {
 		}
 		
 		
-		String destination = eventConfig.get(BrokerConfig.DESTINATION_KEY);
-		String topic = eventConfig.get(BrokerConfig.TOPIC_KEY);
+		String destination = eventConfig.get(IBrokerConfig.DESTINATION_KEY);
+		String topic = eventConfig.get(IBrokerConfig.TOPIC_KEY);
 		
-		PublisherInterface publisher = publishers.get(destination);
+		IPublisher publisher = publishers.get(destination);
 		if(publisher != null){
 			publisher.publishEvent(event, topic);
 		}
@@ -53,11 +53,11 @@ public class EventServicePublisher {
 		
 	}
 	
-	public Map<String, PublisherInterface> getPublishers() {
+	public Map<String, IPublisher> getPublishers() {
 		return publishers;
 	}
 
-	public void setPublishers(Map<String, PublisherInterface> publishers) {
+	public void setPublishers(Map<String, IPublisher> publishers) {
 		this.publishers = publishers;
 	}
 	

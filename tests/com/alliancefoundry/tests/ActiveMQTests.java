@@ -21,7 +21,7 @@ import com.alliancefoundry.model.Event;
 import com.alliancefoundry.publisher.ActiveMQPublisher;
 import com.alliancefoundry.publisher.EventServicePublisher;
 import com.alliancefoundry.publisher.KafkaPublisher;
-import com.alliancefoundry.publisher.PublisherInterface;
+import com.alliancefoundry.publisher.IPublisher;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -38,7 +38,7 @@ public class ActiveMQTests {
 	
 	private boolean eventTestPass1 = false;
 	
-	List<PublisherInterface> publishers;
+	List<IPublisher> publishers;
 
 	@Before
 	public void setUp() throws Exception {

@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.alliancefoundry.dao.DAO;
+import com.alliancefoundry.dao.IDAO;
 import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JDBC_broker_DAO_tests {
 	
-	DAO dao;
+	IDAO dao;
 	Event event;
 	String eventId;
 	Event eventFromDb;
@@ -45,7 +45,7 @@ public class JDBC_broker_DAO_tests {
 		
 		ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
 		
-		dao = ctx.getBean("dao", DAO.class);
+		dao = ctx.getBean("dao", IDAO.class);
 
 		ctx.close();
 	}

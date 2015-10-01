@@ -13,7 +13,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import com.alliancefoundry.dao.DAO;
+import com.alliancefoundry.dao.IDAO;
 import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
@@ -21,7 +21,7 @@ import com.alliancefoundry.model.EventsRequest;
 
 public class JDBCDAOtest {
 	
-	DAO dao;
+	IDAO dao;
 	AbstractApplicationContext ctx;
 	Event event;
 	String eventId;
@@ -47,7 +47,7 @@ public class JDBCDAOtest {
 	@Before
 	public void setUp() throws Exception {
 		ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
-		dao = ctx.getBean("dao", DAO.class);
+		dao = ctx.getBean("dao", IDAO.class);
 
 		createdAfter = new DateTime(0);
 		createdBefore = DateTime.now();

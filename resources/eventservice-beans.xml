@@ -47,8 +47,13 @@
 	</bean>
 	 
 	 <bean id="kafkaPublisher" class="com.alliancefoundry.publisher.KafkaPublisher">
-		<property name="brokerUrl" value="${kafka.url}" />
-		<property name="kafkaProperties" ref="kafkaProperties" />
+		  <property name="properties">
+			<props>
+				<prop key="metadata.broker.list">${kafka.url}</prop>
+	            <prop key="serializer.class">kafka.serializer.StringEncoder</prop>
+	            <prop key="request.required.acks">1</prop>
+			</props>
+		</property>
 	</bean>
 	
 	<bean id="activemqPublisher" class="com.alliancefoundry.publisher.ActiveMQPublisher">
@@ -84,16 +89,6 @@
 				</property>
 			</bean>
 		</property>
-	</bean>
-	
-	<bean id="kafkaProperties" class="java.util.Properties" >
-	    <constructor-arg>
-	        <props>
-	            <prop key="metadata.broker.list">${kafka.url}</prop>
-	            <prop key="serializer.class">kafka.serializer.StringEncoder</prop>
-	            <prop key="request.required.acks">1</prop>
-	        </props>
-	    </constructor-arg>
 	</bean>
 	
     <mvc:annotation-driven />

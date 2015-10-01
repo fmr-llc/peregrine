@@ -16,7 +16,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alliancefoundry.dao.DAO;
+import com.alliancefoundry.dao.IDAO;
 import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
@@ -34,8 +34,8 @@ public class EventServiceController  {
 	static final Logger log = LoggerFactory.getLogger(EventServiceController.class);
 
 	@Autowired
-	DAO dao;
-	public void setDao(DAO dao) {
+	IDAO dao;
+	public void setDao(IDAO dao) {
 		this.dao = dao;
 	}
 

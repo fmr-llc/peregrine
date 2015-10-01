@@ -19,7 +19,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import com.alliancefoundry.dao.DAO;
+import com.alliancefoundry.dao.IDAO;
 import com.alliancefoundry.dao.JdbcTemplateDaoImpl;
 import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.model.DataItem;
@@ -32,7 +32,7 @@ import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
  */
 public class PersistEventTests {
 	
-	DAO dao;
+	IDAO dao;
 	AbstractApplicationContext ctx;
 	String storedEventId = "";
 	Event event1, event2, event3, event4, event5, event6, event7, event8, event9, 
@@ -44,7 +44,7 @@ public class PersistEventTests {
 	@Before
 	public void setUp() throws Exception {
 		ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
-		dao = ctx.getBean("dao", DAO.class);
+		dao = ctx.getBean("dao", IDAO.class);
 		
 		AbstractApplicationContext ctx;
 		ctx = new ClassPathXmlApplicationContext("db-mock-events.xml");

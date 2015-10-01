@@ -9,10 +9,10 @@ import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 
-public class KafkaPublisher implements PublisherInterface {
+public class KafkaPublisher implements IPublisher {
 
-	private Producer<String, String> producer;
-	private String brokerUrl;
+	private Producer<String, String> producer;		
+	private Properties properties;
 
 	public KafkaPublisher() {
 		
@@ -20,32 +20,27 @@ public class KafkaPublisher implements PublisherInterface {
 	
 	@Override
 	public void connect() {
-		Properties props = new Properties();
-
-		props.put("metadata.broker.list", brokerUrl);
-		props.put("serializer.class", "kafka.serializer.StringEncoder");
-		props.put("request.required.acks", "1");
-
-		ProducerConfig config = new ProducerConfig(props);
+		
+		ProducerConfig config = new ProducerConfig(this.getProperties());
 		producer = new Producer<String, String>(config);
 	}
 	
-	public String getBrokerUrl() {
-		return brokerUrl;
-	}
-
-	public void setBrokerUrl(String brokerUrl) {
-		this.brokerUrl = brokerUrl;
-	}
-	
 	@Override
-	public void publishEvent(Event event, String Topic) {
+	public void publishEvent(Event event, String destination) {
 		
 		JsonEventSerializer serializer = new JsonEventSerializer();
 		String jsonEvent = serializer.convertToJSON(event);
 
-		String topic = Topic;
+		String topic = destination;
 		KeyedMessage<String, String> jsonData = new KeyedMessage<String, String>(topic, jsonEvent);
 		producer.send(jsonData);		
+	}
+
+	public Properties getProperties() {
+		return properties;
+	}
+	
+	public void setProperties(Properties properties) {
+		this.properties = properties;
 	}
 }

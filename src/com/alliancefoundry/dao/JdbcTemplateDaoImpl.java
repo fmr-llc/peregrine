@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.jdbc.core.RowMapper;
 
 @Component
-public class JdbcTemplateDaoImpl implements DAO {
+public class JdbcTemplateDaoImpl implements IDAO {
 	
 	private JdbcTemplate jdbcTemplate;
 	private AbstractApplicationContext ctx;

@@ -9,7 +9,7 @@ import java.util.Properties;
 
 import com.alliancefoundry.model.Event;
 
-public class BrokerConfigImpl implements BrokerConfig {
+public class BrokerConfigImpl implements IBrokerConfig {
 
 	@Override
 	public Map<String, String> getConfigForEvent(Event ev) {
