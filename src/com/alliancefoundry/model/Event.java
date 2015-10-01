@@ -3,6 +3,7 @@ package com.alliancefoundry.model;
 import java.util.HashMap;
 import java.util.Map;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import com.alliancefoundry.serializer.JsonDateTimeSerializer;
 import com.alliancefoundry.serializer.JsonDateTimeDeserializer;
@@ -15,7 +16,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
 /**
- * Created by: Paul Bernard, Bobby Writtenberry
+ * Created by: Paul Bernard, Bobby Writtenberry, Paul Fahey
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)

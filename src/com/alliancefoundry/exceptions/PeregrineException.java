@@ -1,5 +1,11 @@
 package com.alliancefoundry.exceptions;
 
+/**
+ * Created by: Curtis Robinson
+ * 
+ *
+ */
+
 public class PeregrineException extends Exception {
 	
 	PeregrineErrorCodes errorCode;

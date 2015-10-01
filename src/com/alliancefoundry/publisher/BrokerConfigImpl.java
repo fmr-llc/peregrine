@@ -7,12 +7,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import com.alliancefoundry.exceptions.PeregrineErrorCodes;
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 
-public class KafkaActivemqImpl implements BrokerConfig {
+/**
+ * Created by: Paul Fahey, Curtis Robinson
+ * 
+ *
+ */
+
+public class BrokerConfigImpl implements IBrokerConfig {
 
 	@Override
-	public Map<String, String> getConfigForEvent(Event ev) {
+	public Map<String, String> getConfigForEvent(Event ev, String configFile) throws PeregrineException {
 		
 		Map<String, String> config = null;
 
@@ -21,7 +29,7 @@ public class KafkaActivemqImpl implements BrokerConfig {
 			return null;
 		}
 		
-		List<String>  eventTypeDatas = getEventTypes();
+		List<String>  eventTypeDatas = getEventTypes(configFile);
 
 		for(String typeData : eventTypeDatas){
 			String[] bundle = typeData.split(",");
@@ -40,15 +48,16 @@ public class KafkaActivemqImpl implements BrokerConfig {
 		return config;
 	}
 	
-	public List<String>  getEventTypes(){
+	public List<String>  getEventTypes(String configFile) throws PeregrineException{
 
 		Properties properties = new Properties();
 		List<String> types = new ArrayList<>();
 		
 		try {
-			properties.load(this.getClass().getClassLoader().getResourceAsStream("broker.properties"));
+			properties.load(this.getClass().getClassLoader().getResourceAsStream(configFile));
 		} catch (IOException e) {
-			System.out.println("Could Not Read Properties File");
+			PeregrineException exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error reading configuration file.", e);
+			throw exception;
 		}
 				
 		for (Map.Entry<Object, Object> entry : properties.entrySet())
