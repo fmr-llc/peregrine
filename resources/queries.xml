@@ -3,7 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 	
-	<bean id="sql" class="com.alliancefoundry.dao.SqlQuery">
+	<bean id="sql" class="com.alliancefoundry.dao.JdbcTemplateDao.SqlQuery">
     	<property name="singleEventById" value="SELECT * FROM event_store WHERE eventId = ? LIMIT 1" />
     	<property name="multipleEventsById" value="SELECT * FROM event_store WHERE TRUE" />
     	<property name="header" value="SELECT name,value FROM event_headers WHERE eventId = ?" />

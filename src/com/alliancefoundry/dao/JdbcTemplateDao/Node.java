@@ -1,4 +1,4 @@
-package com.alliancefoundry.dao;
+package com.alliancefoundry.dao.JdbcTemplateDao;
 
 import java.util.ArrayList;
 import java.util.List;

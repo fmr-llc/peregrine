@@ -1,4 +1,4 @@
-package com.alliancefoundry.dao;
+package com.alliancefoundry.dao.JdbcTemplateDao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,6 +19,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alliancefoundry.dao.IDAO;
 import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;

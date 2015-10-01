@@ -1,4 +1,4 @@
-package com.alliancefoundry.dao;
+package com.alliancefoundry.dao.JdbcTemplateDao;
 
 /**
  * Created by: Bobby Writtenberry

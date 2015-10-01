@@ -2,6 +2,8 @@ package com.alliancefoundry.publisher;
 
 import java.util.Map;
 
+import com.alliancefoundry.exceptions.PeregrineException;
+
 /**
  * Created by: Paul Fahey, Curtis Robinson
  * 
@@ -27,7 +29,8 @@ public interface IBrokerConfig {
 	 * @param ev Event that needs to determine its routing mechanism
 	 * @param configFile File name for event routing configuration
 	 * @return Proper configuration mapping is returned for the router to use
+	 * @throws PeregrineException 
 	 */
-	public Map<String, String> getConfigForEvent(Event ev, String configFile);
+	public Map<String, String> getConfigForEvent(Event ev, String configFile) throws PeregrineException;
 	
 }

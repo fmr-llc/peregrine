@@ -23,11 +23,8 @@ import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
 import com.alliancefoundry.publisher.PublisherRouter;
 
-
-
 /**
- * Created by: Paul Bernard, Bobby Writtenberry, Paul Fahey
- * 
+ * Created by: Paul Bernard, Bobby Writtenberry, Paul Fahey, Robert Coords
  *
  */
 @RestController
@@ -86,7 +83,7 @@ public class EventServiceController  {
 			}
 			eventIds = dao.insertEvents(evts);
 			
-				publisher.attemptPublishEvent(evts);
+			publisher.attemptPublishEvent(evts);
 				
 			if (eventIds.size() > 0){
 			    log.debug("Created events with event id[s]" + eventIds.stream().collect(Collectors.joining("\n")));
@@ -231,14 +228,16 @@ public class EventServiceController  {
 	 * @param eventId - Id of event to replay
 	 * @return whether or not the replay was successful
 	 */
-	@RequestMapping(value="/event", method = RequestMethod.GET)
+	@RequestMapping(value="/replay/{id}", method = RequestMethod.POST)
 	public String ReplayEvent(
 			@RequestParam(value="eventid", required=false) String eventId){
 		String message = String.format("Successfully replayed Event - Event Id: %s", eventId);
+		List<Event> events = new ArrayList<>();
 		
 		try {
 			Event eventFromDb = dao.getEvent(eventId);
-			publisher.publishEventByMapper(eventFromDb);
+			events.add(eventFromDb);
+			publisher.attemptPublishEvent(events);
 		} catch (PeregrineException e) {
 			log.debug("Error replaying event");
 			log.debug("Error Message: " + e.getMessage());
