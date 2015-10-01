@@ -137,7 +137,7 @@ public class ActiveMQConsumerTests {
 	
 	// Base Test 2
 	@Test
-	public void baseTest2() {
+	public void baseTest2() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(event2);
@@ -155,7 +155,7 @@ public class ActiveMQConsumerTests {
 	
 	// Publish and consume 2 events from 1 topic
 	@Test
-	public void consumeTwoEventsTest() {
+	public void consumeTwoEventsTest() throws PeregrineException {
 		List<Event> actual = new ArrayList<Event>();
 		MessageListener listener2;
 		listener2 = new MessageListener() {
@@ -200,7 +200,7 @@ public class ActiveMQConsumerTests {
 	
 	// Publish and consume multiple events from 1 topic
 	@Test
-	public void consumeMultipleEventsTest() {
+	public void consumeMultipleEventsTest() throws PeregrineException {
 		List<Event> actual = new ArrayList<Event>();
 		MessageListener listener2;
 		listener2 = new MessageListener() {
@@ -246,7 +246,7 @@ public class ActiveMQConsumerTests {
 	
 	// Multiple subscribers consume the same event
 	@Test
-	public void consumeEventMultipleSubscribersTest() {
+	public void consumeEventMultipleSubscribersTest() throws PeregrineException {
 		MessageListener listener2;
 		listener2 = new MessageListener() {
 			public void onMessage(Message message) {
@@ -288,7 +288,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume event with Nulls test
 	@Test
-	public void nullEventTest() {
+	public void nullEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(event2);
@@ -306,7 +306,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null parent id
 	@Test
-	public void nullParentIdEventTest() {
+	public void nullParentIdEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullParentIdEvent);
@@ -324,7 +324,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null event name
 	@Test
-	public void nullEventNameEventTest() {
+	public void nullEventNameEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullEventNameEvent);
@@ -342,7 +342,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null correlation id
 	@Test
-	public void nullCorrelationIdEventTest() {
+	public void nullCorrelationIdEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullCorrelationIdEvent);
@@ -360,7 +360,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null sequence number
 	@Test
-	public void nullSequenceNumberEventTest() {
+	public void nullSequenceNumberEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullSequenceNumberEvent);
@@ -378,7 +378,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null data type
 	@Test
-	public void nullDataTypeEventTest() {
+	public void nullDataTypeEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullDataTypeEvent);
@@ -396,7 +396,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null source
 	@Test
-	public void nullSourceEventTest() {
+	public void nullSourceEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullSourceEvent);
@@ -414,7 +414,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null destination
 	@Test
-	public void nullDestinationEventTest() {
+	public void nullDestinationEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullDestinationEvent);
@@ -432,7 +432,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null subdestination
 	@Test
-	public void nullSubdestinationEventTest() {
+	public void nullSubdestinationEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullSubdestinationEvent);
@@ -450,7 +450,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null preEventState
 	@Test
-	public void nullPreEventStateEventTest() {
+	public void nullPreEventStateEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullPreEventStateEvent);
@@ -468,7 +468,7 @@ public class ActiveMQConsumerTests {
 	
 	// Consume an event with a null postEventState
 	@Test
-	public void nullPostEventStateEventTest() {
+	public void nullPostEventStateEventTest() throws PeregrineException {
 		subscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullPostEventStateEvent);

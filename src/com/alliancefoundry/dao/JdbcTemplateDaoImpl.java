@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.joda.time.DateTime;
 
 import com.alliancefoundry.exceptions.EventNotFoundException;
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
@@ -114,7 +115,11 @@ public class JdbcTemplateDaoImpl implements DAO {
 			return eventId;
 		} catch(DataIntegrityViolationException e) {
 			throw e;
+		} catch (PeregrineException e) {
+			e.printStackTrace();
 		}
+		
+		return null;
 	}
 
 	/**
@@ -186,7 +191,11 @@ public class JdbcTemplateDaoImpl implements DAO {
 	 				ctx.close();
 	 				
 	 				publisher.connectPublishers();
-	 				publisher.publishEventByMapper(event);
+	 				try {
+						publisher.publishEventByMapper(event);
+					} catch (PeregrineException e) {
+						e.printStackTrace();
+					}
 	 				System.out.println("Event: " + event.getEventId()+ " was published");
 	 							
 	 			}

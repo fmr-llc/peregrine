@@ -1,5 +1,6 @@
 package com.alliancefoundry.controller;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alliancefoundry.dao.DAO;
+import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
@@ -220,13 +222,12 @@ public class EventServiceController  {
 		try {
 			Event eventFromDb = dao.getEvent(eventId);
 			publisher.publishEventByMapper(eventFromDb);
-		} catch (SQLException e) {
-			log.debug("Error inserting an event: " + e.getMessage());
-			message = String.format("Event could not be found. Event Id: %s", eventId);
 		} catch (PeregrineException e) {
 			log.debug("Error replaying event");
 			log.debug("Error Message: " + e.getMessage());
 			message = String.format("Event could not be replayed. Event Id: %s", eventId);
+		} catch (EventNotFoundException e) {
+			log.debug("Event cannot be found.");
 		}
 		return message;
 	}
