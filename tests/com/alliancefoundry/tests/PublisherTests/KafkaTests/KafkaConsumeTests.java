@@ -1,4 +1,4 @@
-package com.alliancefoundry.tests;
+package com.alliancefoundry.tests.PublisherTests.KafkaTests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

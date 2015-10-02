@@ -1,4 +1,4 @@
-package com.alliancefoundry.tests;
+package com.alliancefoundry.tests.DAOTests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

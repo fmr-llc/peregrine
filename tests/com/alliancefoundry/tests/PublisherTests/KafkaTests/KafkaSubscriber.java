@@ -1,4 +1,4 @@
-package com.alliancefoundry.tests;
+package com.alliancefoundry.tests.PublisherTests.KafkaTests;
 
 import java.util.HashMap;
 import java.util.List;

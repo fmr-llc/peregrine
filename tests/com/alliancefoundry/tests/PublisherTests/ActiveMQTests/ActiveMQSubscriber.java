@@ -1,4 +1,4 @@
-package com.alliancefoundry.tests;
+package com.alliancefoundry.tests.PublisherTests.ActiveMQTests;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.alliancefoundry.tests;
+package com.alliancefoundry.tests.PublisherTests.ActiveMQTests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

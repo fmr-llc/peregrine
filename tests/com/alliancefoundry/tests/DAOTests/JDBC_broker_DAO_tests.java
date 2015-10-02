@@ -1,4 +1,4 @@
-package com.alliancefoundry.tests;
+package com.alliancefoundry.tests.DAOTests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -21,6 +21,7 @@ import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.publisher.PublisherRouter;
+import com.alliancefoundry.tests.PublisherTests.KafkaTests.KafkaSubscriber;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

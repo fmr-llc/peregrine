@@ -1,4 +1,4 @@
-package com.alliancefoundry.tests;
+package com.alliancefoundry.tests.PublisherTests.ActiveMQTests;
 
 import java.io.IOException;
 import java.util.List;
