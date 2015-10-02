@@ -1,4 +1,4 @@
-package com.alliancefoundry.tests;
+package com.alliancefoundry.tests.DAOTests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -21,6 +21,7 @@ import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.publisher.PublisherRouter;
+import com.alliancefoundry.tests.PublisherTests.KafkaTests.KafkaSubscriber;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,8 +40,6 @@ public class JDBC_broker_DAO_tests {
 	Event eventFromDb;
 	
 	Event getEvent1, getEvent2, getEvent3;
-	
-	List<Event> singleEventInsertList = new ArrayList<Event>();
 	
 	PublisherRouter publisher;
 
@@ -95,12 +94,9 @@ public class JDBC_broker_DAO_tests {
 		event.setCustomHeaders(headers);
 		event.setCustomPayload(payload);
 		
-		singleEventInsertList.add(event);
-		String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		String eventId = dao.insertEvent(event);
 		
-		publisher.attemptPublishEvent(singleEventInsertList);
-		
-		singleEventInsertList.remove(0);
+		publisher.attemptPublishEvent(event);
 	
 		eventFromDb = dao.getEvent(eventId);
 	
@@ -140,7 +136,7 @@ public class JDBC_broker_DAO_tests {
 		List<String> expected = new ArrayList<String>();
 		expected = dao.insertEvents(events);
 		
-		publisher.attemptPublishEvent(events);
+		publisher.attemptPublishEvents(events);
 	
 		List<String> actual = new ArrayList<String>();
 		
