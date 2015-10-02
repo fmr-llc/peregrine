@@ -38,13 +38,11 @@ public class JdbcTemplateDaoImpl implements IDAO {
 	private SqlQuery sql;
 	PublisherRouter publisher;
 	public JdbcTemplateDaoImpl(JdbcTemplate jdbcTemplate) {
+		super();
 		this.jdbcTemplate = jdbcTemplate;
 		ctx = new ClassPathXmlApplicationContext("queries.xml");
 		sql = ctx.getBean("sql", SqlQuery.class);
 		ctx.close();
-	}
-
-	public JdbcTemplateDaoImpl() {
 	}
 
 	/**
