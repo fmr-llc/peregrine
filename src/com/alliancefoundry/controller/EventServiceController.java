@@ -49,15 +49,13 @@ public class EventServiceController  {
 	 */
 	@RequestMapping(value="/event", method = RequestMethod.POST)
 	public String setEvent(@RequestBody Event evt){
-		List<Event> events = new ArrayList<Event>();
-		events.add(evt);
-		List<String> eventIds = new ArrayList<String>();
+		String eventId;
 		evt.setReceivedTimeStamp(DateTime.now());
 		try {
-			eventIds.add(dao.insertEvents(events).get(0));
-			log.debug("created event with event id " + eventIds.get(0));
-			publisher.attemptPublishEvent(events);
-			return eventIds.get(0);
+			eventId = dao.insertEvent(evt);
+			log.debug("created event with event id " + eventId);
+			publisher.attemptPublishEvent(evt);
+			return eventId;
 		} catch (DataIntegrityViolationException e) {
 			log.debug("Error inserting an event: " + e.getCause().getMessage());
 			return null;
@@ -83,7 +81,7 @@ public class EventServiceController  {
 			}
 			eventIds = dao.insertEvents(evts);
 			
-			publisher.attemptPublishEvent(evts);
+			publisher.attemptPublishEvents(evts);
 				
 			if (eventIds.size() > 0){
 			    log.debug("Created events with event id[s]" + eventIds.stream().collect(Collectors.joining("\n")));
@@ -232,12 +230,10 @@ public class EventServiceController  {
 	public String ReplayEvent(
 			@RequestParam(value="eventid", required=false) String eventId){
 		String message = String.format("Successfully replayed Event - Event Id: %s", eventId);
-		List<Event> events = new ArrayList<>();
 		
 		try {
 			Event eventFromDb = dao.getEvent(eventId);
-			events.add(eventFromDb);
-			publisher.attemptPublishEvent(events);
+			publisher.attemptPublishEvent(eventFromDb);
 		} catch (PeregrineException e) {
 			log.debug("Error replaying event");
 			log.debug("Error Message: " + e.getMessage());

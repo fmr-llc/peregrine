@@ -139,7 +139,7 @@ public class KafkaConsumeTests {
 			List<Event> expected = new ArrayList<Event>();
 			expected.add(event3); expected.add(event4);
 			
-			publisher.attemptPublishEvent(expected);
+			publisher.attemptPublishEvents(expected);
 			
 			List<Event> actual = new ArrayList<>();
 			
@@ -170,7 +170,7 @@ public class KafkaConsumeTests {
 			List<Event> expected = new ArrayList<Event>();
 			expected.add(event5); expected.add(event6); expected.add(event7);
 			
-			publisher.attemptPublishEvent(expected);
+			publisher.attemptPublishEvents(expected);
 
 			List<Event> actual = new ArrayList<>();
 			

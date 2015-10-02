@@ -32,7 +32,6 @@ public class JdbcTemplateDaoTest {
 	Event event;
 	String eventId;
 	Event eventFromDb;
-	List<Event> singleEventInsertList = new ArrayList<Event>();
 	
 	Event getEvent1;
 	Event getEvent2;
@@ -68,19 +67,13 @@ public class JdbcTemplateDaoTest {
 		ctx = new ClassPathXmlApplicationContext("db-mock-events.xml");
 
 		getEvent1 = ctx.getBean("parentEvent", Event.class);
-		singleEventInsertList.add(getEvent1);
-		parentEventId = (dao.insertEvents(singleEventInsertList)).get(0);
-		singleEventInsertList.remove(0);
+		parentEventId = dao.insertEvent(getEvent1);
 		getEvent2 = ctx.getBean("childEvent1", Event.class);
 		getEvent2.setParentId(parentEventId);
-		singleEventInsertList.add(getEvent2);
-		child1EventId = (dao.insertEvents(singleEventInsertList)).get(0);
-		singleEventInsertList.remove(0);
+		child1EventId = dao.insertEvent(getEvent2);
 		getEvent3 = ctx.getBean("childEvent2", Event.class);
 		getEvent3.setParentId(parentEventId);
-		singleEventInsertList.add(getEvent3);
-		child2EventId = (dao.insertEvents(singleEventInsertList)).get(0);
-		singleEventInsertList.remove(0);
+		child2EventId = dao.insertEvent(getEvent3);
 		
 		ctx.close();
 	}
@@ -235,10 +228,8 @@ public class JdbcTemplateDaoTest {
 		
 		event.setCustomHeaders(headers);
 		event.setCustomPayload(payload);
-		
-		singleEventInsertList.add(event);
-		eventId = (dao.insertEvents(singleEventInsertList)).get(0);
-		singleEventInsertList.remove(0);
+
+		eventId = dao.insertEvent(event);
 		eventFromDb = dao.getEvent(eventId);
 		String expected = eventId;
 		String actual = eventFromDb.getEventId();
@@ -250,9 +241,7 @@ public class JdbcTemplateDaoTest {
 		DateTime datetime = DateTime.now().toDateTime(DateTimeZone.UTC);
 		event = getEvent2;
 		event.setPublishTimeStamp(datetime);
-		singleEventInsertList.add(event);
-		eventId = (dao.insertEvents(singleEventInsertList)).get(0);
-		singleEventInsertList.remove(0);
+		eventId = dao.insertEvent(event);
 		eventFromDb = dao.getEvent(eventId);
 		//datetime before insert into one of the DateTime fields
 		String expected = datetime.toString();
@@ -276,9 +265,7 @@ public class JdbcTemplateDaoTest {
 		event2.setCustomHeaders(headers);
 		event2.setCustomPayload(payload);
 		
-		singleEventInsertList.add(event2);
-		eventId = (dao.insertEvents(singleEventInsertList)).get(0);
-		singleEventInsertList.remove(0);	
+		eventId = dao.insertEvent(event2);
 	}
 	
 	/************************
