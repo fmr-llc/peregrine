@@ -49,21 +49,18 @@ public class EventServiceController  {
 	 */
 	@RequestMapping(value="/event", method = RequestMethod.POST)
 	public String setEvent(@RequestBody Event evt){
-		List<Event> events = new ArrayList<Event>();
-		events.add(evt);
-		List<String> eventIds = new ArrayList<String>();
+		String eventId;
 		evt.setReceivedTimeStamp(DateTime.now());
 		try {
-			eventIds.add(dao.insertEvents(events).get(0));
-			log.debug("created event with event id " + eventIds.get(0));
-			publisher.attemptPublishEvent(events);
-			return eventIds.get(0);
+			eventId = dao.insertEvent(evt);
+			log.info("created event with event id " + eventId);
+			publisher.attemptPublishEvent(evt);
+			return eventId;
 		} catch (DataIntegrityViolationException e) {
-			log.debug("Error inserting an event: " + e.getCause().getMessage());
+			log.error("Error inserting an event: " + e.getCause().getMessage());
 			return null;
-		}catch (PeregrineException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		}catch (PeregrineException e) {
+			log.error("Error inserting an event: " + e.getCause().getMessage());
 			return null;
 		}
 	}
@@ -83,20 +80,19 @@ public class EventServiceController  {
 			}
 			eventIds = dao.insertEvents(evts);
 			
-			publisher.attemptPublishEvent(evts);
+			publisher.attemptPublishEvents(evts);
 				
 			if (eventIds.size() > 0){
-			    log.debug("Created events with event id[s]" + eventIds.stream().collect(Collectors.joining("\n")));
+			    log.info("Created events with event id[s]" + eventIds.stream().collect(Collectors.joining("\n")));
 			} else {
-				log.debug("No events provided to insert");
+				log.info("No events provided to insert");
 			}
 			return eventIds;
 		} catch (DataIntegrityViolationException e) {
-			log.debug("Error inserting an event: " + e.getCause().getMessage() + ".  None of the events were inserted");
+			log.error("Error inserting an event: " + e.getCause().getMessage() + ".  None of the events were inserted");
 			return null;
-		} catch (PeregrineException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (PeregrineException e) {
+			log.error("Error inserting an event: " + e.getCause().getMessage());
 			return null;
 		}
 	}
@@ -112,13 +108,13 @@ public class EventServiceController  {
 		try {
 			Event eventFromDb = dao.getEvent(id);
 			if(eventFromDb != null) {
-	        	log.debug("retrieved event with event id " + eventFromDb.getEventId());
+	        	log.info("retrieved event with event id " + eventFromDb.getEventId());
 	        } else {
-	        	log.debug("No event could be retrieved with the specified id");
+	        	log.info("No event could be retrieved with the specified id");
 	        }
 	        return eventFromDb;
 		} catch (EventNotFoundException e) {
-			log.debug("Error retrieving event: " + e.getMessage());
+			log.error("Error retrieving event: " + e.getMessage());
 			return null;
 		}
     }
@@ -158,7 +154,7 @@ public class EventServiceController  {
     	}
     	if(generations != null && generations < 1){
     		//TODO: Refactor how this condition is handled
-    		log.debug("Invalid value for generations.  Must be greater than 0");
+    		log.error("Invalid value for generations.  Must be greater than 0");
     		return null;
     	}
     	EventsRequest req = new EventsRequest(createdAfterVal, createdBeforeVal, source, objectId,
@@ -171,16 +167,16 @@ public class EventServiceController  {
     			eventIds.add(e.getEventId());
     		}
     		if(eventIds.size() > 0){
-    			log.debug("retrieved events with event id[s] " + eventIds.stream().collect(Collectors.joining("\n")));
+    			log.info("retrieved events with event id[s] " + eventIds.stream().collect(Collectors.joining("\n")));
     		} else {
-    			log.debug("No events match the specified request parameters");
+    			log.info("No events match the specified request parameters");
     		}
     		return eventsFromDb;
     	} catch(IllegalArgumentException e){
-    		log.debug("Incorrect or missing request parameter: " + e.getMessage());
+    		log.error("Incorrect or missing request parameter: " + e.getMessage());
     		return null;
     	} catch(EventNotFoundException e) {
-    		log.debug("Error retrieving an event: " + e.getMessage());
+    		log.error("Error retrieving an event: " + e.getMessage());
     		return null;
     	}
     }
@@ -207,16 +203,16 @@ public class EventServiceController  {
 		try {
 			event = dao.getLatestEvent(req);
 			if(event != null){
-	    		log.debug("retrieved event with event id " + event.getEventId());
+	    		log.info("retrieved event with event id " + event.getEventId());
 	    	} else {
-	    		log.debug("No event matches the specified request parameters");
+	    		log.info("No event matches the specified request parameters");
 	    	}
 			return event;
 		} catch(IllegalArgumentException e){
-    		log.debug("Incorrect or missing request parameter: " + e.getMessage());
+    		log.error("Incorrect or missing request parameter: " + e.getMessage());
     		return null;
 		} catch (EventNotFoundException e) {
-			log.debug("Error retrieving event: " + e.getMessage());
+			log.error("Error retrieving event: " + e.getMessage());
 			return null;
 		}
     }
@@ -232,18 +228,16 @@ public class EventServiceController  {
 	public String ReplayEvent(
 			@RequestParam(value="eventid", required=false) String eventId){
 		String message = String.format("Successfully replayed Event - Event Id: %s", eventId);
-		List<Event> events = new ArrayList<>();
 		
 		try {
 			Event eventFromDb = dao.getEvent(eventId);
-			events.add(eventFromDb);
-			publisher.attemptPublishEvent(events);
+			publisher.attemptPublishEvent(eventFromDb);
 		} catch (PeregrineException e) {
-			log.debug("Error replaying event");
-			log.debug("Error Message: " + e.getMessage());
+			log.error("Error replaying event");
+			log.error("Error Message: " + e.getMessage());
 			message = String.format("Event could not be replayed. Event Id: %s", eventId);
 		} catch (EventNotFoundException e) {
-			log.debug("Event cannot be found.");
+			log.error("Event cannot be found.");
 		}
 		return message;
 	}

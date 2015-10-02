@@ -7,10 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +31,6 @@ public class PersistEventTests {
 	String storedEventId = "";
 	Event event1, event2, event3, event4, event5, event6, event7, event8, event9, 
 		event10, event11, event12;
-	List<Event> singleEventInsertList = new ArrayList<Event>();
 
 	/**
 	 * @throws java.lang.Exception
@@ -77,10 +73,8 @@ public class PersistEventTests {
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.add(event);
-		String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		String eventId = dao.insertEvent(event);
 		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.remove(0);
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;
@@ -100,10 +94,8 @@ public class PersistEventTests {
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.add(event);
-		String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		String eventId = dao.insertEvent(event);
 		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.remove(0);
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;
@@ -123,10 +115,8 @@ public class PersistEventTests {
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.add(event);
-		String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		String eventId = dao.insertEvent(event);
 		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.remove(0);
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;
@@ -147,10 +137,8 @@ public class PersistEventTests {
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.add(event);
-		String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		String eventId = dao.insertEvent(event);
 		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.remove(0);
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;
@@ -167,9 +155,7 @@ public class PersistEventTests {
 	public void persistEventWithoutPublishTimeStampOrExpirationTimeStampTest() throws EventNotFoundException {
 		try {
 			Event event = event5;
-			singleEventInsertList.add(event);
-			String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
-			singleEventInsertList.remove(0);
+			String eventId = dao.insertEvent(event);
 			storedEventId = eventId;
 			Event eventFromDb = dao.getEvent(eventId);
 			Event expected = event;
@@ -191,10 +177,8 @@ public class PersistEventTests {
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.add(event);
-		String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		String eventId = dao.insertEvent(event);
 		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.remove(0);
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;
@@ -212,9 +196,7 @@ public class PersistEventTests {
 	public void persistEventWithoutReceivedTimeStampOrInsertTimeStampTest() throws SQLException, EventNotFoundException {
 		try {
 			Event event = event7;
-			singleEventInsertList.add(event);
-			String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
-			singleEventInsertList.remove(0);
+			String eventId = dao.insertEvent(event);
 			storedEventId = eventId;
 			Event eventFromDb = dao.getEvent(eventId);
 			Event expected = event;
@@ -235,9 +217,7 @@ public class PersistEventTests {
 	public void persistEventWithoutObjectIdTest() throws SQLException, EventNotFoundException {
 		try {
 			Event event = event8;
-			singleEventInsertList.add(event);
-			String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
-			singleEventInsertList.remove(0);
+			String eventId = dao.insertEvent(event);
 			storedEventId = eventId;
 			Event eventFromDb = dao.getEvent(eventId);
 			Event expected = event;
@@ -258,9 +238,7 @@ public class PersistEventTests {
 	public void persistEventWithoutMessageTypeTest() throws SQLException, EventNotFoundException {
 		try {
 			Event event = event9;
-			singleEventInsertList.add(event);
-			String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
-			singleEventInsertList.remove(0);
+			String eventId = dao.insertEvent(event);
 			storedEventId = eventId;
 			Event eventFromDb = dao.getEvent(eventId);
 			Event expected = event;
@@ -283,10 +261,8 @@ public class PersistEventTests {
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.add(event);
-		String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		String eventId = dao.insertEvent(event);
 		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.remove(0);
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;
@@ -306,10 +282,8 @@ public class PersistEventTests {
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.add(event);
-		String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		String eventId = dao.insertEvent(event);
 		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.remove(0);
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;
@@ -329,10 +303,8 @@ public class PersistEventTests {
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.add(event);
-		String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		String eventId = dao.insertEvent(event);
 		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
-		singleEventInsertList.remove(0);
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;

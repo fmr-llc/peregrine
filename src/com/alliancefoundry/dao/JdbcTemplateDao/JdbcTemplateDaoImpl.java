@@ -38,15 +38,27 @@ public class JdbcTemplateDaoImpl implements IDAO {
 	private SqlQuery sql;
 	PublisherRouter publisher;
 	public JdbcTemplateDaoImpl(JdbcTemplate jdbcTemplate) {
+		super();
 		this.jdbcTemplate = jdbcTemplate;
 		ctx = new ClassPathXmlApplicationContext("queries.xml");
 		sql = ctx.getBean("sql", SqlQuery.class);
 		ctx.close();
 	}
 
-	public JdbcTemplateDaoImpl() {
+	/**
+	 * @param event								event to be inserted
+	 * @return									event id of the event that was inserted
+	 * @throws DataIntegrityViolationException	if insertion data is invalid
+	 */
+	@Transactional
+	public String insertEvent(Event event) throws DataIntegrityViolationException {
+		List<String> eventIds = new ArrayList<String>();
+		List<Event> events = new ArrayList<Event>();
+		events.add(event);
+		eventIds.add(insertEvents(events).get(0));
+		return eventIds.get(0);
 	}
-
+	
 	/**
 	 * @param events							list of events to be inserted
 	 * @return									list of event ids of the events that were inserted

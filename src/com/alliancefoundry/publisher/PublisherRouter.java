@@ -1,5 +1,6 @@
 package com.alliancefoundry.publisher;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,7 +60,18 @@ public class PublisherRouter {
 	 * @param events Events to be published
 	 * @throws PeregrineException 
 	 */
-	public void attemptPublishEvent(List<Event> events) throws PeregrineException{
+	public void attemptPublishEvent(Event event) throws PeregrineException{
+		List<Event> events = new ArrayList<>();
+		events.add(event);
+		attemptPublishEvents(events);
+	}
+	
+	/**
+	 * 
+	 * @param events Events to be published
+	 * @throws PeregrineException 
+	 */
+	public void attemptPublishEvents(List<Event> events) throws PeregrineException{
 		
 		for(Event event : events){
 			

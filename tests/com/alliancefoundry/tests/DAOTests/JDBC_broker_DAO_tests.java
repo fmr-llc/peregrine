@@ -41,8 +41,6 @@ public class JDBC_broker_DAO_tests {
 	
 	Event getEvent1, getEvent2, getEvent3;
 	
-	List<Event> singleEventInsertList = new ArrayList<Event>();
-	
 	PublisherRouter publisher;
 
 	@Before
@@ -96,12 +94,9 @@ public class JDBC_broker_DAO_tests {
 		event.setCustomHeaders(headers);
 		event.setCustomPayload(payload);
 		
-		singleEventInsertList.add(event);
-		String eventId = (dao.insertEvents(singleEventInsertList)).get(0);
+		String eventId = dao.insertEvent(event);
 		
-		publisher.attemptPublishEvent(singleEventInsertList);
-		
-		singleEventInsertList.remove(0);
+		publisher.attemptPublishEvent(event);
 	
 		eventFromDb = dao.getEvent(eventId);
 	
@@ -141,7 +136,7 @@ public class JDBC_broker_DAO_tests {
 		List<String> expected = new ArrayList<String>();
 		expected = dao.insertEvents(events);
 		
-		publisher.attemptPublishEvent(events);
+		publisher.attemptPublishEvents(events);
 	
 		List<String> actual = new ArrayList<String>();
 		

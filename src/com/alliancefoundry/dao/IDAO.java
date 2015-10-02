@@ -14,6 +14,12 @@ import com.alliancefoundry.model.EventsRequest;
 public interface IDAO {
 
 	/**
+	 * @param event								event to be inserted
+	 * @return									event id of the event that was inserted
+	 * @throws DataIntegrityViolationException	if insertion data is invalid
+	 */
+	public String insertEvent(Event event) throws DataIntegrityViolationException;
+	/**
 	 * @param events							list of events to be inserted
 	 * @return									list of event ids of the events that were inserted
 	 * @throws DataIntegrityViolationException	if insertion data is invalid
