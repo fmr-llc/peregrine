@@ -12,6 +12,8 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
@@ -26,6 +28,8 @@ import com.alliancefoundry.serializer.JsonEventSerializer;
  */
 
 public class ActiveMQPublisher implements IPublisher {
+	
+	static final Logger log = LoggerFactory.getLogger(ActiveMQPublisher.class);
 	
 	private String brokerUrl;
 	private String username;
@@ -115,12 +119,16 @@ public class ActiveMQPublisher implements IPublisher {
 			producer.send(txtMessage);
 		} 
 		catch (MessageFormatException e) {
+			log.error("The producer tried to send an invalid message: " + e.getMessage());
 			exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "The producer tried to send an invalid message.", e);
 		} catch (InvalidDestinationException e) {
+			log.error("The producer tried to send a message with an invalid destination: " + e.getMessage());
 			exception = new PeregrineException(PeregrineErrorCodes.INVALID_DESTINATION, "The producer tried to send a message with an invalid destination.", e);
 		} catch (UnsupportedOperationException e) {
+			log.error("The destination for the message was not specified at creation time: " + e.getMessage());
 			exception = new PeregrineException(PeregrineErrorCodes.DESTINATION_NOT_SUPPLIED, "The destination for the message was not specified at creation time.", e);
 		} catch (JMSException e) {
+			log.error("An internal error occurred, preventing the operation from occuring: " + e.getMessage());
 			exception = new PeregrineException(PeregrineErrorCodes.JMS_INTERNAL_ERROR, "An internal error occurred, preventing the operation from occuring", e);
 		}
 		
