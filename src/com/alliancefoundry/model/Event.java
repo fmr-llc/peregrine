@@ -3,9 +3,9 @@ package com.alliancefoundry.model;
 import java.util.HashMap;
 import java.util.Map;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
 import com.alliancefoundry.serializer.JsonDateTimeSerializer;
+import com.alliancefoundry.exceptions.PeregrineErrorCodes;
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.serializer.JsonDateTimeDeserializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -406,6 +406,14 @@ public class Event {
 		this.insertTimeStamp = insertTimeStamp;
 	}
 
+	public static void verifyNonNullables(Event event) throws PeregrineException{
+		if(event.getObjectId() == null){
+			throw new PeregrineException(PeregrineErrorCodes.EVENT_INSERTION_ERROR,"An Object Id must be specified");
+		}
+		if(event.getMessageType() == null){
+			throw new PeregrineException(PeregrineErrorCodes.EVENT_INSERTION_ERROR,"A Message Type must be specified");
+		}
+	}
 
 	@Override
 	public int hashCode() {
@@ -437,10 +445,10 @@ public class Event {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
 		if (obj == null)
 			return false;
+		if (this == obj)
+			return true;
 		if (getClass() != obj.getClass())
 			return false;
 		Event other = (Event) obj;

@@ -17,6 +17,7 @@
     	<property name="reqObjectId" value=" AND objectId = ?" />
     	<property name="reqCorrelationId" value=" AND correlationId = ?" />
     	<property name="reqEventName" value=" AND eventName = ?" />
+    	<property name="orderMultiple" value=" ORDER BY insertTimeStamp" />
     	<property name="latestEvent" value=" ORDER BY insertTimeStamp DESC LIMIT 1" />
 	</bean>
 	

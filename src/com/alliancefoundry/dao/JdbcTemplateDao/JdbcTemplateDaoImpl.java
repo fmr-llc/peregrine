@@ -12,6 +12,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -20,7 +21,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alliancefoundry.dao.IDAO;
-import com.alliancefoundry.exceptions.EventNotFoundException;
+import com.alliancefoundry.exceptions.PeregrineErrorCodes;
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
@@ -46,12 +48,11 @@ public class JdbcTemplateDaoImpl implements IDAO {
 	}
 
 	/**
-	 * @param event								event to be inserted
-	 * @return									event id of the event that was inserted
-	 * @throws DataIntegrityViolationException	if insertion data is invalid
+	 * @param event		event to be inserted
+	 * @return			event id of the event that was inserted
 	 */
 	@Transactional
-	public String insertEvent(Event event) throws DataIntegrityViolationException {
+	public String insertEvent(Event event) throws PeregrineException {
 		List<String> eventIds = new ArrayList<String>();
 		List<Event> events = new ArrayList<Event>();
 		events.add(event);
@@ -60,18 +61,20 @@ public class JdbcTemplateDaoImpl implements IDAO {
 	}
 	
 	/**
-	 * @param events							list of events to be inserted
-	 * @return									list of event ids of the events that were inserted
-	 * @throws DataIntegrityViolationException	if insertion data is invalid
+	 * @param events	list of events to be inserted
+	 * @return			list of event ids of the events that were inserted
 	 */
 	@Transactional
-	public List<String> insertEvents(List<Event> events) throws DataIntegrityViolationException {
+	public List<String> insertEvents(List<Event> events) throws PeregrineException {
 		List<String> eventIds = new ArrayList<String>();
 		String eventSql = sql.getInsertSingleEvent();
 		String headersSql = sql.getInsertHeader();
 		String payloadSql = sql.getInsertPayload();
 		try{
 			for (Event event : events) {
+				//check that all necessary values are initialized
+				Event.verifyNonNullables(event);
+				
 				//insert into event_store
 				String eventId = insertIntoEventStoreTable(eventSql, event);
 
@@ -82,105 +85,116 @@ public class JdbcTemplateDaoImpl implements IDAO {
 				insertIntoEventPayloadTable(payloadSql, event);
 				
 				eventIds.add(eventId);
-			}
-				
+			}	
 			return eventIds;
 		} catch(DataIntegrityViolationException e) {
-			throw e;
+			throw new PeregrineException(PeregrineErrorCodes.EVENT_INSERTION_ERROR,e.getCause().getMessage(),e);
 		}
 	}
 	
 	/**
-	 * @param eventId					of the event to be retrieved
-	 * @return							the event with the corresponding event id
-	 * @throws EventNotFoundException	if the event does not exist
+	 * @param eventId				of the event to be retrieved
+	 * @return						the event with the corresponding event id
+	 * @throws PeregrineException 	if some problem related to an event occurs
 	 */
-	public Event getEvent(String eventId) throws EventNotFoundException {
+	public Event getEvent(String eventId) throws PeregrineException {
 		String eventSql = sql.getSingleEventById();
-		List<Event> eventList = jdbcTemplate.query(eventSql, new PreparedStatementSetter() {
-			@Override
-			public void setValues(java.sql.PreparedStatement ps) throws SQLException {
-				ps.setString(1, eventId);
+		List<Event> eventList = new ArrayList<Event>();
+		try {
+			eventList = jdbcTemplate.query(eventSql, new PreparedStatementSetter() {
+				@Override
+				public void setValues(java.sql.PreparedStatement ps) throws SQLException {
+					ps.setString(1, eventId);
+				}
+			}, new EventRowMapper(jdbcTemplate, sql));
+			//query limits to one result because event ids are unique so there should only be one event
+			if (eventList.size() == 1) {
+				return eventList.get(0);
+			} else {
+				throw new PeregrineException(PeregrineErrorCodes.EVENT_NOT_FOUND_ERROR,"Event not found in database");
 			}
-		}, new EventRowMapper(jdbcTemplate, sql));
-		//query limits to one result because event ids are unique so there should only be one event
-		if (eventList.size() == 1) {
-			return eventList.get(0);
-		} else {
-			throw new EventNotFoundException("Event not found in database");
+		} catch (DataAccessException e) {
+			throw new PeregrineException(PeregrineErrorCodes.EVENT_RETRIEVAL_ERROR,e.getCause().getMessage(),e);
 		}
 	}
 	
 	/**
-	 * @param req						has values set to search parameters
-	 * @return							list of events matching the search parameters
-	 * @throws IllegalArgumentException	if request data is invalid
-	 * @throws EventNotFoundException	if no events exist matching the request params
+	 * @param req					has values set to search parameters
+	 * @return						list of events matching the search parameters
+	 * @throws PeregrineException 	if some problem related to an event occurs
 	 */
-	public List<Event> getEvents(EventsRequest req) throws IllegalArgumentException, EventNotFoundException {
-		//ensure valid request params
-		Integer genNum = verifyRequestParameters(req, false);
-		
-		//build the SQL query
-		String eventSql = sqlStringBuilder(req, false);
-		
-		//retrieve the list matching request params
-		List<Event> eventList = queryWithPs(eventSql, req, false);
-		
-		//verify some events were retrieved
-		if (eventList.size() == 0) {
-			throw new EventNotFoundException("No events matching the specified parameters were found in database");
-		}
-		
-		//get the events based off of generation count if one is specified
-		if (genNum == null) {
+	public List<Event> getEvents(EventsRequest req) throws PeregrineException {
+		try {
+			//ensure valid request params
+			Integer genNum = EventsRequest.verifyRequestParameters(req, false);
+			
+			//build the SQL query
+			String eventSql = sqlStringBuilder(req, false);
+			
+			//retrieve the list matching request params
+			List<Event> eventList = queryWithPs(eventSql, req, false);
+			
+			//verify some events were retrieved
+			if (eventList.size() == 0) {
+				throw new PeregrineException(PeregrineErrorCodes.EVENT_NOT_FOUND_ERROR,"No events matching the specified parameters were found in database");
+			}
+			
+			//get the events based off of generation count if one is specified
+			if (genNum == null) {
+				return eventList;
+			} else {
+				List<Event> genList = new ArrayList<Event>();
+				List<Node> eventForest = new ArrayList<Node>();
+				eventForest = generations((ArrayList<Event>) eventList, eventForest);
+				putGenerationsInList(eventForest, genList, 0, req.getGenerations());
+				eventList = genList;
+			}
 			return eventList;
-		} else {
-			List<Event> genList = new ArrayList<Event>();
-			List<Node> eventForest = new ArrayList<Node>();
-			eventForest = generations((ArrayList<Event>) eventList, eventForest);
-			putGenerationsInList(eventForest, genList, 0, req.getGenerations());
-			eventList = genList;
+		} catch (DataAccessException e) {	
+			throw new PeregrineException(PeregrineErrorCodes.EVENT_RETRIEVAL_ERROR,e.getCause().getMessage(),e);
 		}
-		return eventList;
 	}
 	
 	/**
 	 * Basically the same as getEvents except doesn't care about createdBefore, 
 	 * createdAfter, or generations
 	 * 
-	 * @param req						has values set to search parameters
-	 * @return							most recent event inserted matching search params
-	 * @throws IllegalArgumentException	if request data is invalid
-	 * @throws EventNotFoundException	if no events exist matching the request params
+	 * @param req					has values set to search parameters
+	 * @return						most recent event inserted matching search params
+	 * @throws PeregrineException 	if some problem related to an event occurs
 	 */
-	public Event getLatestEvent(EventsRequest req) throws IllegalArgumentException, EventNotFoundException {
-		//ensure valid request params
-		verifyRequestParameters(req, true);
-		
-		//build the SQL query
-		String eventSql = sqlStringBuilder(req, true);
+	public Event getLatestEvent(EventsRequest req) throws PeregrineException {
+		try {
+			//ensure valid request params
+			EventsRequest.verifyRequestParameters(req, true);
+			
+			//build the SQL query
+			String eventSql = sqlStringBuilder(req, true);
 
-		//retrieve the list matching request params
-		List<Event> eventList = queryWithPs(eventSql, req, true);
-		
-		//verify some events were retrieved
-		if (eventList.size() == 0) {
-			throw new EventNotFoundException("No events matching the specified parameters were found in database");
+			//retrieve the list matching request params
+			List<Event> eventList = queryWithPs(eventSql, req, true);
+			
+			//verify some events were retrieved
+			if (eventList.size() == 0) {
+				throw new PeregrineException(PeregrineErrorCodes.EVENT_NOT_FOUND_ERROR,"No events matching the specified parameters were found in database");
+			}
+			
+			//query limits to one result so there should only be one event in the list
+			return eventList.get(0);
+		} catch (DataAccessException e) {
+			throw new PeregrineException(PeregrineErrorCodes.EVENT_RETRIEVAL_ERROR,e.getCause().getMessage(),e);
 		}
-		
-		//query limits to one result so there should only be one event in the list
-		return eventList.get(0);
 	}
 	
 	/**
 	 * 
 	 * @param eventSql	SQL string to insert event into DB
 	 * @param event		to be inserted into DB
-	 * @return
+	 * @return			eventId of the Event being inserted
 	 */
 	private String insertIntoEventStoreTable(String eventSql, Event event){
 		String eventId = UUID.randomUUID().toString();
+		//TODO: log warn eventId is being set if it does not equal null
 		event.setEventId(eventId);
 		event.setInsertTimeStamp(DateTime.now());
 		
@@ -239,33 +253,6 @@ public class JdbcTemplateDaoImpl implements IDAO {
 	
 	/**
 	 * 
-	 * @param req		request parameters
-	 * @param latest	determines whether using only params related to getLatestEvent
-	 * @return			generations count
-	 */
-	private Integer verifyRequestParameters(EventsRequest req, boolean latest){
-		if(!latest){
-			if( req.getCreatedAfter() == null){
-    			throw new IllegalArgumentException("A createdAfter date must be specified");
-    		}
-			if(req.getSource() == null && req.getObjectId() == null && req.getCorrelationId() == null){
-				throw new IllegalArgumentException("A source, object id, or correlation id must be specified");
-			}
-			Integer genNum = req.getGenerations();
-			if(genNum != null && genNum < 1) {
-				throw new IllegalArgumentException("Invalid value for generations.  Must be greater than 0");
-			}
-			return genNum;
-		} else {
-			if (req.getSource() == null) {
-				throw new IllegalArgumentException("A source must be specified");
-			}
-			return -1;
-		}
-	}
-	
-	/**
-	 * 
 	 * @param req		request parameters to determine how the SQL string is built
 	 * @param latest	determines whether using only params related to getLatestEvent
 	 * @return			SQL string built to get Events
@@ -289,6 +276,7 @@ public class JdbcTemplateDaoImpl implements IDAO {
 			if(req.getEventName() != null){
 				eventSql += sql.getReqEventName();
 			}
+			eventSql += sql.getOrderMultiple();
 		} else {
 			eventSql += sql.getReqSource();
 			if(req.getObjectId() != null){
@@ -383,9 +371,7 @@ public class JdbcTemplateDaoImpl implements IDAO {
 		for(Node n : eventForest){
 			if(genCount < maxGens){
 				genList.add(n.getEvent());
-				if(n.getChildren() != null){
-					putGenerationsInList(n.getChildren(), genList, ++genCount, maxGens);
-				}
+				putGenerationsInList(n.getChildren(), genList, genCount + 1, maxGens);
 			}
 		}
 	}
@@ -422,14 +408,23 @@ public class JdbcTemplateDaoImpl implements IDAO {
 		 * @throws SQLException		if there is an issue running the query on the DB
 		 */
 		private void setNullables(ResultSet rs, Event event) throws SQLException{
+			//set sequence number
 			Integer sequenceNumber = rs.getInt("sequenceNumber");
 			if (rs.wasNull()) sequenceNumber = null;
 			event.setSequenceNumber(sequenceNumber);
-			DateTime publishTimeStamp = new DateTime(rs.getLong("publishTimeStamp"),DateTimeZone.UTC);
+			
+			//set publish time stamp
+			Long publish = rs.getLong("publishTimeStamp");
+			DateTime publishTimeStamp;
 			if (rs.wasNull()) publishTimeStamp = null;
+			else publishTimeStamp = new DateTime(publish,DateTimeZone.UTC);
 			event.setPublishTimeStamp(publishTimeStamp);
-			DateTime expirationTimeStamp = new DateTime(rs.getLong("expirationTimeStamp"),DateTimeZone.UTC);
+			
+			//set expiration time stamp
+			Long expiration = rs.getLong("expirationTimeStamp");
+			DateTime expirationTimeStamp;
 			if (rs.wasNull()) expirationTimeStamp = null;
+			else expirationTimeStamp = new DateTime(expiration,DateTimeZone.UTC);
 			event.setExpirationTimeStamp(expirationTimeStamp);
 		}
 		
@@ -490,6 +485,9 @@ public class JdbcTemplateDaoImpl implements IDAO {
 			for(String [] payload : payloads) {
 				customPayload.put(payload[0], new DataItem(payload[1],payload[2]));
 			}
+			
+			event.setCustomHeaders(customHeaders);
+			event.setCustomPayload(customPayload);
 		}
 	}
 	
