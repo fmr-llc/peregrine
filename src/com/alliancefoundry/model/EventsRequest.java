@@ -2,6 +2,9 @@ package com.alliancefoundry.model;
 
 import org.joda.time.DateTime;
 
+import com.alliancefoundry.exceptions.PeregrineErrorCodes;
+import com.alliancefoundry.exceptions.PeregrineException;
+
 /**
  * Created by: Bobby Writtenberry
  *
@@ -132,6 +135,34 @@ public class EventsRequest {
 	 */
 	public void setGenerations(Integer generations) {
 		this.generations = generations;
+	}
+	
+	/**
+	 * 
+	 * @param req					request parameters
+	 * @param latest				determines whether using only params related to getLatestEvent
+	 * @return						generations count if not looking for latest, unimportant constant otherwise
+	 * @throws PeregrineException 	if some problem related to an event occurs
+	 */
+	public static Integer verifyRequestParameters(EventsRequest req, boolean latest) throws PeregrineException {
+		if(!latest){
+			if( req.getCreatedAfter() == null){
+    			throw new PeregrineException(PeregrineErrorCodes.EVENT_REQUEST_ARGUMENT_ERROR,"A createdAfter date must be specified");
+    		}
+			if(req.getSource() == null && req.getObjectId() == null && req.getCorrelationId() == null){
+				throw new PeregrineException(PeregrineErrorCodes.EVENT_REQUEST_ARGUMENT_ERROR,"A source, object id, or correlation id must be specified");
+			}
+			Integer genNum = req.getGenerations();
+			if(genNum != null && genNum < 1) {
+				throw new PeregrineException(PeregrineErrorCodes.EVENT_REQUEST_ARGUMENT_ERROR,"Invalid value for generations.  Must be greater than 0");
+			}
+			return genNum;
+		} else {
+			if (req.getSource() == null) {
+				throw new PeregrineException(PeregrineErrorCodes.EVENT_REQUEST_ARGUMENT_ERROR,"A source must be specified");
+			}
+			return -1;
+		}
 	}
 
 }

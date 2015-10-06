@@ -20,6 +20,7 @@ public class SqlQuery {
 	private String reqObjectId;
 	private String reqCorrelationId;
 	private String reqEventName;
+	private String orderMultiple;
 	
 	/**
 	 * @return the singleEventById
@@ -188,5 +189,17 @@ public class SqlQuery {
 	 */
 	public void setReqEventName(String reqEventName) {
 		this.reqEventName = reqEventName;
+	}
+	/**
+	 * @return the orderMultiple
+	 */
+	public String getOrderMultiple() {
+		return orderMultiple;
+	}
+	/**
+	 * @param orderMultiple the orderMultiple to set
+	 */
+	public void setOrderMultiple(String orderMultiple) {
+		this.orderMultiple = orderMultiple;
 	}
 }

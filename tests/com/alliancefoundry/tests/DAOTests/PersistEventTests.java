@@ -6,7 +6,6 @@ package com.alliancefoundry.tests.DAOTests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -16,12 +15,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataIntegrityViolationException;
 	
 import com.alliancefoundry.dao.IDAO;
-import com.alliancefoundry.exceptions.EventNotFoundException;
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 
 /**
- * @author Robert Coords
+ * @author Robert Coords, Bobby Writtenberry
  *
  */
 public class PersistEventTests {
@@ -64,11 +63,10 @@ public class PersistEventTests {
 
 	/**
 	 * Test to persist an event for a new object within database.
-	 * @throws SQLException 
-	 * @throws EventNotFoundException 
+	 * @throws PeregrineException 
 	 */
 	@Test
-	public void persistEventTest() throws SQLException, EventNotFoundException {
+	public void persistEventTest() throws PeregrineException {
 		Event event = event1;
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
@@ -83,12 +81,11 @@ public class PersistEventTests {
 	}
 	
 	/**
-	 * Test to persist an event that updates an object within database.
-	 * @throws SQLException 
-	 * @throws EventNotFoundException 
+	 * Test to persist an event that updates an object within database. 
+	 * @throws PeregrineException 
 	 */
 	@Test
-	public void persistSecondEventTest() throws SQLException, EventNotFoundException {
+	public void persistSecondEventTest() throws PeregrineException {
 		event2.setParentId(storedEventId);
 		Event event = event2;
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
@@ -105,11 +102,10 @@ public class PersistEventTests {
 	
 	/**
 	 * Test to persist an event that updates an object within database.
-	 * @throws SQLException 
-	 * @throws EventNotFoundException 
+	 * @throws PeregrineException 
 	 */
 	@Test
-	public void persistThirdEventTest() throws SQLException, EventNotFoundException {
+	public void persistThirdEventTest() throws PeregrineException {
 		event3.setParentId(storedEventId);
 		Event event = event3;
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
@@ -127,11 +123,10 @@ public class PersistEventTests {
 	/**
 	 * Test to persist an event that tries to update an event which has already been updated.
 	 * This event should be persisted to database.
-	 * @throws SQLException 
-	 * @throws EventNotFoundException 
+	 * @throws PeregrineException 
 	 */
 	@Test
-	public void persistEventUpdateToPreviouslyUpdatedEventTest() throws SQLException, EventNotFoundException {
+	public void persistEventUpdateToPreviouslyUpdatedEventTest() throws PeregrineException {
 		event4.setParentId(event1.getEventId());
 		Event event = event4;
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
@@ -148,11 +143,11 @@ public class PersistEventTests {
 	
 	/**
 	 * Test to persist an event that does not have publishTimeStamp or expirationTimeStamp to database.
-	 * Event should be persisted to database.
-	 * @throws EventNotFoundException 
+	 * Event should be persisted to database. 
+	 * @throws PeregrineException 
 	 */
 	@Test
-	public void persistEventWithoutPublishTimeStampOrExpirationTimeStampTest() throws EventNotFoundException {
+	public void persistEventWithoutPublishTimeStampOrExpirationTimeStampTest() throws PeregrineException {
 		try {
 			Event event = event5;
 			String eventId = dao.insertEvent(event);
@@ -169,10 +164,10 @@ public class PersistEventTests {
 	/**
 	 * Test to persist an event that does not have any destinations specified.
 	 * Event should be stored in database.
-	 * @throws EventNotFoundException 
+	 * @throws PeregrineException 
 	 */
 	@Test
-	public void persistEventWithoutDestinationsTest() throws EventNotFoundException {
+	public void persistEventWithoutDestinationsTest() throws PeregrineException {
 		Event event = event6;
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
@@ -189,11 +184,10 @@ public class PersistEventTests {
 	/**
 	 * Test to try to persist an event that does not have receivedTimeStamp or insertTimeStamp specified.
 	 * Event should not be stored in database.
-	 * @throws SQLException 
-	 * @throws EventNotFoundException 
+	 * @throws PeregrineException 
 	 */
 	@Test
-	public void persistEventWithoutReceivedTimeStampOrInsertTimeStampTest() throws SQLException, EventNotFoundException {
+	public void persistEventWithoutReceivedTimeStampOrInsertTimeStampTest() throws PeregrineException {
 		try {
 			Event event = event7;
 			String eventId = dao.insertEvent(event);
@@ -210,11 +204,10 @@ public class PersistEventTests {
 	/**
 	 * Test to try to persist an event that does not have an objectId specified.
 	 * Event should not be stored in database.
-	 * @throws SQLException 
-	 * @throws EventNotFoundException 
+	 * @throws PeregrineException 
 	 */
 	@Test
-	public void persistEventWithoutObjectIdTest() throws SQLException, EventNotFoundException {
+	public void persistEventWithoutObjectIdTest() throws PeregrineException {
 		try {
 			Event event = event8;
 			String eventId = dao.insertEvent(event);
@@ -231,11 +224,10 @@ public class PersistEventTests {
 	/**
 	 * Test to try to persist an event that does not have a messageType specified.
 	 * Event should not be stored in database.
-	 * @throws SQLException 
-	 * @throws EventNotFoundException 
+	 * @throws PeregrineException 
 	 */
 	@Test
-	public void persistEventWithoutMessageTypeTest() throws SQLException, EventNotFoundException {
+	public void persistEventWithoutMessageTypeTest() throws PeregrineException  {
 		try {
 			Event event = event9;
 			String eventId = dao.insertEvent(event);
@@ -252,11 +244,10 @@ public class PersistEventTests {
 	/**
 	 * Test to try to persist an event that does not have a dataType specified.
 	 * Event should be stored in database.
-	 * @throws SQLException 
-	 * @throws EventNotFoundException 
+	 * @throws PeregrineException 
 	 */
 	@Test
-	public void persistEventWithoutDataTypeTest() throws SQLException, EventNotFoundException {
+	public void persistEventWithoutDataTypeTest() throws PeregrineException {
 		Event event = event12;
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
@@ -273,11 +264,10 @@ public class PersistEventTests {
 	/**
 	 * Test to try to persist an event that does not have CustomeHeaders identified.
 	 * Event should be stored in database.
-	 * @throws SQLException 
-	 * @throws EventNotFoundException 
+	 * @throws PeregrineException 
 	 */
 	@Test
-	public void persistEventWithoutHeaders() throws SQLException, EventNotFoundException {
+	public void persistEventWithoutHeaders() throws PeregrineException {
 		Event event = event10;
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
@@ -294,11 +284,10 @@ public class PersistEventTests {
 	/**
 	 * Test to try to persist event that does not have a CustomPayload identified.
 	 * Event should be stored in database.
-	 * @throws SQLException 
-	 * @throws EventNotFoundException 
+	 * @throws PeregrineException 
 	 */
 	@Test
-	public void persistEventWithoutPayload() throws SQLException, EventNotFoundException {
+	public void persistEventWithoutPayload() throws PeregrineException {
 		Event event = event11;
 		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
 		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
