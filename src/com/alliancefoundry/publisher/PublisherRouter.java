@@ -12,7 +12,7 @@ import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 
 /**
- * Created by: Paul Fahey, Curtis Robinson
+ * Created by: Paul Fahey, Curtis Robinson, Bobby Writtenberry
  * 
  *
  */

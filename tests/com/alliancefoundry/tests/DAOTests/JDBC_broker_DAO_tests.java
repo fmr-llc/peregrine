@@ -15,7 +15,6 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.alliancefoundry.dao.IDAO;
-import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
@@ -70,17 +69,13 @@ public class JDBC_broker_DAO_tests {
 		pubctx.close();
 	}
 	
-	/***********************
-	 *Testing insertEvent()
-	 * @throws IOException 
-	 * @throws JsonMappingException 
-	 * @throws JsonParseException 
-	 * @throws EventNotFoundException 
+	/******************************
+	 *Testing insertEvent() 	  *
 	 * @throws PeregrineException *
-	 ***********************/
+	 ******************************/
 	
 	@Test
-	public void insertToDbAndBrokerTest() throws EventNotFoundException, PeregrineException {
+	public void insertToDbAndBrokerTest() throws PeregrineException {
 		event = getEvent2;
 
 		Map<String,String> headers = new HashMap<String,String>();
@@ -125,7 +120,7 @@ public class JDBC_broker_DAO_tests {
 	}
 	
 	@Test
-	public void insertMultipleEventsToDbTest() throws PeregrineException, EventNotFoundException {
+	public void insertMultipleEventsToDbTest() throws PeregrineException {
 		
 		event = getEvent1;
 		Event event2 = getEvent3;

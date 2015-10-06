@@ -1,7 +1,7 @@
 package com.alliancefoundry.exceptions;
 
 /**
- * Created by: Curtis Robinson
+ * Created by: Curtis Robinson, Bobby Writtenberry
  * 
  *
  */
@@ -20,6 +20,11 @@ public enum PeregrineErrorCodes {
 	DESTINATION_NOT_SUPPLIED,
 	
 	INVALID_DESTINATION_OR_TOPIC,
+	
+	EVENT_NOT_FOUND_ERROR,
+	EVENT_INSERTION_ERROR,
+	EVENT_RETRIEVAL_ERROR,
+	EVENT_REQUEST_ARGUMENT_ERROR,
 	
 	NOT_AN_ERROR
 	
