@@ -1,23 +1,25 @@
 package com.alliancefoundry.controller;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.alliancefoundry.dao.DAO;
+import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
@@ -211,18 +213,16 @@ public class EventServiceController  {
 	 * 
 	 * @param eventId - Id of event to replay
 	 * @return whether or not the replay was successful
+	 * @throws EventNotFoundException 
 	 */
 	@RequestMapping(value="/event", method = RequestMethod.GET)
 	public String ReplayEvent(
-			@RequestParam(value="eventid", required=false) String eventId){
+			@RequestParam(value="eventid", required=false) String eventId) throws EventNotFoundException{
 		String message = String.format("Successfully replayed Event - Event Id: %s", eventId);
 		
 		try {
 			Event eventFromDb = dao.getEvent(eventId);
 			publisher.publishEventByMapper(eventFromDb);
-		} catch (SQLException e) {
-			log.debug("Error inserting an event: " + e.getMessage());
-			message = String.format("Event could not be found. Event Id: %s", eventId);
 		} catch (PeregrineException e) {
 			log.debug("Error replaying event");
 			log.debug("Error Message: " + e.getMessage());
