@@ -20,7 +20,6 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.alliancefoundry.dao.IDAO;
-import com.alliancefoundry.exceptions.EventNotFoundException;
 import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
@@ -93,17 +92,13 @@ public class JDBC_broker_DAO_tests {
 		pubctx.close();
 	}
 	
-	/***********************
-	 *Testing insertEvent()
-	 * @throws IOException 
-	 * @throws JsonMappingException 
-	 * @throws JsonParseException 
-	 * @throws EventNotFoundException 
+	/******************************
+	 *Testing insertEvent() 	  *
 	 * @throws PeregrineException *
-	 ***********************/
+	 ******************************/
 	
 	@Test
-	public void insertToDbAndKafkaBrokerTest() throws EventNotFoundException, PeregrineException {
+	public void insertToDbAndKafkaBrokerTest() throws  PeregrineException {
 		event = getEvent2;
 
 		Map<String,String> headers = new HashMap<String,String>();
@@ -148,7 +143,7 @@ public class JDBC_broker_DAO_tests {
 	}
 	
 	@Test
-	public void insertMultipleEventsToDbAndKafkaTest() throws PeregrineException, EventNotFoundException {
+	public void insertMultipleEventsToDbAndKafkaTest() throws PeregrineException {
 		
 		event = getEvent1;
 		Event event2 = getEvent3;
@@ -208,7 +203,7 @@ public class JDBC_broker_DAO_tests {
 	 ***********************/
 	
 	@Test
-	public void insertToDbAndActiveMQBrokerTest() throws EventNotFoundException, PeregrineException {
+	public void insertToDbAndActiveMQBrokerTest() throws PeregrineException {
 		event = getEvent5;
 		
 		// setup listener for activemq
@@ -280,7 +275,7 @@ public class JDBC_broker_DAO_tests {
 	}
 	
 	@Test
-	public void insertMultipleEventsToDbAndActiveMQTest() throws PeregrineException, EventNotFoundException {
+	public void insertMultipleEventsToDbAndActiveMQTest() throws PeregrineException {
 		event = getEvent4;
 		Event event2 = getEvent6;
 		List<Event> events = new ArrayList<Event>();
