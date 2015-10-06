@@ -68,11 +68,11 @@ public class PersistEventTests {
 	@Test
 	public void persistEventTest() throws PeregrineException {
 		Event event = event1;
-		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setPublishTimeStamp(event.getPublishTimeStamp());
+		event.setReceivedTimeStamp(event.getReceivedTimeStamp());
+		event.setExpirationTimeStamp(event.getExpirationTimeStamp());
 		String eventId = dao.insertEvent(event);
-		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setInsertTimeStamp(event.getInsertTimeStamp());
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;
@@ -88,11 +88,11 @@ public class PersistEventTests {
 	public void persistSecondEventTest() throws PeregrineException {
 		event2.setParentId(storedEventId);
 		Event event = event2;
-		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setPublishTimeStamp(event.getPublishTimeStamp());
+		event.setReceivedTimeStamp(event.getReceivedTimeStamp());
+		event.setExpirationTimeStamp(event.getExpirationTimeStamp());
 		String eventId = dao.insertEvent(event);
-		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setInsertTimeStamp(event.getInsertTimeStamp());
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;
@@ -108,11 +108,11 @@ public class PersistEventTests {
 	public void persistThirdEventTest() throws PeregrineException {
 		event3.setParentId(storedEventId);
 		Event event = event3;
-		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setPublishTimeStamp(event.getPublishTimeStamp());
+		event.setReceivedTimeStamp(event.getReceivedTimeStamp());
+		event.setExpirationTimeStamp(event.getExpirationTimeStamp());
 		String eventId = dao.insertEvent(event);
-		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setInsertTimeStamp(event.getInsertTimeStamp());
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;
@@ -129,11 +129,11 @@ public class PersistEventTests {
 	public void persistEventUpdateToPreviouslyUpdatedEventTest() throws PeregrineException {
 		event4.setParentId(event1.getEventId());
 		Event event = event4;
-		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setPublishTimeStamp(event.getPublishTimeStamp());
+		event.setReceivedTimeStamp(event.getReceivedTimeStamp());
+		event.setExpirationTimeStamp(event.getExpirationTimeStamp());
 		String eventId = dao.insertEvent(event);
-		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setInsertTimeStamp(event.getInsertTimeStamp());
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;
@@ -169,11 +169,11 @@ public class PersistEventTests {
 	@Test
 	public void persistEventWithoutDestinationsTest() throws PeregrineException {
 		Event event = event6;
-		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setPublishTimeStamp(event.getPublishTimeStamp());
+		event.setReceivedTimeStamp(event.getReceivedTimeStamp());
+		event.setExpirationTimeStamp(event.getExpirationTimeStamp());
 		String eventId = dao.insertEvent(event);
-		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setInsertTimeStamp(event.getInsertTimeStamp());
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;
@@ -216,7 +216,7 @@ public class PersistEventTests {
 			Event expected = event;
 			Event actual = eventFromDb;
 			assertEquals(expected,actual);
-		} catch (DataIntegrityViolationException e) {
+		} catch (PeregrineException e) {
 			assertTrue(true);
 		}
 	}
@@ -236,7 +236,7 @@ public class PersistEventTests {
 			Event expected = event;
 			Event actual = eventFromDb;
 			assertEquals(expected,actual);
-		} catch (DataIntegrityViolationException e) {
+		} catch (PeregrineException e) {
 			assertTrue(true);
 		}
 	}
@@ -249,11 +249,11 @@ public class PersistEventTests {
 	@Test
 	public void persistEventWithoutDataTypeTest() throws PeregrineException {
 		Event event = event12;
-		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setPublishTimeStamp(event.getPublishTimeStamp());
+		event.setReceivedTimeStamp(event.getReceivedTimeStamp());
+		event.setExpirationTimeStamp(event.getExpirationTimeStamp());
 		String eventId = dao.insertEvent(event);
-		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setInsertTimeStamp(event.getInsertTimeStamp());
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;
@@ -269,11 +269,11 @@ public class PersistEventTests {
 	@Test
 	public void persistEventWithoutHeaders() throws PeregrineException {
 		Event event = event10;
-		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setPublishTimeStamp(event.getPublishTimeStamp());
+		event.setReceivedTimeStamp(event.getReceivedTimeStamp());
+		event.setExpirationTimeStamp(event.getExpirationTimeStamp());
 		String eventId = dao.insertEvent(event);
-		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setInsertTimeStamp(event.getInsertTimeStamp());
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;
@@ -289,11 +289,11 @@ public class PersistEventTests {
 	@Test
 	public void persistEventWithoutPayload() throws PeregrineException {
 		Event event = event11;
-		event.setPublishTimeStamp(event.getPublishTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setReceivedTimeStamp(event.getReceivedTimeStamp().toDateTime(DateTimeZone.UTC));
-		event.setExpirationTimeStamp(event.getExpirationTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setPublishTimeStamp(event.getPublishTimeStamp());
+		event.setReceivedTimeStamp(event.getReceivedTimeStamp());
+		event.setExpirationTimeStamp(event.getExpirationTimeStamp());
 		String eventId = dao.insertEvent(event);
-		event.setInsertTimeStamp(event.getInsertTimeStamp().toDateTime(DateTimeZone.UTC));
+		event.setInsertTimeStamp(event.getInsertTimeStamp());
 		storedEventId = eventId;
 		Event eventFromDb = dao.getEvent(eventId);
 		Event expected = event;

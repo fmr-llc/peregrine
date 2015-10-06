@@ -5,16 +5,16 @@
 
 		
 	<bean id="publishDateTime1" class="org.joda.time.DateTime">
-	    	<constructor-arg type="java.lang.Object" value="2015-09-08T13:40:47.285-0400" />
+	    	<constructor-arg type="java.lang.Object" value="2015-09-08T13:40:47.285Z" />
 	</bean>
 	<bean id="receivedDateTime1" class="org.joda.time.DateTime">
-	    	<constructor-arg type="java.lang.Object" value="2015-09-15T13:40:47.285-0400" />
+	    	<constructor-arg type="java.lang.Object" value="2015-09-15T13:40:47.285Z" />
 	</bean>
 	<bean id="experiationDateTime1" class="org.joda.time.DateTime">
-	    	<constructor-arg type="java.lang.Object" value="2015-09-15T13:40:47.285-0400" />
+	    	<constructor-arg type="java.lang.Object" value="2015-09-15T13:40:47.285Z" />
 	</bean>
 	<bean id="insertDateTime1" class="org.joda.time.DateTime">
-	    	<constructor-arg type="java.lang.Object" value="2015-09-08T13:40:47.285-0400" />
+	    	<constructor-arg type="java.lang.Object" value="2015-09-08T13:40:47.285Z" />
 	</bean>
 	<bean id="publishDateTime2" class="org.joda.time.DateTime">
 	    	<constructor-arg type="java.lang.Object" value="2015-09-08T13:40:47.285-0400" />
