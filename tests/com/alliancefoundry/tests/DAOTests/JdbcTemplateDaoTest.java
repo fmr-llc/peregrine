@@ -236,7 +236,7 @@ public class JdbcTemplateDaoTest {
 	
 	@Test
 	public void insertToAndRetrieveFromDbDateTimeTest() throws PeregrineException {
-		DateTime datetime = DateTime.now().toDateTime(DateTimeZone.UTC);
+		DateTime datetime = DateTime.now();
 		event = getEvent2;
 		event.setPublishTimeStamp(datetime);
 		eventId = dao.insertEvent(event);
