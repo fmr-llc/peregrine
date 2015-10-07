@@ -79,22 +79,21 @@ public class JDBC_broker_DAO_tests {
 		ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
 		
 		dao = ctx.getBean("dao", IDAO.class);
+		
+		// setup publisher
+		publisher = ctx.getBean("eventPublisherservice", PublisherRouter.class);
 
 		ctx.close();
 		
-		AbstractApplicationContext pubctx;
-		pubctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
-		pubctx.registerShutdownHook();
-		
+		ctx = new ClassPathXmlApplicationContext("activemq-subscribers.xml");
+	
 		// setup subscriber for ActiveMQ
-		subscriber1 = pubctx.getBean("activemqSubscriber1", ActiveMQSubscriber.class);
+		subscriber1 = ctx.getBean("activemqSubscriber18", ActiveMQSubscriber.class);
 		subscriber1.subscribeTopic("topic3b");
-		subscriber2 = pubctx.getBean("activemqSubscriber2", ActiveMQSubscriber.class);
+		subscriber2 = ctx.getBean("activemqSubscriber19", ActiveMQSubscriber.class);
 		subscriber2.subscribeTopic("topic3a");
 		
-		// setup publisher
-		publisher = pubctx.getBean("eventPublisherservice", PublisherRouter.class);
-		pubctx.close();
+		ctx.close();
 	}
 	
 	/******************************

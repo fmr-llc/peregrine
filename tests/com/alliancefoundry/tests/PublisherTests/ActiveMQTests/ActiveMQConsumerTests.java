@@ -31,12 +31,12 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * @author Robert Coords
+ * @author Robert Coords, Paul Fahey
  *
  */
 public class ActiveMQConsumerTests {
 	
-	Event event1, event2, event3, nullEvent, nullParentIdEvent, nullEventNameEvent, 
+	Event event1, event2, event3, event4, event5, event6, event7, event8, nullEvent, nullParentIdEvent, nullEventNameEvent, 
 		nullCorrelationIdEvent, nullSequenceNumberEvent, nullDataTypeEvent, 
 		nullSourceEvent, nullDestinationEvent, nullSubdestinationEvent, 
 		nullPreEventStateEvent, nullPostEventStateEvent;
@@ -44,7 +44,8 @@ public class ActiveMQConsumerTests {
 	PublisherRouter manager;
 	MessageListener listener;
 	Event eventFromListener, secondEvent;
-	ActiveMQSubscriber subscriber, secondSubscriber, thirdSubscriber;
+	ActiveMQSubscriber subscriber, secondSubscriber, thirdSubscriber, s4, s5, s6, s7, s8, s9, s10, s11, s12, 
+	s13, s14, s15, s16, s17;
 	
 	@Before
 	public void setUp() {
@@ -55,6 +56,11 @@ public class ActiveMQConsumerTests {
 		event1 = ctx.getBean("mockEvent1", Event.class);
 		event2 = ctx.getBean("mockEvent2", Event.class);
 		event3 = ctx.getBean("mockEvent3", Event.class);
+		event4 = ctx.getBean("mockEvent7", Event.class);
+		event5 = ctx.getBean("mockEvent8", Event.class);
+		event6 = ctx.getBean("mockEvent9", Event.class);
+		event7 = ctx.getBean("mockEvent10", Event.class);
+		event8 = ctx.getBean("mockEvent11", Event.class);
 		nullEvent = ctx.getBean("nullMockEvent", Event.class);
 		nullParentIdEvent = ctx.getBean("nullParentIdEvent", Event.class);
 		nullEventNameEvent = ctx.getBean("nullEventNameEvent", Event.class);
@@ -71,16 +77,52 @@ public class ActiveMQConsumerTests {
 		
 		ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
 		ctx.registerShutdownHook();
+		
+		manager = ctx.getBean("eventPublisherservice", PublisherRouter.class);
+		
+		ctx.close();
+		
+		ctx = new ClassPathXmlApplicationContext("activemq-subscribers.xml");
+		ctx.registerShutdownHook();
+		
 		// Create subscribers/consumers
 		subscriber = ctx.getBean("activemqSubscriber1", ActiveMQSubscriber.class);
 		secondSubscriber = ctx.getBean("activemqSubscriber2", ActiveMQSubscriber.class);
 		thirdSubscriber = ctx.getBean("activemqSubscriber3", ActiveMQSubscriber.class);
-		manager = ctx.getBean("eventPublisherservice", PublisherRouter.class);
-		ctx.close();
+		s4 = ctx.getBean("activemqSubscriber4", ActiveMQSubscriber.class);
+		s5 = ctx.getBean("activemqSubscriber5", ActiveMQSubscriber.class);
+		s6 = ctx.getBean("activemqSubscriber6", ActiveMQSubscriber.class);
+		s7 = ctx.getBean("activemqSubscriber7", ActiveMQSubscriber.class);
+		s8 = ctx.getBean("activemqSubscriber8", ActiveMQSubscriber.class);
+		s9 = ctx.getBean("activemqSubscriber9", ActiveMQSubscriber.class);
+		s10 = ctx.getBean("activemqSubscriber10", ActiveMQSubscriber.class);
+		s11 = ctx.getBean("activemqSubscriber11", ActiveMQSubscriber.class);
+		s12 = ctx.getBean("activemqSubscriber12", ActiveMQSubscriber.class);
+		s13 = ctx.getBean("activemqSubscriber13", ActiveMQSubscriber.class);
+		s14 = ctx.getBean("activemqSubscriber14", ActiveMQSubscriber.class);
+		s15 = ctx.getBean("activemqSubscriber15", ActiveMQSubscriber.class);
+		s16 = ctx.getBean("activemqSubscriber16", ActiveMQSubscriber.class);
+		s17 = ctx.getBean("activemqSubscriber17", ActiveMQSubscriber.class);
 
+		ctx.close();
+		
 		subscriber.subscribeTopic("topic1");
 		secondSubscriber.subscribeTopic("topic2");
-		thirdSubscriber.subscribeTopic("topic1");
+		thirdSubscriber.subscribeTopic("topic3");
+		s4.subscribeTopic("topic4");
+		s5.subscribeTopic("topic5");
+		s6.subscribeTopic("topic5");
+		s7.subscribeTopic("topic6");
+		s8.subscribeTopic("topic1a");
+		s9.subscribeTopic("topic2a");
+		s10.subscribeTopic("topic7");
+		s11.subscribeTopic("topic8");
+		s12.subscribeTopic("topic9");
+		s13.subscribeTopic("topic10");
+		s14.subscribeTopic("topic11");
+		s15.subscribeTopic("topic12");
+		s16.subscribeTopic("topic13");
+		s17.subscribeTopic("topic14");
 		
 		listener = new MessageListener() {
 			public void onMessage(Message message) {
@@ -138,7 +180,7 @@ public class ActiveMQConsumerTests {
 	// Base Test 2
 	@Test
 	public void baseTest2() throws PeregrineException {
-		subscriber.setConsumerListener(listener);
+		secondSubscriber.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(event2);
 		try {
@@ -183,12 +225,12 @@ public class ActiveMQConsumerTests {
 		};
 		
 		List<Event> expected = new ArrayList<Event>();
-		expected.add(event1); expected.add(event2);
+		expected.add(event3); expected.add(event4);
 		
-		subscriber.setConsumerListener(listener2);
+		thirdSubscriber.setConsumerListener(listener2);
 		
-		manager.publishEventByMapper(event1);
-		manager.publishEventByMapper(event2);
+		manager.publishEventByMapper(event3);
+		manager.publishEventByMapper(event4);
 		try {
 			Thread.sleep(4000);
 		} catch (InterruptedException e) {
@@ -228,13 +270,13 @@ public class ActiveMQConsumerTests {
 		};
 		
 		List<Event> expected = new ArrayList<Event>();
-		expected.add(event1); expected.add(event2); expected.add(event3);
+		expected.add(event5); expected.add(event6); expected.add(event7);
 		
-		subscriber.setConsumerListener(listener2);
+		s4.setConsumerListener(listener2);
 		
-		manager.publishEventByMapper(event1);
-		manager.publishEventByMapper(event2);
-		manager.publishEventByMapper(event3);
+		manager.publishEventByMapper(event5);
+		manager.publishEventByMapper(event6);
+		manager.publishEventByMapper(event7);
 		try {
 			Thread.sleep(6000);
 		} catch (InterruptedException e) {
@@ -271,10 +313,10 @@ public class ActiveMQConsumerTests {
 			}
 		};
 		
-		subscriber.setConsumerListener(listener);
-		thirdSubscriber.setConsumerListener(listener2);
+		s5.setConsumerListener(listener);
+		s6.setConsumerListener(listener2);
 		
-		manager.publishEventByMapper(event3);
+		manager.publishEventByMapper(event8);
 		try {
 			Thread.sleep(4000);
 		} catch (InterruptedException e) {
@@ -289,16 +331,16 @@ public class ActiveMQConsumerTests {
 	// Consume event with Nulls test
 	@Test
 	public void nullEventTest() throws PeregrineException {
-		subscriber.setConsumerListener(listener);
+		s7.setConsumerListener(listener);
 		
-		manager.publishEventByMapper(event2);
+		manager.publishEventByMapper(nullEvent);
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			System.out.println("Error sleep interrupted.");
 		}
 		
-		Event expected = event2;
+		Event expected = nullEvent;
 		Event actual = eventFromListener;
 		
 		assertEquals(expected.toString(), actual.toString());
@@ -307,7 +349,7 @@ public class ActiveMQConsumerTests {
 	// Consume an event with a null parent id
 	@Test
 	public void nullParentIdEventTest() throws PeregrineException {
-		subscriber.setConsumerListener(listener);
+		s8.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullParentIdEvent);
 		try {
@@ -325,7 +367,7 @@ public class ActiveMQConsumerTests {
 	// Consume an event with a null event name
 	@Test
 	public void nullEventNameEventTest() throws PeregrineException {
-		subscriber.setConsumerListener(listener);
+		s9.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullEventNameEvent);
 		try {
@@ -343,7 +385,7 @@ public class ActiveMQConsumerTests {
 	// Consume an event with a null correlation id
 	@Test
 	public void nullCorrelationIdEventTest() throws PeregrineException {
-		subscriber.setConsumerListener(listener);
+		s10.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullCorrelationIdEvent);
 		try {
@@ -361,7 +403,7 @@ public class ActiveMQConsumerTests {
 	// Consume an event with a null sequence number
 	@Test
 	public void nullSequenceNumberEventTest() throws PeregrineException {
-		subscriber.setConsumerListener(listener);
+		s11.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullSequenceNumberEvent);
 		try {
@@ -379,7 +421,7 @@ public class ActiveMQConsumerTests {
 	// Consume an event with a null data type
 	@Test
 	public void nullDataTypeEventTest() throws PeregrineException {
-		subscriber.setConsumerListener(listener);
+		s12.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullDataTypeEvent);
 		try {
@@ -397,7 +439,7 @@ public class ActiveMQConsumerTests {
 	// Consume an event with a null source
 	@Test
 	public void nullSourceEventTest() throws PeregrineException {
-		subscriber.setConsumerListener(listener);
+		s13.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullSourceEvent);
 		try {
@@ -415,7 +457,7 @@ public class ActiveMQConsumerTests {
 	// Consume an event with a null destination
 	@Test
 	public void nullDestinationEventTest() throws PeregrineException {
-		subscriber.setConsumerListener(listener);
+		s14.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullDestinationEvent);
 		try {
@@ -433,7 +475,7 @@ public class ActiveMQConsumerTests {
 	// Consume an event with a null subdestination
 	@Test
 	public void nullSubdestinationEventTest() throws PeregrineException {
-		subscriber.setConsumerListener(listener);
+		s15.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullSubdestinationEvent);
 		try {
@@ -451,7 +493,7 @@ public class ActiveMQConsumerTests {
 	// Consume an event with a null preEventState
 	@Test
 	public void nullPreEventStateEventTest() throws PeregrineException {
-		subscriber.setConsumerListener(listener);
+		s16.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullPreEventStateEvent);
 		try {
@@ -469,7 +511,7 @@ public class ActiveMQConsumerTests {
 	// Consume an event with a null postEventState
 	@Test
 	public void nullPostEventStateEventTest() throws PeregrineException {
-		subscriber.setConsumerListener(listener);
+		s17.setConsumerListener(listener);
 		
 		manager.publishEventByMapper(nullPostEventStateEvent);
 		try {
