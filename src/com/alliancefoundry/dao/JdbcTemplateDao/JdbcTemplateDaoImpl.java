@@ -196,6 +196,12 @@ public class JdbcTemplateDaoImpl implements IDAO {
 		String eventId = UUID.randomUUID().toString();
 		//TODO: log warn eventId is being set if it does not equal null
 		event.setEventId(eventId);
+		Long publish;
+		Long expiration;
+		if(event.getPublishTimeStamp() == null) publish = null;
+		else publish = event.getPublishTimeStamp().getMillis();
+		if(event.getExpirationTimeStamp() == null) expiration = null;
+		else expiration = event.getExpirationTimeStamp().getMillis();
 		event.setInsertTimeStamp(DateTime.now());
 		
 		jdbcTemplate.update(eventSql,
@@ -211,9 +217,9 @@ public class JdbcTemplateDaoImpl implements IDAO {
 				event.getDestination(),
 				event.getSubdestination(),
 				event.isReplayIndicator(),
-				event.getPublishTimeStamp().getMillis(),
+				publish,
 				event.getReceivedTimeStamp().getMillis(),
-				event.getExpirationTimeStamp().getMillis(),
+				expiration,
 				event.getPreEventState(),
 				event.getPostEventState(),
 				event.getIsPublishable(),
