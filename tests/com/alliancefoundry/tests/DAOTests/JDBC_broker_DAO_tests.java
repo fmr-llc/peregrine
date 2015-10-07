@@ -43,6 +43,8 @@ public class JDBC_broker_DAO_tests {
 	
 	static final Logger log = LoggerFactory.getLogger(JDBC_broker_DAO_tests.class);
 	
+	PeregrineException exception = null;
+	
 	IDAO dao;
 	Event event;
 	String eventId;
@@ -141,7 +143,7 @@ public class JDBC_broker_DAO_tests {
 			log.debug("No import source found.");
 			throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 		}
-		System.out.println("expected: " + expected + "\nactual: " + actual);
+
 		//db insert check
 		assertEquals(expected,actual);	
 		
@@ -271,7 +273,6 @@ public class JDBC_broker_DAO_tests {
 		// setup listener for activemq
 		listener = new MessageListener() {
 			public void onMessage(Message message) {
-				PeregrineException exception = null;
 				if(message instanceof TextMessage){
 					TextMessage txt = (TextMessage)message;
 					try {
@@ -279,20 +280,24 @@ public class JDBC_broker_DAO_tests {
 						// turn json string back into event object
 						ObjectMapper mapper = new ObjectMapper(); 
 						eventFromListener = mapper.readValue(eventAsJson, Event.class);
-					}  catch (JsonParseException e) {
+					} catch (JsonParseException e) {
+						log.debug("Could not parse into JSON object.");
 						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error converting JSON to an Object.", e);
 					} catch (JsonMappingException e) {
+						log.debug("Could not map JSON object into Event object.");
 						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error mapping JSON to Object.", e);
 					} catch (IOException e) {
+						log.debug("No import source found.");
 						exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error parsing input source", e);
 					} catch (JMSException e) {
+						log.debug("An internal error occurred, preventing the operation from occuring: " + e.getMessage());
 						exception = new PeregrineException(PeregrineErrorCodes.JMS_INTERNAL_ERROR, "An internal error occurred", e);
 					}
 					
 					if(exception != null){
 						// Cannot throw exception here,
 						// Just log it
-						System.out.println("An error has occured, replace with a log");
+						log.debug("An internal error occurred, preventing the operation from occuring.");
 					}
 
 				}				
@@ -324,7 +329,7 @@ public class JDBC_broker_DAO_tests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event actual2 = eventFromListener;
@@ -350,7 +355,6 @@ public class JDBC_broker_DAO_tests {
 		// setup listener for activemq
 		listener = new MessageListener() {
 			public void onMessage(Message message) {
-				PeregrineException exception = null;
 				if(message instanceof TextMessage){
 					TextMessage txt = (TextMessage)message;
 					try {
@@ -359,20 +363,24 @@ public class JDBC_broker_DAO_tests {
 						ObjectMapper mapper = new ObjectMapper(); 
 						eventFromListener = mapper.readValue(eventAsJson, Event.class);
 						actual2.add(eventFromListener.toString());
-					}  catch (JsonParseException e) {
+					} catch (JsonParseException e) {
+						log.debug("Could not parse into JSON object.");
 						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error converting JSON to an Object.", e);
 					} catch (JsonMappingException e) {
+						log.debug("Could not map JSON object into Event object.");
 						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error mapping JSON to Object.", e);
 					} catch (IOException e) {
+						log.debug("No import source found.");
 						exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error parsing input source", e);
 					} catch (JMSException e) {
+						log.debug("An internal error occurred, preventing the operation from occuring: " + e.getMessage());
 						exception = new PeregrineException(PeregrineErrorCodes.JMS_INTERNAL_ERROR, "An internal error occurred", e);
 					}
 					
 					if(exception != null){
 						// Cannot throw exception here,
 						// Just log it
-						System.out.println("An error has occured, replace with a log");
+						log.debug("An internal error occurred, preventing the operation from occuring.");
 					}
 
 				}				
@@ -397,7 +405,7 @@ public class JDBC_broker_DAO_tests {
 		try {
 			Thread.sleep(4000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		//db insert check

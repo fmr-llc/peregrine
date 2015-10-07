@@ -19,6 +19,8 @@ import javax.jms.TextMessage;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -36,6 +38,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class ActiveMQConsumerTests {
 	
+	static final Logger log = LoggerFactory.getLogger(ActiveMQConsumerTests.class);
+	
 	Event event1, event2, event3, event4, event5, event6, event7, event8, nullEvent, nullParentIdEvent, nullEventNameEvent, 
 		nullCorrelationIdEvent, nullSequenceNumberEvent, nullDataTypeEvent, 
 		nullSourceEvent, nullDestinationEvent, nullSubdestinationEvent, 
@@ -46,6 +50,8 @@ public class ActiveMQConsumerTests {
 	Event eventFromListener, secondEvent;
 	ActiveMQSubscriber subscriber, secondSubscriber, thirdSubscriber, s4, s5, s6, s7, s8, s9, s10, s11, s12, 
 	s13, s14, s15, s16, s17;
+	
+	PeregrineException exception = null;
 	
 	@Before
 	public void setUp() {
@@ -126,7 +132,6 @@ public class ActiveMQConsumerTests {
 		
 		listener = new MessageListener() {
 			public void onMessage(Message message) {
-				PeregrineException exception = null;
 				if(message instanceof TextMessage){
 					TextMessage txt = (TextMessage)message;
 					try {
@@ -135,19 +140,23 @@ public class ActiveMQConsumerTests {
 						ObjectMapper mapper = new ObjectMapper(); 
 						eventFromListener = mapper.readValue(eventAsJson, Event.class);
 					}  catch (JsonParseException e) {
+						log.debug("Could not parse into JSON object.");
 						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error converting JSON to an Object.", e);
 					} catch (JsonMappingException e) {
+						log.debug("Could not map JSON object into Event object.");
 						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error mapping JSON to Object.", e);
 					} catch (IOException e) {
+						log.debug("No import source found.");
 						exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error parsing input source", e);
 					} catch (JMSException e) {
+						log.debug("An internal error occurred, preventing the operation from occuring: " + e.getMessage());
 						exception = new PeregrineException(PeregrineErrorCodes.JMS_INTERNAL_ERROR, "An internal error occurred", e);
 					}
 					
 					if(exception != null){
 						// Cannot throw exception here,
 						// Just log it
-						System.out.println("An error has occured, replace with a log");
+						log.debug("An internal error occurred, preventing the operation from occuring.");
 					}
 
 				}				
@@ -168,7 +177,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event expected = event1;
@@ -186,7 +195,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event expected = event2;
@@ -211,14 +220,17 @@ public class ActiveMQConsumerTests {
 						Event tempEvent = mapper.readValue(eventAsJson, Event.class);
 						actual.add(tempEvent);
 					} catch (JsonParseException e) {
-						System.out.println("Error converting JSON to an Object.");
+						log.debug("Could not parse into JSON object.");
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error converting JSON to an Object.", e);
 					} catch (JsonMappingException e) {
-						System.out.println("Error mapping JSON to Object.");
+						log.debug("Could not map JSON object into Event object.");
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error mapping JSON to Object.", e);
 					} catch (IOException e) {
-						System.out.println("Error parsing input source.");
+						log.debug("No import source found.");
+						exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error parsing input source", e);
 					} catch (JMSException e) {
-						System.out.println("An internal error occurred, preventing "
-								+ "the JMS provider from retrieving the text.");
+						log.debug("An internal error occurred, preventing the operation from occuring: " + e.getMessage());
+						exception = new PeregrineException(PeregrineErrorCodes.JMS_INTERNAL_ERROR, "An internal error occurred", e);
 					}
 				}				
 			}
@@ -234,7 +246,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(4000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		assertTrue(compareLists(expected, actual));
@@ -255,15 +267,18 @@ public class ActiveMQConsumerTests {
 						ObjectMapper mapper = new ObjectMapper(); 
 						Event tempEvent = mapper.readValue(eventAsJson, Event.class);
 						actual.add(tempEvent);
-					} catch (JsonParseException e) {
-						System.out.println("Error converting JSON to an Object.");
+					}  catch (JsonParseException e) {
+						log.debug("Could not parse into JSON object.");
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error converting JSON to an Object.", e);
 					} catch (JsonMappingException e) {
-						System.out.println("Error mapping JSON to Object.");
+						log.debug("Could not map JSON object into Event object.");
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error mapping JSON to Object.", e);
 					} catch (IOException e) {
-						System.out.println("Error parsing input source.");
+						log.debug("No import source found.");
+						exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error parsing input source", e);
 					} catch (JMSException e) {
-						System.out.println("An internal error occurred, preventing "
-								+ "the JMS provider from retrieving the text.");
+						log.debug("An internal error occurred, preventing the operation from occuring: " + e.getMessage());
+						exception = new PeregrineException(PeregrineErrorCodes.JMS_INTERNAL_ERROR, "An internal error occurred", e);
 					}
 				}				
 			}
@@ -280,7 +295,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(6000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		assertTrue(compareLists(expected, actual));
@@ -299,15 +314,18 @@ public class ActiveMQConsumerTests {
 						// turn json string back into event object
 						ObjectMapper mapper = new ObjectMapper(); 
 						secondEvent = mapper.readValue(eventAsJson, Event.class);
-					} catch (JsonParseException e) {
-						System.out.println("Error converting JSON to an Object.");
+					}  catch (JsonParseException e) {
+						log.debug("Could not parse into JSON object.");
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error converting JSON to an Object.", e);
 					} catch (JsonMappingException e) {
-						System.out.println("Error mapping JSON to Object.");
+						log.debug("Could not map JSON object into Event object.");
+						exception = new PeregrineException(PeregrineErrorCodes.MSG_FORMAT_ERROR, "Error mapping JSON to Object.", e);
 					} catch (IOException e) {
-						System.out.println("Error parsing input source.");
+						log.debug("No import source found.");
+						exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error parsing input source", e);
 					} catch (JMSException e) {
-						System.out.println("An internal error occurred, preventing "
-								+ "the JMS provider from retrieving the text.");
+						log.debug("An internal error occurred, preventing the operation from occuring: " + e.getMessage());
+						exception = new PeregrineException(PeregrineErrorCodes.JMS_INTERNAL_ERROR, "An internal error occurred", e);
 					}
 				}				
 			}
@@ -320,7 +338,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(4000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event expected = eventFromListener;
@@ -337,7 +355,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event expected = nullEvent;
@@ -355,7 +373,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event expected = nullParentIdEvent;
@@ -373,7 +391,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event expected = nullEventNameEvent;
@@ -391,7 +409,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event expected = nullCorrelationIdEvent;
@@ -409,7 +427,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event expected = nullSequenceNumberEvent;
@@ -427,7 +445,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event expected = nullDataTypeEvent;
@@ -445,7 +463,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event expected = nullSourceEvent;
@@ -463,7 +481,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event expected = nullDestinationEvent;
@@ -481,7 +499,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event expected = nullSubdestinationEvent;
@@ -499,7 +517,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event expected = nullPreEventStateEvent;
@@ -517,7 +535,7 @@ public class ActiveMQConsumerTests {
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			System.out.println("Error sleep interrupted.");
+			log.debug("Error sleep interrupted: " + e.getMessage());
 		}
 		
 		Event expected = nullPostEventStateEvent;
