@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alliancefoundry.exceptions.PeregrineErrorCodes;
@@ -18,6 +20,8 @@ import com.alliancefoundry.model.Event;
  */
 
 public class PublisherRouter {
+	
+	static final Logger log = LoggerFactory.getLogger(PublisherRouter.class);
 
 	@Autowired
 	private Map<String, IPublisher> publishers;
@@ -32,7 +36,7 @@ public class PublisherRouter {
 		
 		Map<String, String> eventConfig = mapper.getConfigForEvent(event, this.getConfigFile());
 		if(eventConfig == null){
-			System.out.println("Event's topic and destination could not be determined");
+			log.error("Event's topic and destination could not be determined");
 			throw new PeregrineException(PeregrineErrorCodes.INVALID_DESTINATION_OR_TOPIC, "Event's topic and destination could not be determined");
 		}
 		
@@ -79,12 +83,11 @@ public class PublisherRouter {
 					
 				connectPublishers();
 				publishEventByMapper(event);
-
-				System.out.println("Event: " + event.getEventId()+ " was published");
+				log.info("Event with ID: " + event.getEventId()+ " was published");
 							
 			}
 			else{
-				System.out.println("Event: " + event.getEventId()+ " was not published");
+				log.info("Event with ID: " + event.getEventId()+ " was not published");
 			}
 		}
 	}
