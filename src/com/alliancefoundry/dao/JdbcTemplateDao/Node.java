@@ -1,13 +1,18 @@
-package com.alliancefoundry.dao;
+package com.alliancefoundry.dao.JdbcTemplateDao;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.alliancefoundry.model.Event;
 
+/**
+ * Created by: Bobby Writtenberry
+ *
+ */
 public class Node {
 	private Event event;
-	private List<Node> children;
+	private final List<Node> children = new ArrayList<Node>();
+	private boolean inserted;
 	
 	/**
 	 * @param event	stored in the node
@@ -31,21 +36,27 @@ public class Node {
 	}
 
 	/**
+	 * @return the inserted
+	 */
+	public boolean isInserted() {
+		return inserted;
+	}
+
+	/**
 	 * @param	event to be contained in the child node
+	 * @param	top node of the tree being inserted in to
 	 * @return	true if the child node was added, false if otherwise
 	 */
-	protected boolean insertNode(Event event){
+	protected void insertNode(Event event, Node top){
+		top.inserted = false;
 		if(event.getParentId() != null && event.getParentId().equals(this.event.getEventId())){
-			if(this.children == null) children = new ArrayList<Node>();
 			children.add(new Node(event));
-			return true;
+			top.inserted = true;
+			return;
 		} else {
-			if(this.children != null){
-				for(Node n : this.children){
-					return n.insertNode(event);
-				}
+			for(Node n : this.children){
+				n.insertNode(event, top);
 			}
 		}
-		return false;
 	}
 }

@@ -53,46 +53,5 @@
 <login-config>
 	<auth-method>BASIC</auth-method>
 </login-config>
-<!--  -->
-
-<!-- 
-<context-param>
-	<param-name>contextConfigLocation</param-name>
-	<param-value>
- 	classpath:security-context.xml
-	</param-value>
-  </context-param>
--->
-	<!--  For Jersey and RESTful web services -->
-	<!-- 
-<servlet>
-	<servlet-name>jersey-servlet</servlet-name>
-		<servlet-class>
-                     com.sun.jersey.spi.container.servlet.ServletContainer
-                </servlet-class>
-		<init-param>
-		     <param-name>com.sun.jersey.config.property.packages</param-name>
-		     <param-value>com.ness</param-value>
-		</init-param>
-	<load-on-startup>1</load-on-startup>
-</servlet>
-
-	<servlet-mapping>
-		<servlet-name>jersey-servlet</servlet-name>
-		<url-pattern>/jaxrs/*</url-pattern>
-	</servlet-mapping>
- -->
-<!--Hook into spring security-->
-<!-- 
-<filter>
-	<filter-name>springSecurityFilterChain</filter-name>
-	<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-</filter>
- 
-<filter-mapping>
-  <filter-name>springSecurityFilterChain</filter-name>
-  <url-pattern>/jaxrs/*</url-pattern>
-</filter-mapping>
--->
 
 </web-app>

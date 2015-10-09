@@ -1,4 +1,4 @@
-package com.alliancefoundry.tests;
+package com.alliancefoundry.tests.DAOTests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -8,21 +8,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.dao.DataIntegrityViolationException;
-
-import com.alliancefoundry.dao.DAO;
-import com.alliancefoundry.exceptions.EventNotFoundException;
+import com.alliancefoundry.dao.IDAO;
+import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
 
-public class JDBCDAOtest {
+/**
+ * Created by: Bobby Writtenberry
+ *
+ */
+public class JdbcTemplateDaoTest {
 	
-	DAO dao;
+	IDAO dao;
 	AbstractApplicationContext ctx;
 	Event event;
 	String eventId;
@@ -48,7 +51,7 @@ public class JDBCDAOtest {
 	@Before
 	public void setUp() throws Exception {
 		ctx = new ClassPathXmlApplicationContext("eventservice-beans.xml");
-		dao = ctx.getBean("dao", DAO.class);
+		dao = ctx.getBean("dao", IDAO.class);
 
 		createdAfter = new DateTime(0);
 		createdBefore = DateTime.now();
@@ -77,24 +80,24 @@ public class JDBCDAOtest {
 	 *Testing getLatestEvent()*
 	 **************************/
 	
-	@Test(expected=IllegalArgumentException.class)
-	public void getLatestEventFromDbNoParamsTest() throws IllegalArgumentException, EventNotFoundException {
+	@Test(expected=PeregrineException.class)
+	public void getLatestEventFromDbNoParamsTest() throws PeregrineException {
 		EventsRequest req = new EventsRequest(null,null,null,null,null,null,null);
 		dao.getLatestEvent(req);
 	}
 	
-	@Test(expected=EventNotFoundException.class)
-	public void getLatestEventFromDbNoMatchingParamsTest() throws IllegalArgumentException, EventNotFoundException {
+	@Test(expected=PeregrineException.class)
+	public void getLatestEventFromDbNoMatchingParamsTest() throws PeregrineException {
 		EventsRequest req = new EventsRequest(null,null,"","","","",null);
 		dao.getLatestEvent(req);
 	}
 	
 	@Test
-	public void getLatestEventFromDbMultipleMatchingParamsTest() throws IllegalArgumentException, EventNotFoundException {
+	public void getLatestEventFromDbMultipleMatchingParamsTest() throws PeregrineException {
 		EventsRequest req = new EventsRequest(null,null,
 				getEvent2.getSource(),
 				getEvent2.getObjectId(),
-				getEvent2.getCorrelationId(),
+				null,
 				getEvent2.getEventName(),
 				null);
 		long actual = dao.getLatestEvent(req).getInsertTimeStamp().getMillis();
@@ -107,15 +110,15 @@ public class JDBCDAOtest {
 	 ********************/
 	
 	@Test
-	public void getFromDbTest() throws EventNotFoundException {
+	public void getFromDbTest() throws PeregrineException {
 		eventFromDb = dao.getEvent(child1EventId);
 		String expected = child1EventId;
 		String actual = eventFromDb.getEventId();
 		assertEquals(expected,actual);
 	}
 	
-	@Test(expected=EventNotFoundException.class)
-	public void EventNotFoundInDbTest() throws EventNotFoundException {
+	@Test(expected=PeregrineException.class)
+	public void EventNotFoundInDbTest() throws PeregrineException {
 		//there shouldn't be an event with eventId of ""
 		eventId = "";
 		dao.getEvent(eventId);
@@ -125,20 +128,20 @@ public class JDBCDAOtest {
 	 *Testing getEvents()*
 	 *********************/
 	
-	@Test(expected=IllegalArgumentException.class)
-	public void getMultipleEventsFromDbOnlyGenParamAndCreatedAfterParamTest() throws IllegalArgumentException, EventNotFoundException  {
+	@Test(expected=PeregrineException.class)
+	public void getMultipleEventsFromDbOnlyGenParamAndCreatedAfterParamTest() throws PeregrineException  {
 		EventsRequest req = new EventsRequest(createdAfter,null,null,null,null,null,generations);
 		dao.getEvents(req);
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
-	public void getMultipleEventsFromDbNoParamsTest() throws IllegalArgumentException, EventNotFoundException {
+	@Test(expected=PeregrineException.class)
+	public void getMultipleEventsFromDbNoParamsTest() throws PeregrineException {
 		EventsRequest req = new EventsRequest(null,null,null,null,null,null,null);
 		dao.getEvents(req);
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
-	public void getMultipleEventsFromDbOneParamTest() throws IllegalArgumentException, EventNotFoundException {
+	@Test(expected=PeregrineException.class)
+	public void getMultipleEventsFromDbOneParamTest() throws PeregrineException {
 		EventsRequest req = new EventsRequest(createdAfter,null,null,null,null,null,null);
 		List<Event> eventList = new ArrayList<Event>();
 		eventList = dao.getEvents(req);
@@ -152,9 +155,23 @@ public class JDBCDAOtest {
 			assert(true);
 		}
 	}
+	
+	@Test(expected=PeregrineException.class)
+	public void getMultipleEventsFromDbInvalidGenCountTest() throws PeregrineException  {
+		generations = 0;
+		EventsRequest req = new EventsRequest(createdAfter,null,null,null,null,null,generations);
+		dao.getEvents(req);
+	}
+	
+	@Test(expected=PeregrineException.class)
+	public void getMultipleEventsFromDbNoMatchingParamsTest() throws PeregrineException  {
+		//there shouldn't be any events with params matching ""
+		EventsRequest req = new EventsRequest(createdAfter,null,"","","","",generations);
+		dao.getEvents(req);
+	}
 
 	@Test
-	public void getMultipleEventsFromDbMultipleParamTest() throws IllegalArgumentException, EventNotFoundException {
+	public void getMultipleEventsFromDbMultipleParamTest() throws PeregrineException {
 		EventsRequest req = new EventsRequest(createdAfter,null,null,objectId,null,name,null);
 		List<Event> eventList = new ArrayList<Event>();
 		eventList = dao.getEvents(req);
@@ -172,7 +189,7 @@ public class JDBCDAOtest {
 	}
 	
 	@Test
-	public void getMultipleEventsFromDbAllParamTest() throws IllegalArgumentException, EventNotFoundException {
+	public void getMultipleEventsFromDbAllParamTest() throws PeregrineException {
 		EventsRequest req = new EventsRequest(createdAfter,createdBefore,source,objectId,correlationId,name,generations);
 		List<Event> eventList = new ArrayList<Event>();
 		eventList = dao.getEvents(req);
@@ -197,7 +214,7 @@ public class JDBCDAOtest {
 	 ***********************/
 	
 	@Test
-	public void insertToDbTest() throws EventNotFoundException {
+	public void insertToDbTest() throws PeregrineException {
 		event = getEvent2;
 		Map<String,String> headers = new HashMap<String,String>();
 		Map<String,DataItem> payload = new HashMap<String,DataItem>();
@@ -218,7 +235,7 @@ public class JDBCDAOtest {
 	}
 	
 	@Test
-	public void insertToAndRetrieveFromDbDateTimeTest() throws EventNotFoundException {
+	public void insertToAndRetrieveFromDbDateTimeTest() throws PeregrineException {
 		DateTime datetime = DateTime.now();
 		event = getEvent2;
 		event.setPublishTimeStamp(datetime);
@@ -231,8 +248,8 @@ public class JDBCDAOtest {
 		assertEquals(expected, actual);
 	}
 	
-	@Test(expected=DataIntegrityViolationException.class)
-	public void insertToDbObjectIdNullTest() throws EventNotFoundException, DataIntegrityViolationException {
+	@Test(expected=PeregrineException.class)
+	public void insertToDbObjectIdNullTest() throws PeregrineException {
 		Event event2 = getEvent2;
 		event2.setObjectId(null);
 		Map<String,String> headers = new HashMap<String,String>();
@@ -246,7 +263,7 @@ public class JDBCDAOtest {
 		event2.setCustomHeaders(headers);
 		event2.setCustomPayload(payload);
 		
-		eventId = dao.insertEvent(event2);		
+		eventId = dao.insertEvent(event2);	
 	}
 	
 	/************************
@@ -254,7 +271,7 @@ public class JDBCDAOtest {
 	 ************************/
 	
 	@Test
-	public void insertMultipleEventsToDbTest() throws EventNotFoundException {
+	public void insertMultipleEventsToDbTest() throws PeregrineException {
 		event = getEvent2;
 		Event event2 = getEvent3;
 		List<Event> events = new ArrayList<Event>();
@@ -269,9 +286,8 @@ public class JDBCDAOtest {
 		assertEquals(expected, actual);
 	}
 	
-	//FIX THIS. FIRST EVENT IS STILL BEING INSERTED.
-	@Test(expected=DataIntegrityViolationException.class)
-	public void insertMultipleEventsToDbInvalidEventTest() {
+	@Test(expected=PeregrineException.class)
+	public void insertMultipleEventsToDbInvalidEventTest() throws PeregrineException {
 		event = getEvent2;
 		Event event2 = getEvent3;
 		event2.setObjectId(null);

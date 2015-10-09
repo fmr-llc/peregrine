@@ -26,8 +26,6 @@ public class SecurityTests {
 	public void testAccessRestServiceWithoutPassword() throws ClientProtocolException, IOException {
 		
 		// access get event reest service
-//		Request.Get("http://localhost:8080/event-service/event/34578")
-//	    .execute().returnContent();
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		HttpGet httpGet = new HttpGet("http://localhost:8080/event-service/event/34578");
 		CloseableHttpResponse response1 = httpclient.execute(httpGet);
@@ -46,13 +44,13 @@ public class SecurityTests {
 		// access get event reest service
 
 		CloseableHttpClient httpclient = HttpClients.createDefault();
-		HttpGet httpGet = new HttpGet("http://ratnesh:ratnesh@localhost:8080/event-service/event/34578");
+		HttpGet httpGet = new HttpGet("http://user:user@localhost:8080/event-service/event/34578");
 		CloseableHttpResponse response1 = httpclient.execute(httpGet);
 		
 		System.out.println(response1.getStatusLine().getStatusCode());
 		
-		// if we get this far test passes
-//		Assert.assertTrue(true);
+		// Status code 401 - Unauthorized 401 
+		Assert.assertTrue((response1.getStatusLine().getStatusCode() != 401));
 	}
 
 }

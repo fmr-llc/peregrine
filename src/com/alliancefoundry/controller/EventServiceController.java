@@ -1,6 +1,5 @@
 package com.alliancefoundry.controller;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,8 +8,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,18 +15,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alliancefoundry.dao.DAO;
-import com.alliancefoundry.exceptions.EventNotFoundException;
+import com.alliancefoundry.dao.IDAO;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
+import com.alliancefoundry.model.EventResponse;
 import com.alliancefoundry.model.EventsRequest;
-import com.alliancefoundry.publisher.EventServicePublisher;
-
-
+import com.alliancefoundry.publisher.PublisherRouter;
 
 /**
- * Created by: Paul Bernard
- * 
+ * Created by: Paul Bernard, Bobby Writtenberry, Paul Fahey, Robert Coords
  *
  */
 @RestController
@@ -38,13 +32,13 @@ public class EventServiceController  {
 	static final Logger log = LoggerFactory.getLogger(EventServiceController.class);
 
 	@Autowired
-	DAO dao;
-	public void setDao(DAO dao) {
+	IDAO dao;
+	public void setDao(IDAO dao) {
 		this.dao = dao;
 	}
 	
 	@Autowired
-	private EventServicePublisher publisher;
+	private PublisherRouter publisher;
 
 	/**
 	 * Creates a new event
@@ -53,17 +47,23 @@ public class EventServiceController  {
 	 * @return		the id of the created event
 	 */
 	@RequestMapping(value="/event", method = RequestMethod.POST)
-	public String setEvent(@RequestBody Event evt){
-		String eventId = "";
+	public EventResponse setEvent(@RequestBody Event evt){
+		EventResponse response = new EventResponse();
+		String msg;
 		evt.setReceivedTimeStamp(DateTime.now());
 		try {
-			eventId = dao.insertEvent(evt);
-			log.debug("created event with event id " + eventId);
-			return eventId;
-		} catch (DataIntegrityViolationException e) {
-			log.debug("Error inserting an event: " + e.getCause().getMessage());
-			return null;
+			Event.verifyNonNullables(evt);
+			String eventId = dao.insertEvent(evt);
+			msg  = String.format("Successfully created event - Event Id: %s", eventId);
+			publisher.attemptPublishEvent(evt);
+			response.getEventIds().add(eventId);
+		}catch (PeregrineException e) {
+			response.getEvents().add(evt);
+			msg = String.format("Error inserting or publishing an event: %s", e.getMessage());
 		}
+		response.setMsg(msg);
+		log.info(msg);
+		return response;
 	}
 	
 	/**
@@ -73,23 +73,26 @@ public class EventServiceController  {
 	 * @return		the list of ids of the created events
 	 */
 	@RequestMapping(value="/events", method = RequestMethod.POST)
-	public List<String> setEvents(@RequestBody List<Event> evts){
+	public EventResponse setEvents(@RequestBody List<Event> evts){
+		EventResponse response = new EventResponse();
+		String msg;
 		List<String> eventIds = new ArrayList<String>();
 		try {
 			for(Event e : evts){
+				Event.verifyNonNullables(e);
 				e.setReceivedTimeStamp(DateTime.now());
 			}
 			eventIds = dao.insertEvents(evts);
-			if (eventIds.size() > 0){
-			    log.debug("Created events with event id[s]" + eventIds.stream().collect(Collectors.joining("\n")));
-			} else {
-				log.debug("No events provided to insert");
-			}
-			return eventIds;
-		} catch (DataIntegrityViolationException e) {
-			log.debug("Error inserting an event: " + e.getCause().getMessage() + ".  None of the events were inserted");
-			return null;
+			msg  = String.format("Successfully created event[s] - Event Id[s]: %s", eventIds.stream().collect(Collectors.joining("\n")));
+			publisher.attemptPublishEvents(evts);
+			response.setEventIds(eventIds);
+		}catch (PeregrineException e) {
+			response.setEvents(evts);
+			msg = String.format("Error inserting or publishing an event: %s", e.getMessage());
 		}
+		response.setMsg(msg);
+		log.info(msg);
+		return response;
 	}
 	
 	/**
@@ -99,19 +102,20 @@ public class EventServiceController  {
 	 * @return		the event with the corresponding event id
 	 */
     @RequestMapping(value="/event/{id}", method = RequestMethod.GET)
-    public Event getEvent(@PathVariable String id){
-		try {
+    public EventResponse getEvent(@PathVariable String id){
+		EventResponse response = new EventResponse();
+		String msg;
+    	try {
 			Event eventFromDb = dao.getEvent(id);
-			if(eventFromDb != null) {
-	        	log.debug("retrieved event with event id " + eventFromDb.getEventId());
-	        } else {
-	        	log.debug("No event could be retrieved with the specified id");
-	        }
-	        return eventFromDb;
-		} catch (EventNotFoundException e) {
-			log.debug("Error retrieving event: " + e.getMessage());
-			return null;
+			msg  = String.format("Successfully retrieved event - Event Id: %s", eventFromDb.getEventId());
+	        response.getEvents().add(eventFromDb); 
+		} catch (PeregrineException e) {
+			msg = String.format("Error retrieving event - Event Id %s: %s", id, e.getMessage());
+			response.getEventIds().add(id);
 		}
+    	response.setMsg(msg);
+    	log.info(msg);
+    	return response;
     }
     
     /**
@@ -127,7 +131,7 @@ public class EventServiceController  {
      * @return					list of events with values matching params
      */
     @RequestMapping(value="/events", method = RequestMethod.GET)
-    public List<Event> getEvents(
+    public EventResponse getEvents(
     		@RequestParam(value="createdAfter", required=false) String createdAfter,
     		@RequestParam(value="createdBefore", required=false) String createdBefore,
     		@RequestParam(value="source", required=false) String source,	
@@ -147,28 +151,26 @@ public class EventServiceController  {
     	} else {
     		createdBeforeVal = new DateTime(createdBefore);
     	}
+    	EventResponse response = new EventResponse();
+    	String msg;
     	EventsRequest req = new EventsRequest(createdAfterVal, createdBeforeVal, source, objectId,
     			correlationId, eventName, generations);
     	List<Event> eventsFromDb = new ArrayList<Event>();
     	List<String> eventIds = new ArrayList<String>();
     	try{
+    		EventsRequest.verifyRequestParameters(req, false);
     		eventsFromDb = dao.getEvents(req);
     		for(Event e : eventsFromDb){
     			eventIds.add(e.getEventId());
     		}
-    		if(eventIds.size() > 0){
-    			log.debug("retrieved events with event id[s] " + eventIds.stream().collect(Collectors.joining("\n")));
-    		} else {
-    			log.debug("No events match the specified request parameters");
-    		}
-    		return eventsFromDb;
-    	} catch(IllegalArgumentException e){
-    		log.debug("Incorrect or missing request parameter: " + e.getMessage());
-    		return null;
-    	} catch(EventNotFoundException e) {
-    		log.debug("Error retrieving an event: " + e.getMessage());
-    		return null;
+    		response.setEvents(eventsFromDb);
+    		msg = String.format("Successfully retrieved event[s] - Event Id[s]: %s", eventIds.stream().collect(Collectors.joining("\n")));
+    	} catch(PeregrineException e) {
+    		msg = String.format("Error retrieving an event: %s", e.getMessage());
     	}
+    	response.setMsg(msg);
+    	log.info(msg);
+    	return response;
     }
 
     /**
@@ -181,30 +183,28 @@ public class EventServiceController  {
      * @return					the event with values matching the params
      */
     @RequestMapping(value="/latest-event", method = RequestMethod.GET)
-    public Event getLatestEvent(
+    public EventResponse getLatestEvent(
     		@RequestParam(value="source", required=false) String source,	
     		@RequestParam(value="objectId", required=false) String objectId,
     		@RequestParam(value="correlationId", required=false) String correlationId,
     		@RequestParam(value="eventName", required=false) String eventName){
 
+    	EventResponse response = new EventResponse();
+    	String msg;
     	EventsRequest req = new EventsRequest(null, null, source, objectId,
     			correlationId, eventName, null);
     	Event event;
 		try {
+			EventsRequest.verifyRequestParameters(req, true);
 			event = dao.getLatestEvent(req);
-			if(event != null){
-	    		log.debug("retrieved event with event id " + event.getEventId());
-	    	} else {
-	    		log.debug("No event matches the specified request parameters");
-	    	}
-			return event;
-		} catch(IllegalArgumentException e){
-    		log.debug("Incorrect or missing request parameter: " + e.getMessage());
-    		return null;
-		} catch (EventNotFoundException e) {
-			log.debug("Error retrieving event: " + e.getMessage());
-			return null;
+			response.getEvents().add(event);
+	    	msg  = String.format("Successfully retrieved event - Event Id: %s", event.getEventId());
+		} catch (PeregrineException e) {
+			msg = String.format("Error retrieving event: %s", e.getMessage());
 		}
+		response.setMsg(msg);
+		log.info(msg);
+		return response;
     }
     
     
@@ -213,31 +213,29 @@ public class EventServiceController  {
 	 * 
 	 * @param eventId - Id of event to replay
 	 * @return whether or not the replay was successful
-	 * @throws EventNotFoundException 
 	 */
-	@RequestMapping(value="/event", method = RequestMethod.GET)
-	public String ReplayEvent(
-			@RequestParam(value="eventid", required=false) String eventId) throws EventNotFoundException{
-		String message = String.format("Successfully replayed Event - Event Id: %s", eventId);
+	@RequestMapping(value="/replay/{id}", method = RequestMethod.POST)
+	public EventResponse replayEvent(@PathVariable String id){
+		EventResponse response = new EventResponse();
+		String msg;
 		
 		try {
-			Event eventFromDb = dao.getEvent(eventId);
-			publisher.publishEventByMapper(eventFromDb);
+			Event eventFromDb = dao.getEvent(id);
+			publisher.attemptPublishEvent(eventFromDb);
+			msg = String.format("Successfully replayed event - Event Id: %s", id);
 		} catch (PeregrineException e) {
-			log.debug("Error replaying event");
-			log.debug("Error Message: " + e.getMessage());
-			message = String.format("Event could not be replayed. Event Id: %s", eventId);
+			msg = String.format("Error replaying event - Event Id %s: %s", id, e.getMessage());
 		}
-		return message;
+		response.setMsg(msg);
+		log.info(msg);
+		return response;
 	}
 
-	public EventServicePublisher getPublisher() {
+	public PublisherRouter getPublisher() {
 		return publisher;
 	}
 
-	public void setPublisher(EventServicePublisher publisher) {
+	public void setPublisher(PublisherRouter publisher) {
 		this.publisher = publisher;
 	}
-	
-	
 }

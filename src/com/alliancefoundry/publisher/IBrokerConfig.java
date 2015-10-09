@@ -2,9 +2,17 @@ package com.alliancefoundry.publisher;
 
 import java.util.Map;
 
+import com.alliancefoundry.exceptions.PeregrineException;
+
+/**
+ * Created by: Paul Fahey, Curtis Robinson
+ * 
+ *
+ */
+
 import com.alliancefoundry.model.Event;
 
-public interface BrokerConfig {
+public interface IBrokerConfig {
 	
 	/**
 	 * Constant to map the broker destination for a given event
@@ -19,8 +27,10 @@ public interface BrokerConfig {
 	/**
 	 * Maps proper configuration to give to the router based on an events messagetype
 	 * @param ev Event that needs to determine its routing mechanism
+	 * @param configFile File name for event routing configuration
 	 * @return Proper configuration mapping is returned for the router to use
+	 * @throws PeregrineException 
 	 */
-	public Map<String, String> getConfigForEvent(Event ev);
+	public Map<String, String> getConfigForEvent(Event ev, String configFile) throws PeregrineException;
 	
 }
