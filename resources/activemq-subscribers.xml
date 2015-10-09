@@ -98,4 +98,9 @@
 		<property name="name" value="${activemq.name2}" />
 	</bean>
 	
+	<bean id="activemqSubscriber20" class="com.alliancefoundry.tests.PublisherTests.ActiveMQTests.ActiveMQSubscriber">
+		<property name="brokerUrl" value="${activemq.url}" />
+		<property name="name" value="${activemq.name2}" />
+	</bean>
+	
 </beans>
