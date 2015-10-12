@@ -10,6 +10,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -29,6 +31,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 
 public class KafkaConsumeTests {
+	
+	static final Logger log = LoggerFactory.getLogger(KafkaConsumeTests.class);
 	
 	Event event1, event2, event3, event4, event5, event6, event7, simpleEvent, 
 		nullParentEvent, nullEventNameEvent, nullCorrelationIdEvent, nullSequenceNumEvent, 
@@ -98,12 +102,16 @@ public class KafkaConsumeTests {
 		try {
 			actual = mapper.readValue(event, Event.class);
 		} catch (JsonParseException e) {
+			log.debug("Could not parse into JSON object.");
 			throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 		} catch (JsonMappingException e) {
+			log.debug("Could not map JSON object into Event object.");
 			throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 		} catch (IOException e) {
+			log.debug("No import source found.");
 			throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 		}
+		
 		
 		assertEquals(expected, actual);
 	}
@@ -124,12 +132,16 @@ public class KafkaConsumeTests {
 			try {
 				actual = mapper.readValue(event, Event.class);
 			} catch (JsonParseException e) {
+				log.debug("Could not parse into JSON object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 			} catch (JsonMappingException e) {
+				log.debug("Could not map JSON object into Event object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 			} catch (IOException e) {
+				log.debug("No import source found.");
 				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 			}
+			
 			
 			assertEquals(expected, actual);
 		}
@@ -154,7 +166,14 @@ public class KafkaConsumeTests {
 				Event event = null;
 				try {
 					event = mapper.readValue(eventasString, Event.class);
+				} catch (JsonParseException e) {
+					log.debug("Could not parse into JSON object.");
+					throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
+				} catch (JsonMappingException e) {
+					log.debug("Could not map JSON object into Event object.");
+					throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 				} catch (IOException e) {
+					log.debug("No import source found.");
 					throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 				}
 
@@ -186,12 +205,16 @@ public class KafkaConsumeTests {
 				try {
 					event = mapper.readValue(eventasString, Event.class);
 				} catch (JsonParseException e) {
+					log.debug("Could not parse into JSON object.");
 					throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 				} catch (JsonMappingException e) {
+					log.debug("Could not map JSON object into Event object.");
 					throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 				} catch (IOException e) {
+					log.debug("No import source found.");
 					throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 				}
+				
 
 				actual.add(event);
 
@@ -219,13 +242,17 @@ public class KafkaConsumeTests {
 			Event actual;
 			try {
 				actual = mapper.readValue(event, Event.class);
-			} catch (JsonParseException e) {
+			}catch (JsonParseException e) {
+				log.debug("Could not parse into JSON object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 			} catch (JsonMappingException e) {
+				log.debug("Could not map JSON object into Event object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 			} catch (IOException e) {
+				log.debug("No import source found.");
 				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 			}
+			
 			
 			assertEquals(expected, actual);
 		}
@@ -255,12 +282,16 @@ public class KafkaConsumeTests {
 			try {
 				expected = mapper1.readValue(event1, Event.class);
 			} catch (JsonParseException e) {
+				log.debug("Could not parse into JSON object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 			} catch (JsonMappingException e) {
+				log.debug("Could not map JSON object into Event object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 			} catch (IOException e) {
+				log.debug("No import source found.");
 				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 			}
+			
 			
 			KafkaSubscriber kafkaSubscriber2 = new KafkaSubscriber("testJaneDoe344");
 			String event2 = kafkaSubscriber2.consumeEvent();
@@ -268,13 +299,17 @@ public class KafkaConsumeTests {
 			Event actual;
 			try {
 				actual = mapper2.readValue(event2, Event.class);
-			} catch (JsonParseException e) {
+			}catch (JsonParseException e) {
+				log.debug("Could not parse into JSON object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 			} catch (JsonMappingException e) {
+				log.debug("Could not map JSON object into Event object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 			} catch (IOException e) {
+				log.debug("No import source found.");
 				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 			}
+			
 				
 			assertEquals(expected, actual);
 		}
@@ -295,12 +330,16 @@ public class KafkaConsumeTests {
 			try {
 				actual = mapper.readValue(event, Event.class);
 			} catch (JsonParseException e) {
+				log.debug("Could not parse into JSON object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 			} catch (JsonMappingException e) {
+				log.debug("Could not map JSON object into Event object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 			} catch (IOException e) {
+				log.debug("No import source found.");
 				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 			}
+			
 			
 			assertEquals(expected, actual);
 		}
@@ -321,12 +360,16 @@ public class KafkaConsumeTests {
 			try {
 				actual = mapper.readValue(event, Event.class);
 			} catch (JsonParseException e) {
+				log.debug("Could not parse into JSON object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 			} catch (JsonMappingException e) {
+				log.debug("Could not map JSON object into Event object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 			} catch (IOException e) {
+				log.debug("No import source found.");
 				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 			}
+			
 			
 			assertEquals(expected, actual);
 		}
@@ -346,13 +389,17 @@ public class KafkaConsumeTests {
 			Event actual;
 			try {
 				actual = mapper.readValue(event, Event.class);
-			} catch (JsonParseException e) {
+			}catch (JsonParseException e) {
+				log.debug("Could not parse into JSON object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 			} catch (JsonMappingException e) {
+				log.debug("Could not map JSON object into Event object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 			} catch (IOException e) {
+				log.debug("No import source found.");
 				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 			}
+			
 			
 			assertEquals(expected, actual);
 		}
@@ -373,12 +420,16 @@ public class KafkaConsumeTests {
 			try {
 				actual = mapper.readValue(event, Event.class);
 			} catch (JsonParseException e) {
+				log.debug("Could not parse into JSON object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 			} catch (JsonMappingException e) {
+				log.debug("Could not map JSON object into Event object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 			} catch (IOException e) {
+				log.debug("No import source found.");
 				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 			}
+			
 			assertEquals(expected, actual);
 		}
 		
@@ -398,12 +449,16 @@ public class KafkaConsumeTests {
 			try {
 				actual = mapper.readValue(event, Event.class);
 			} catch (JsonParseException e) {
+				log.debug("Could not parse into JSON object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 			} catch (JsonMappingException e) {
+				log.debug("Could not map JSON object into Event object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 			} catch (IOException e) {
+				log.debug("No import source found.");
 				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 			}
+			
 			
 			assertEquals(expected, actual);
 		}
@@ -424,12 +479,16 @@ public class KafkaConsumeTests {
 			try {
 				actual = mapper.readValue(event, Event.class);
 			} catch (JsonParseException e) {
+				log.debug("Could not parse into JSON object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 			} catch (JsonMappingException e) {
+				log.debug("Could not map JSON object into Event object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 			} catch (IOException e) {
+				log.debug("No import source found.");
 				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 			}
+			
 			
 			assertEquals(expected, actual);
 		}
@@ -450,12 +509,16 @@ public class KafkaConsumeTests {
 			try {
 				actual = mapper.readValue(event, Event.class);
 			} catch (JsonParseException e) {
+				log.debug("Could not parse into JSON object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 			} catch (JsonMappingException e) {
+				log.debug("Could not map JSON object into Event object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 			} catch (IOException e) {
+				log.debug("No import source found.");
 				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 			}
+			
 			
 			assertEquals(expected, actual);
 		}
@@ -475,13 +538,17 @@ public class KafkaConsumeTests {
 			Event actual;
 			try {
 				actual = mapper.readValue(event, Event.class);
-			} catch (JsonParseException e) {
+			}catch (JsonParseException e) {
+				log.debug("Could not parse into JSON object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 			} catch (JsonMappingException e) {
+				log.debug("Could not map JSON object into Event object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 			} catch (IOException e) {
+				log.debug("No import source found.");
 				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 			}
+			
 			
 			assertEquals(expected, actual);
 		}
@@ -502,12 +569,16 @@ public class KafkaConsumeTests {
 			try {
 				actual = mapper.readValue(event, Event.class);
 			} catch (JsonParseException e) {
+				log.debug("Could not parse into JSON object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 			} catch (JsonMappingException e) {
+				log.debug("Could not map JSON object into Event object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 			} catch (IOException e) {
+				log.debug("No import source found.");
 				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 			}
+			
 			
 			assertEquals(expected, actual);
 		}
@@ -528,12 +599,16 @@ public class KafkaConsumeTests {
 			try {
 				actual = mapper.readValue(event, Event.class);
 			} catch (JsonParseException e) {
+				log.debug("Could not parse into JSON object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_PARSE_ERROR, "Could not parse into JSON object.", e);
 			} catch (JsonMappingException e) {
+				log.debug("Could not map JSON object into Event object.");
 				throw new PeregrineException(PeregrineErrorCodes.JSON_MAPPING_ERROR, "Could not map JSON object into Event object.", e);
 			} catch (IOException e) {
+				log.debug("No import source found.");
 				throw new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "No import source found.", e);
 			}
+			
 			
 			assertEquals(expected, actual);
 		}
