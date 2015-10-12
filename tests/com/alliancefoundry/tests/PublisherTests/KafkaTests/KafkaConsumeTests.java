@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Before;
@@ -17,6 +18,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
+import com.alliancefoundry.model.EventPublicationAudit;
 import com.alliancefoundry.publisher.PublisherRouter;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -151,7 +153,7 @@ public class KafkaConsumeTests {
 			List<Event> expected = new ArrayList<Event>();
 			expected.add(event3); expected.add(event4);
 			
-			publisher.attemptPublishEvents(expected);
+			publisher.attemptPublishEvents(expected, new HashMap<String,EventPublicationAudit>());
 			
 			List<Event> actual = new ArrayList<>();
 			
@@ -189,7 +191,7 @@ public class KafkaConsumeTests {
 			List<Event> expected = new ArrayList<Event>();
 			expected.add(event5); expected.add(event6); expected.add(event7);
 			
-			publisher.attemptPublishEvents(expected);
+			publisher.attemptPublishEvents(expected, new HashMap<String,EventPublicationAudit>());
 
 			List<Event> actual = new ArrayList<>();
 			
