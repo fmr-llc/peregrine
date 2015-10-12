@@ -3,29 +3,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-		
-	<bean id="publishDateTime1" class="org.joda.time.DateTime">
+	<bean id="timestamp1" class="org.joda.time.DateTime">
 	    	<constructor-arg type="java.lang.Object" value="2015-09-08T13:40:47.285-0400" />
 	</bean>
-	<bean id="receivedDateTime1" class="org.joda.time.DateTime">
-	    	<constructor-arg type="java.lang.Object" value="2015-09-15T13:40:47.285-0400" />
-	</bean>
-	<bean id="expirationDateTime1" class="org.joda.time.DateTime">
-	    	<constructor-arg type="java.lang.Object" value="2015-09-15T13:40:47.285-0400" />
-	</bean>
-	<bean id="insertDateTime1" class="org.joda.time.DateTime">
-	    	<constructor-arg type="java.lang.Object" value="2015-09-08T13:40:47.285-0400" />
-	</bean>
-	<bean id="publishDateTime2" class="org.joda.time.DateTime">
-	    	<constructor-arg type="java.lang.Object" value="2015-09-08T13:40:47.285-0400" />
-	</bean>
-	<bean id="receivedDateTime2" class="org.joda.time.DateTime">
-	    	<constructor-arg type="java.lang.Object" value="2015-09-09T10:07:18.285-0400" />
-	</bean>
-	<bean id="expirationDateTime2" class="org.joda.time.DateTime">
-	    	<constructor-arg type="java.lang.Object" value="2015-09-16T10:07:18.285-0400" />
-	</bean>
-	<bean id="insertDateTime2" class="org.joda.time.DateTime">
+	<bean id="timestamp2" class="org.joda.time.DateTime">
 	    	<constructor-arg type="java.lang.Object" value="2015-09-09T10:07:18.285-0400" />
 	</bean>
 	
@@ -41,13 +22,10 @@
 		<property name="destination" value="Kafka" />
 		<property name="subdestination" value="test2" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime1" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime1" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime1" /> <!-- DateTime -->
 		<property name="preEventState" value="pre" />
 		<property name="postEventState" value="post" />
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime1" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp1" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="childEvent1" class="com.alliancefoundry.model.Event">
@@ -62,13 +40,9 @@
 		<property name="destination" value="Kafka" />
 		<property name="subdestination" value="test2" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime1" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime1" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime1" /> <!-- DateTime -->
 		<property name="preEventState" value="pre" />
 		<property name="postEventState" value="post" />
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime1" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="childEvent2" class="com.alliancefoundry.model.Event">
@@ -83,13 +57,10 @@
 		<property name="destination" value="Kafka" />
 		<property name="subdestination" value="test2" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime1" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime1" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime1" /> <!-- DateTime -->
 		<property name="preEventState" value="pre" />
 		<property name="postEventState" value="post" />
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime1" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp1" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="simpleEvent" class="com.alliancefoundry.model.Event">
@@ -104,13 +75,10 @@
 		<property name="destination"><null/></property>
 		<property name="subdestination"><null/></property>
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp2" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="persistEvent1" class="com.alliancefoundry.model.Event">
@@ -125,13 +93,10 @@
 		<property name="destination" value="TestDestination" />
 		<property name="subdestination" value="TestSubdestination" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp2" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="persistEvent2" class="com.alliancefoundry.model.Event">
@@ -146,13 +111,10 @@
 		<property name="destination" value="TestDestination" />
 		<property name="subdestination" value="TestSubdestination" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp2" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="persistEvent3" class="com.alliancefoundry.model.Event">
@@ -167,13 +129,10 @@
 		<property name="destination" value="TestDestination" />
 		<property name="subdestination" value="TestSubdestination" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp2" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="persistEvent4" class="com.alliancefoundry.model.Event">
@@ -188,13 +147,10 @@
 		<property name="destination" value="TestDestination" />
 		<property name="subdestination" value="TestSubdestination" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="1025" />
 		<property name="postEventState"><null/></property>
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp2" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="persistEvent5" class="com.alliancefoundry.model.Event">
@@ -209,13 +165,10 @@
 		<property name="destination" value="TestDestination" />
 		<property name="subdestination" value="TestSubdestination" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp"><null/></property> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp"><null/></property> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp2" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="persistEvent6" class="com.alliancefoundry.model.Event">
@@ -230,13 +183,10 @@
 		<property name="destination"><null/></property>
 		<property name="subdestination"><null/></property>
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp2" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="persistEvent7" class="com.alliancefoundry.model.Event">
@@ -251,13 +201,10 @@
 		<property name="destination" value="TestDestination" />
 		<property name="subdestination" value="TestSubdestination" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
-		<property name="receivedTimeStamp"><null/></property> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp"><null/></property> <!-- DateTime -->
+		<property name="timestamp"><null/></property> <!-- DateTime -->
 	</bean>
 	
 	<bean id="persistEvent8" class="com.alliancefoundry.model.Event">
@@ -272,13 +219,10 @@
 		<property name="destination" value="TestDestination" />
 		<property name="subdestination" value="TestSubdestination" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp2" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="persistEvent9" class="com.alliancefoundry.model.Event">
@@ -293,13 +237,10 @@
 		<property name="destination" value="TestDestination" />
 		<property name="subdestination" value="TestSubdestination" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp2" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="persistEvent10" class="com.alliancefoundry.model.Event">
@@ -314,13 +255,10 @@
 		<property name="destination" value="TestDestination" />
 		<property name="subdestination" value="TestSubdestination" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp2" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="persistEvent11" class="com.alliancefoundry.model.Event">
@@ -335,13 +273,10 @@
 		<property name="destination" value="TestDestination" />
 		<property name="subdestination" value="TestSubdestination" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp2" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="persistEvent12" class="com.alliancefoundry.model.Event">
@@ -356,13 +291,10 @@
 		<property name="destination" value="TestDestination" />
 		<property name="subdestination" value="TestSubdestination" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="expirationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
 		<property name="isPublishable" value="false" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp2" /> <!-- DateTime -->
 	</bean>
 
 </beans>

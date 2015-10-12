@@ -39,7 +39,6 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
-  
 	  <security-constraint>
 		<web-resource-collection>
 		<web-resource-name>Rest Calls</web-resource-name>

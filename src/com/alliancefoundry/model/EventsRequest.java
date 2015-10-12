@@ -164,5 +164,12 @@ public class EventsRequest {
 			return -1;
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return "EventsRequest [getCreatedAfter()=" + getCreatedAfter() + ", getCreatedBefore()=" + getCreatedBefore()
+				+ ",  getSource()=" + getSource() + ", getObjectId()=" + getObjectId() + ", getCorrelationId()=" 
+				+ getCorrelationId() + ", getEventName()=" + getEventName() + ", getGenerations()=" + getGenerations() + "]";
+	}
 
 }

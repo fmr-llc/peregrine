@@ -231,6 +231,43 @@
 		<version>4.5.1</version>
 	</dependency>
         
+	<!-- Spring security -->
+	<dependency>
+		<groupId>org.springframework.security</groupId>
+		<artifactId>spring-security-core</artifactId>
+		<version>${spring.security.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework.security</groupId>
+		<artifactId>spring-security-web</artifactId>
+		<version>${spring.security.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework.security</groupId>
+		<artifactId>spring-security-config</artifactId>
+		<version>${spring.security.version}</version>
+	</dependency>
+
+	<dependency>
+		<groupId>com.sun.jersey</groupId>
+		<artifactId>jersey-server</artifactId>
+		<version>1.8</version>
+	</dependency>
+<dependency>
+	<groupId>org.apache.httpcomponents</groupId>
+	<artifactId>httpclient</artifactId>
+	<version>4.5.1</version>
+</dependency>
+<dependency>
+	<groupId>org.apache.httpcomponents</groupId>
+	<artifactId>httpcore</artifactId>
+	<version>4.4.3</version>
+</dependency>
+<dependency>
+	<groupId>org.apache.httpcomponents</groupId>
+	<artifactId>fluent-hc</artifactId>
+	<version>4.5.1</version>
+</dependency>
     </dependencies>
 
 

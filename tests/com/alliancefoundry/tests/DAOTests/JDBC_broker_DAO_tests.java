@@ -26,6 +26,7 @@ import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
+import com.alliancefoundry.model.EventPublicationAudit;
 import com.alliancefoundry.publisher.PublisherRouter;
 import com.alliancefoundry.tests.PublisherTests.ActiveMQTests.ActiveMQSubscriber;
 import com.alliancefoundry.tests.PublisherTests.KafkaTests.KafkaSubscriber;
@@ -118,9 +119,9 @@ public class JDBC_broker_DAO_tests {
 		event.setCustomHeaders(headers);
 		event.setCustomPayload(payload);
 		
-		String eventId = dao.insertEvent(event);
+		String eventId = dao.insertEvent(event, new HashMap<String,EventPublicationAudit>());
 		
-		publisher.attemptPublishEvent(event);
+		publisher.attemptPublishEvent(event, new HashMap<String,EventPublicationAudit>());
 	
 		eventFromDb = dao.getEvent(eventId);
 	
@@ -167,9 +168,9 @@ public class JDBC_broker_DAO_tests {
 		event.setCustomHeaders(headers);
 		event.setCustomPayload(payload);
 		
-		String eventId = dao.insertEvent(event);
+		String eventId = dao.insertEvent(event, new HashMap<String,EventPublicationAudit>());
 		
-		publisher.attemptPublishEvent(event);
+		publisher.attemptPublishEvent(event, new HashMap<String,EventPublicationAudit>());
 	
 		eventFromDb = dao.getEvent(eventId);
 	
@@ -212,9 +213,9 @@ public class JDBC_broker_DAO_tests {
 		events.add(event2);
 		
 		List<String> expected = new ArrayList<String>();
-		expected = dao.insertEvents(events);
+		expected = dao.insertEvents(events, new HashMap<String,EventPublicationAudit>());
 		
-		publisher.attemptPublishEvents(events);
+		publisher.attemptPublishEvents(events, new HashMap<String,EventPublicationAudit>());
 	
 		List<String> actual = new ArrayList<String>();
 		
@@ -317,9 +318,9 @@ public class JDBC_broker_DAO_tests {
 		
 		subscriber1.setConsumerListener(listener);
 		
-		String eventId = dao.insertEvent(event);
+		String eventId = dao.insertEvent(event, new HashMap<String,EventPublicationAudit>());
 		
-		publisher.attemptPublishEvent(event);
+		publisher.attemptPublishEvent(event, new HashMap<String,EventPublicationAudit>());
 	
 		eventFromDb = dao.getEvent(eventId);
 	
@@ -392,7 +393,7 @@ public class JDBC_broker_DAO_tests {
 		List<String> ids = new ArrayList<String>();
 		List<String> expected = new ArrayList<String>();
 		List<String> actual = new ArrayList<String>();
-		ids = dao.insertEvents(events);
+		ids = dao.insertEvents(events, new HashMap<String,EventPublicationAudit>());
 		for (Event e : events) {
 			expected.add(e.toString());
 		}
@@ -400,7 +401,7 @@ public class JDBC_broker_DAO_tests {
 			actual.add(dao.getEvent(id).toString());
 		}
 		
-		publisher.attemptPublishEvents(events);
+		publisher.attemptPublishEvents(events, new HashMap<String,EventPublicationAudit>());
 		
 		try {
 			Thread.sleep(4000);
