@@ -3,6 +3,8 @@ package com.alliancefoundry.model;
 import java.util.HashMap;
 import java.util.Map;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
 import com.alliancefoundry.serializer.JsonDateTimeSerializer;
 import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
@@ -36,15 +38,6 @@ public class Event {
     private String destination;
     private String subdestination;
     private boolean replayIndicator;
-    @JsonSerialize(using = JsonDateTimeSerializer.class)
-    @JsonDeserialize(using = JsonDateTimeDeserializer.class)
-    private DateTime publishTimeStamp;
-    @JsonSerialize(using = JsonDateTimeSerializer.class)
-    @JsonDeserialize(using = JsonDateTimeDeserializer.class)
-    private DateTime receivedTimeStamp;
-    @JsonSerialize(using = JsonDateTimeSerializer.class)
-    @JsonDeserialize(using = JsonDateTimeDeserializer.class)
-    private DateTime expirationTimeStamp;
 
     // other
     private Map<String, String> customHeaders;
@@ -54,10 +47,11 @@ public class Event {
     private boolean isPublishable;
     @JsonSerialize(using = JsonDateTimeSerializer.class)
     @JsonDeserialize(using = JsonDateTimeDeserializer.class)
-    private DateTime insertTimeStamp;
+    private DateTime timestamp;
 
 
     public Event(){
+    	timestamp = new DateTime(DateTime.now().toDateTime(DateTimeZone.UTC));
     	customHeaders = new HashMap<String, String>();
     	customPayload = new HashMap<String, DataItem>();
     }
@@ -74,20 +68,17 @@ public class Event {
 	 * @param destination
 	 * @param subdestination
 	 * @param replayIndicator
-	 * @param publishTimeStamp
-	 * @param receivedTimeStamp
-	 * @param expirationTimeStamp
 	 * @param preEventState
 	 * @param postEventState
 	 * @param isPublishable
-	 * @param insertTimeStamp
+	 * @param timestamp
 	 */
     
 	public Event(String parentId, String eventName, String objectId, String correlationId,
 			Integer sequenceNumber, String messageType, String dataType, String source, String destination,
 			String subdestination, boolean replayIndicator, DateTime publishTimeStamp, DateTime receivedTimeStamp,
 			DateTime expirationTimeStamp, String preEventState, String postEventState, boolean isPublishable,
-			DateTime insertTimeStamp) {
+			DateTime timestamp) {
 		
 		//call empty constructor to initialize hash maps
 		this();
@@ -103,13 +94,10 @@ public class Event {
 		this.destination = destination;
 		this.subdestination = subdestination;
 		this.replayIndicator = replayIndicator;
-		this.publishTimeStamp = publishTimeStamp;
-		this.receivedTimeStamp = receivedTimeStamp;
-		this.expirationTimeStamp = expirationTimeStamp;
 		this.preEventState = preEventState;
 		this.postEventState = postEventState;
 		this.isPublishable = isPublishable;
-		this.insertTimeStamp = insertTimeStamp;
+		this.timestamp = timestamp;
 	}
 
 	/**
@@ -281,48 +269,6 @@ public class Event {
 	}
 
 	/**
-	 * @return the publishTimeStamp
-	 */
-	public DateTime getPublishTimeStamp() {
-		return publishTimeStamp;
-	}
-
-	/**
-	 * @param publishTimeStamp the publishTimeStamp to set
-	 */
-	public void setPublishTimeStamp(DateTime publishTimeStamp) {
-		this.publishTimeStamp = publishTimeStamp;
-	}
-
-	/**
-	 * @return the receivedTimeStamp
-	 */
-	public DateTime getReceivedTimeStamp() {
-		return receivedTimeStamp;
-	}
-
-	/**
-	 * @param receivedTimeStamp the receivedTimeStamp to set
-	 */
-	public void setReceivedTimeStamp(DateTime receivedTimeStamp) {
-		this.receivedTimeStamp = receivedTimeStamp;
-	}
-
-	/**
-	 * @return the expirationTimeStamp
-	 */
-	public DateTime getExpirationTimeStamp() {
-		return expirationTimeStamp;
-	}
-
-	/**
-	 * @param expirationTimeStamp the expirationTimeStamp to set
-	 */
-	public void setExpirationTimeStamp(DateTime expirationTimeStamp) {
-		this.expirationTimeStamp = expirationTimeStamp;
-	}
-
-	/**
 	 * @return the customHeaders
 	 */
 	public Map<String, String> getCustomHeaders() {
@@ -393,25 +339,26 @@ public class Event {
 	}
 
 	/**
-	 * @return the insertTimeStamp
+	 * @return the timestamp
 	 */
-	public DateTime getInsertTimeStamp() {
-		return insertTimeStamp;
+	public DateTime getTimestamp() {
+		return timestamp;
 	}
 
 	/**
-	 * @param insertTimeStamp the insertTimeStamp to set
+	 * @param timestamp the timestamp to set
 	 */
-	public void setInsertTimeStamp(DateTime insertTimeStamp) {
-		this.insertTimeStamp = insertTimeStamp;
+	public void setTimestamp(DateTime timestamp) {
+		if(timestamp == null) this.timestamp = timestamp;
+		else this.timestamp = timestamp.toDateTime(DateTimeZone.UTC);
 	}
 
 	public static void verifyNonNullables(Event event) throws PeregrineException{
 		if(event.getObjectId() == null){
-			throw new PeregrineException(PeregrineErrorCodes.EVENT_INSERTION_ERROR,"An Object Id must be specified");
+			throw new PeregrineException(PeregrineErrorCodes.EVENT_INSERTION_ERROR,"An Object Id must be specified for event - " + event);
 		}
 		if(event.getMessageType() == null){
-			throw new PeregrineException(PeregrineErrorCodes.EVENT_INSERTION_ERROR,"A Message Type must be specified");
+			throw new PeregrineException(PeregrineErrorCodes.EVENT_INSERTION_ERROR,"A Message Type must be specified for event - " + event);
 		}
 	}
 
@@ -426,16 +373,13 @@ public class Event {
 		result = prime * result + ((destination == null) ? 0 : destination.hashCode());
 		result = prime * result + ((eventId == null) ? 0 : eventId.hashCode());
 		result = prime * result + ((eventName == null) ? 0 : eventName.hashCode());
-		result = prime * result + ((expirationTimeStamp == null) ? 0 : expirationTimeStamp.hashCode());
-		result = prime * result + ((insertTimeStamp == null) ? 0 : insertTimeStamp.hashCode());
 		result = prime * result + (isPublishable ? 1231 : 1237);
 		result = prime * result + ((messageType == null) ? 0 : messageType.hashCode());
 		result = prime * result + ((objectId == null) ? 0 : objectId.hashCode());
 		result = prime * result + ((parentId == null) ? 0 : parentId.hashCode());
 		result = prime * result + ((postEventState == null) ? 0 : postEventState.hashCode());
 		result = prime * result + ((preEventState == null) ? 0 : preEventState.hashCode());
-		result = prime * result + ((publishTimeStamp == null) ? 0 : publishTimeStamp.hashCode());
-		result = prime * result + ((receivedTimeStamp == null) ? 0 : receivedTimeStamp.hashCode());
+		result = prime * result + ((timestamp == null) ? 0 : timestamp.hashCode());
 		result = prime * result + (replayIndicator ? 1231 : 1237);
 		result = prime * result + ((sequenceNumber == null) ? 0 : sequenceNumber.hashCode());
 		result = prime * result + ((source == null) ? 0 : source.hashCode());
@@ -487,16 +431,6 @@ public class Event {
 				return false;
 		} else if (!eventName.equals(other.eventName))
 			return false;
-		if (expirationTimeStamp == null) {
-			if (other.expirationTimeStamp != null)
-				return false;
-		} else if (!expirationTimeStamp.equals(other.expirationTimeStamp))
-			return false;
-		if (insertTimeStamp == null) {
-			if (other.insertTimeStamp != null)
-				return false;
-		} else if (!insertTimeStamp.equals(other.insertTimeStamp))
-			return false;
 		if (isPublishable != other.isPublishable)
 			return false;
 		if (messageType == null) {
@@ -524,15 +458,10 @@ public class Event {
 				return false;
 		} else if (!preEventState.equals(other.preEventState))
 			return false;
-		if (publishTimeStamp == null) {
-			if (other.publishTimeStamp != null)
+		if (timestamp == null) {
+			if (other.timestamp != null)
 				return false;
-		} else if (!publishTimeStamp.equals(other.publishTimeStamp))
-			return false;
-		if (receivedTimeStamp == null) {
-			if (other.receivedTimeStamp != null)
-				return false;
-		} else if (!receivedTimeStamp.equals(other.receivedTimeStamp))
+		} else if (!timestamp.equals(other.timestamp))
 			return false;
 		if (replayIndicator != other.replayIndicator)
 			return false;
@@ -562,9 +491,7 @@ public class Event {
 				+ ", getSequenceNumber()=" + getSequenceNumber() + ", getMessageType()=" + getMessageType()
 				+ ", getDataType()=" + getDataType() + ", getSource()=" + getSource() + ", getDestination()="
 				+ getDestination() + ", getSubdestination()=" + getSubdestination() + ", isReplayIndicator()="
-				+ isReplayIndicator() + ", getPublishTimeStamp()=" + getPublishTimeStamp() + ", getReceivedTimeStamp()="
-				+ getReceivedTimeStamp() + ", getExpirationTimeStamp()=" + getExpirationTimeStamp()
-				+ ", getPreEventState()=" + getPreEventState() + ", getPostEventState()=" + getPostEventState()
-				+ ", isPublishable()=" + getIsPublishable() + ", getInsertTimeStamp()=" + getInsertTimeStamp() + "]";
+				+ isReplayIndicator() + ", getPreEventState()=" + getPreEventState() + ", getPostEventState()=" 
+				+ getPostEventState() + ", isPublishable()=" + getIsPublishable() + ", getTimestamp()=" + getTimestamp() + "]";
 	}
 }

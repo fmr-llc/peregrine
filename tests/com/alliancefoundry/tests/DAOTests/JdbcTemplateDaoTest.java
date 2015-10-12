@@ -8,15 +8,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.alliancefoundry.dao.IDAO;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
+import com.alliancefoundry.model.EventPublicationAudit;
 import com.alliancefoundry.model.EventsRequest;
 
 /**
@@ -25,11 +27,14 @@ import com.alliancefoundry.model.EventsRequest;
  */
 public class JdbcTemplateDaoTest {
 	
+	static final Logger log = LoggerFactory.getLogger(JdbcTemplateDaoTest.class);
+	
 	IDAO dao;
 	AbstractApplicationContext ctx;
 	Event event;
 	String eventId;
 	Event eventFromDb;
+	EventPublicationAudit audit;
 	
 	Event getEvent1;
 	Event getEvent2;
@@ -65,15 +70,61 @@ public class JdbcTemplateDaoTest {
 		ctx = new ClassPathXmlApplicationContext("db-mock-events.xml");
 
 		getEvent1 = ctx.getBean("parentEvent", Event.class);
-		parentEventId = dao.insertEvent(getEvent1);
+		parentEventId = dao.insertEvent(getEvent1, new HashMap<String,EventPublicationAudit>());
 		getEvent2 = ctx.getBean("childEvent1", Event.class);
 		getEvent2.setParentId(parentEventId);
-		child1EventId = dao.insertEvent(getEvent2);
+		child1EventId = dao.insertEvent(getEvent2, new HashMap<String,EventPublicationAudit>());
 		getEvent3 = ctx.getBean("childEvent2", Event.class);
 		getEvent3.setParentId(parentEventId);
-		child2EventId = dao.insertEvent(getEvent3);
+		child2EventId = dao.insertEvent(getEvent3, new HashMap<String,EventPublicationAudit>());
 		
 		ctx.close();
+	}
+	
+	/***********************************
+	 *Testing insertPublicationAudit() *
+	 *				&				   *
+	 *		   getPublicationAudit()   *
+	 ***********************************/
+	
+	@Test
+	public void insertAndGetPublicationAuditTest() throws PeregrineException {
+		String auditId = parentEventId;
+		audit = new EventPublicationAudit();
+		audit.setEventId(auditId);
+		audit.setCaptureTimestamp(DateTime.now());
+		audit.setPersistTimestamp(DateTime.now());
+		audit.addPublishTimestamp(DateTime.now());
+		log.debug("insertAndGetPublicationAuditTest(): EventPublicationAudit object is " + audit);
+		log.debug("first publish time is " + audit.getPublishTimestamps().get(0));
+		Map<String,EventPublicationAudit> audits = new HashMap<String,EventPublicationAudit>();
+		audits.put(auditId, audit);
+		dao.insertPublicationAudit(audits);
+		for(int i = 0; i < 3; i++){
+			audit.addPublishTimestamp(DateTime.now());
+			log.debug("next publish time is " + audit.getPublishTimestamps().get(i + 1));
+			dao.insertPublishTimestamp(audit, audit.getPublishTimestamps().get(audit.getPublishTimestamps().size() - 1), audit.getPublishTimestamps().size());
+		}
+		EventPublicationAudit expected = audit;
+		EventPublicationAudit actual = dao.getPublicationAudit(auditId);
+		assertEquals(expected, actual);
+	}
+	
+	@Test(expected=PeregrineException.class)
+	public void insertWithNullTimestampsAuditTest() throws PeregrineException {
+		String auditId = parentEventId;
+		audit = new EventPublicationAudit();
+		log.debug("insertWithNullTimestampsAuditTest(): EventPublicationAudit object is " + audit);
+		Map<String,EventPublicationAudit> audits = new HashMap<String,EventPublicationAudit>();
+		audits.put(auditId, audit);
+		dao.insertPublicationAudit(audits);
+	}
+	
+	@Test(expected=PeregrineException.class)
+	public void getAuditWithInvalidEventIdTest() throws PeregrineException {
+		eventId = "";
+		log.debug("getAuditWithInvalidEventIdTest(): Event id of the audit to be retrieved is " + eventId);
+		dao.getPublicationAudit(eventId);
 	}
 	
 	/**************************
@@ -83,12 +134,14 @@ public class JdbcTemplateDaoTest {
 	@Test(expected=PeregrineException.class)
 	public void getLatestEventFromDbNoParamsTest() throws PeregrineException {
 		EventsRequest req = new EventsRequest(null,null,null,null,null,null,null);
+		log.debug("getLatestEventFromDbNoParamsTest(): EventsRequest object is " + req);
 		dao.getLatestEvent(req);
 	}
 	
 	@Test(expected=PeregrineException.class)
 	public void getLatestEventFromDbNoMatchingParamsTest() throws PeregrineException {
 		EventsRequest req = new EventsRequest(null,null,"","","","",null);
+		log.debug("getLatestEventFromDbNoMatchingParamsTest(): EventsRequest object is " + req);
 		dao.getLatestEvent(req);
 	}
 	
@@ -100,8 +153,9 @@ public class JdbcTemplateDaoTest {
 				null,
 				getEvent2.getEventName(),
 				null);
-		long actual = dao.getLatestEvent(req).getInsertTimeStamp().getMillis();
-		long expected = getEvent2.getInsertTimeStamp().getMillis();
+		log.debug("getLatestEventFromDbMultipleMatchingParamsTest(): EventsRequest object is " + req);
+		Event actual = dao.getLatestEvent(req);
+		Event expected = getEvent2;
 		assertEquals(expected,actual);
 	}
 	
@@ -112,15 +166,17 @@ public class JdbcTemplateDaoTest {
 	@Test
 	public void getFromDbTest() throws PeregrineException {
 		eventFromDb = dao.getEvent(child1EventId);
+		log.debug("getFromDbTest(): Event Id is " + child1EventId);
 		String expected = child1EventId;
 		String actual = eventFromDb.getEventId();
 		assertEquals(expected,actual);
 	}
 	
 	@Test(expected=PeregrineException.class)
-	public void EventNotFoundInDbTest() throws PeregrineException {
+	public void eventNotFoundInDbTest() throws PeregrineException {
 		//there shouldn't be an event with eventId of ""
 		eventId = "";
+		log.debug("eventNotFoundInDbTest(): Event Id is " + eventId);
 		dao.getEvent(eventId);
 	}
 	
@@ -131,25 +187,28 @@ public class JdbcTemplateDaoTest {
 	@Test(expected=PeregrineException.class)
 	public void getMultipleEventsFromDbOnlyGenParamAndCreatedAfterParamTest() throws PeregrineException  {
 		EventsRequest req = new EventsRequest(createdAfter,null,null,null,null,null,generations);
+		log.debug("getMultipleEventsFromDbOnlyGenParamAndCreatedAfterParamTest(): EventsRequest object is " + req);
 		dao.getEvents(req);
 	}
 	
 	@Test(expected=PeregrineException.class)
 	public void getMultipleEventsFromDbNoParamsTest() throws PeregrineException {
 		EventsRequest req = new EventsRequest(null,null,null,null,null,null,null);
+		log.debug("getMultipleEventsFromDbNoParamsTest(): EventsRequest object is " + req);
 		dao.getEvents(req);
 	}
 	
 	@Test(expected=PeregrineException.class)
 	public void getMultipleEventsFromDbOneParamTest() throws PeregrineException {
 		EventsRequest req = new EventsRequest(createdAfter,null,null,null,null,null,null);
+		log.debug("getMultipleEventsFromDbOneParamTest(): EventsRequest object is " + req);
 		List<Event> eventList = new ArrayList<Event>();
 		eventList = dao.getEvents(req);
 		if(eventList.size() == 0){
 			fail();
 		} else {
 			for(Event e : eventList){
-				if(!(e.getPublishTimeStamp().getMillis() > createdAfter.getMillis())) fail();
+				if(!(e.getTimestamp().getMillis() > createdAfter.getMillis())) fail();
 			}
 			//all the events have been compared and the comparisons did not fail
 			assert(true);
@@ -160,6 +219,7 @@ public class JdbcTemplateDaoTest {
 	public void getMultipleEventsFromDbInvalidGenCountTest() throws PeregrineException  {
 		generations = 0;
 		EventsRequest req = new EventsRequest(createdAfter,null,null,null,null,null,generations);
+		log.debug("getMultipleEventsFromDbInvalidGenCountTest(): EventsRequest object is " + req);
 		dao.getEvents(req);
 	}
 	
@@ -167,19 +227,21 @@ public class JdbcTemplateDaoTest {
 	public void getMultipleEventsFromDbNoMatchingParamsTest() throws PeregrineException  {
 		//there shouldn't be any events with params matching ""
 		EventsRequest req = new EventsRequest(createdAfter,null,"","","","",generations);
+		log.debug("getMultipleEventsFromDbNoMatchingParamsTest(): EventsRequest object is " + req);
 		dao.getEvents(req);
 	}
 
 	@Test
 	public void getMultipleEventsFromDbMultipleParamTest() throws PeregrineException {
 		EventsRequest req = new EventsRequest(createdAfter,null,null,objectId,null,name,null);
+		log.debug("getMultipleEventsFromDbMultipleParamTest(): EventsRequest object is " + req);
 		List<Event> eventList = new ArrayList<Event>();
 		eventList = dao.getEvents(req);
 		if(eventList.size() == 0){
 			fail();
 		} else {
 			for(Event e : eventList){
-				if(!(e.getPublishTimeStamp().getMillis() > createdAfter.getMillis())) fail();
+				if(!(e.getTimestamp().getMillis() > createdAfter.getMillis())) fail();
 				if(!e.getObjectId().equals(objectId)) fail();
 				if(!e.getEventName().equals(name)) fail();
 			}
@@ -191,14 +253,15 @@ public class JdbcTemplateDaoTest {
 	@Test
 	public void getMultipleEventsFromDbAllParamTest() throws PeregrineException {
 		EventsRequest req = new EventsRequest(createdAfter,createdBefore,source,objectId,correlationId,name,generations);
+		log.debug("getMultipleEventsFromDbAllParamTest(): EventsRequest object is " + req);
 		List<Event> eventList = new ArrayList<Event>();
 		eventList = dao.getEvents(req);
 		if(eventList.size() == 0){
 			fail();
 		} else {
 			for(Event e : eventList){
-				if(!(e.getPublishTimeStamp().getMillis() > createdAfter.getMillis())) fail();
-				if(!(e.getPublishTimeStamp().getMillis() < createdBefore.getMillis())) fail();
+				if(!(e.getTimestamp().getMillis() > createdAfter.getMillis())) fail();
+				if(!(e.getTimestamp().getMillis() < createdBefore.getMillis())) fail();
 				if(!e.getSource().equals(source)) fail();
 				if(!e.getObjectId().equals(objectId)) fail();
 				if(!e.getCorrelationId().equals(correlationId)) fail();
@@ -227,7 +290,8 @@ public class JdbcTemplateDaoTest {
 		event.setCustomHeaders(headers);
 		event.setCustomPayload(payload);
 		
-		eventId = dao.insertEvent(event);
+		log.debug("insertToDbTest(): Event object is " + event);
+		eventId = dao.insertEvent(event, new HashMap<String,EventPublicationAudit>());
 		eventFromDb = dao.getEvent(eventId);
 		String expected = eventId;
 		String actual = eventFromDb.getEventId();
@@ -236,15 +300,16 @@ public class JdbcTemplateDaoTest {
 	
 	@Test
 	public void insertToAndRetrieveFromDbDateTimeTest() throws PeregrineException {
-		DateTime datetime = DateTime.now().toDateTime(DateTimeZone.UTC);
 		event = getEvent2;
-		event.setPublishTimeStamp(datetime);
-		eventId = dao.insertEvent(event);
+		event.setTimestamp(DateTime.now());
+		
+		log.debug("insertToAndRetrieveFromDbDateTimeTest(): Event object is " + event);
+		eventId = dao.insertEvent(event, new HashMap<String,EventPublicationAudit>());
 		eventFromDb = dao.getEvent(eventId);
 		//datetime before insert into one of the DateTime fields
-		String expected = datetime.toString();
+		String expected = event.getTimestamp().toString();
 		//datetime 
-		String actual = eventFromDb.getPublishTimeStamp().toString();
+		String actual = eventFromDb.getTimestamp().toString();
 		assertEquals(expected, actual);
 	}
 	
@@ -260,10 +325,11 @@ public class JdbcTemplateDaoTest {
 		headers.put("some other key", "some other value");
 		payload.put("some other key", new DataItem("some other data type","some other value"));
 		
+		log.debug("insertToDbObjectIdNullTest(): Event object is " + event2);
 		event2.setCustomHeaders(headers);
 		event2.setCustomPayload(payload);
 		
-		eventId = dao.insertEvent(event2);	
+		eventId = dao.insertEvent(event2, new HashMap<String,EventPublicationAudit>());	
 	}
 	
 	/************************
@@ -277,8 +343,9 @@ public class JdbcTemplateDaoTest {
 		List<Event> events = new ArrayList<Event>();
 		events.add(event);
 		events.add(event2);
+		log.debug("insertMultipleEventsToDbTest(): List of Event objects is " + events);
 		List<String> expected = new ArrayList<String>();
-		expected = dao.insertEvents(events);
+		expected = dao.insertEvents(events, new HashMap<String,EventPublicationAudit>());
 		List<String> actual = new ArrayList<String>();
 		for(String id : expected){
 			actual.add((dao.getEvent(id)).getEventId());
@@ -294,6 +361,7 @@ public class JdbcTemplateDaoTest {
 		List<Event> events = new ArrayList<Event>();
 		events.add(event);
 		events.add(event2);
-		dao.insertEvents(events);
+		log.debug("insertMultipleEventsToDbInvalidEventTest(): List of Event objects is " + events);
+		dao.insertEvents(events, new HashMap<String,EventPublicationAudit>());
 	}
 }

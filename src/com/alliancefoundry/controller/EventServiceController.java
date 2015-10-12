@@ -1,7 +1,9 @@
 package com.alliancefoundry.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alliancefoundry.dao.IDAO;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
+import com.alliancefoundry.model.EventPublicationAudit;
+import com.alliancefoundry.model.EventPublicationAuditResponse;
 import com.alliancefoundry.model.EventResponse;
 import com.alliancefoundry.model.EventsRequest;
 import com.alliancefoundry.publisher.PublisherRouter;
@@ -31,6 +35,9 @@ public class EventServiceController  {
 	
 	static final Logger log = LoggerFactory.getLogger(EventServiceController.class);
 
+	Map<String,DateTime> persistTimes = new HashMap<String,DateTime>();
+	Map<String,DateTime> publishTimes = new HashMap<String,DateTime>();
+	
 	@Autowired
 	IDAO dao;
 	public void setDao(IDAO dao) {
@@ -48,18 +55,22 @@ public class EventServiceController  {
 	 */
 	@RequestMapping(value="/event", method = RequestMethod.POST)
 	public EventResponse setEvent(@RequestBody Event evt){
+		log.info("request received to insert event: " + evt);
 		EventResponse response = new EventResponse();
 		String msg;
-		evt.setReceivedTimeStamp(DateTime.now());
+		Map<String,EventPublicationAudit> audits = new HashMap<String,EventPublicationAudit>();
 		try {
+			String eventId;
+			DateTime capture = DateTime.now();
 			Event.verifyNonNullables(evt);
-			String eventId = dao.insertEvent(evt);
-			msg  = String.format("Successfully created event - Event Id: %s", eventId);
-			publisher.attemptPublishEvent(evt);
-			response.getEventIds().add(eventId);
-		}catch (PeregrineException e) {
+			eventId = dao.insertEvent(evt, audits);
+			publisher.attemptPublishEvent(evt, audits);
+			audits.get(eventId).setCaptureTimestamp(capture);
+			dao.insertPublicationAudit(audits);
 			response.getEvents().add(evt);
-			msg = String.format("Error inserting or publishing an event: %s", e.getMessage());
+			msg  = String.format("Successfully created event - Event Id: %s", eventId);
+		}catch (PeregrineException e) {
+			msg = String.format("Error inserting or publishing event: %s", e.getMessage());
 		}
 		response.setMsg(msg);
 		log.info(msg);
@@ -70,25 +81,30 @@ public class EventServiceController  {
 	 * Creates new events
 	 * 
 	 * @param evts	the list of events to be created
-	 * @return		the list of ids of the created events
+	 * @return		the list of event response objects of the created events
 	 */
 	@RequestMapping(value="/events", method = RequestMethod.POST)
 	public EventResponse setEvents(@RequestBody List<Event> evts){
+		log.info("request received to insert multiple events: " + evts);
 		EventResponse response = new EventResponse();
 		String msg;
+		Map<String,EventPublicationAudit> audits = new HashMap<String,EventPublicationAudit>();
 		List<String> eventIds = new ArrayList<String>();
 		try {
-			for(Event e : evts){
-				Event.verifyNonNullables(e);
-				e.setReceivedTimeStamp(DateTime.now());
+			DateTime capture = DateTime.now();
+			for(Event evt : evts){
+				Event.verifyNonNullables(evt);
 			}
-			eventIds = dao.insertEvents(evts);
-			msg  = String.format("Successfully created event[s] - Event Id[s]: %s", eventIds.stream().collect(Collectors.joining("\n")));
-			publisher.attemptPublishEvents(evts);
-			response.setEventIds(eventIds);
-		}catch (PeregrineException e) {
+			eventIds = dao.insertEvents(evts, audits);
+			publisher.attemptPublishEvents(evts, audits);
+			for(String key : audits.keySet()){
+				audits.get(key).setCaptureTimestamp(capture);
+			}
+			dao.insertPublicationAudit(audits);
 			response.setEvents(evts);
-			msg = String.format("Error inserting or publishing an event: %s", e.getMessage());
+			msg  = String.format("Successfully created event[s] - Event Id[s]: %s", eventIds.stream().collect(Collectors.joining("\n")));
+		}catch (PeregrineException e) {
+			msg = String.format("Error inserting or publishing event: %s", e.getMessage());
 		}
 		response.setMsg(msg);
 		log.info(msg);
@@ -103,15 +119,15 @@ public class EventServiceController  {
 	 */
     @RequestMapping(value="/event/{id}", method = RequestMethod.GET)
     public EventResponse getEvent(@PathVariable String id){
+    	log.info("request received to retrieve event with id: " + id);
 		EventResponse response = new EventResponse();
 		String msg;
     	try {
 			Event eventFromDb = dao.getEvent(id);
+			response.getEvents().add(eventFromDb);
 			msg  = String.format("Successfully retrieved event - Event Id: %s", eventFromDb.getEventId());
-	        response.getEvents().add(eventFromDb); 
 		} catch (PeregrineException e) {
 			msg = String.format("Error retrieving event - Event Id %s: %s", id, e.getMessage());
-			response.getEventIds().add(id);
 		}
     	response.setMsg(msg);
     	log.info(msg);
@@ -123,12 +139,12 @@ public class EventServiceController  {
      * 
      * @param createdAfter		timestamp after which an event was created
      * @param createdBefore		timestamp before which an event was created
-     * @param source			of an event
-     * @param objectId			of an event
-     * @param correlationId		of an event
-     * @param eventName			of an event
+     * @param source			where the event is derived from
+     * @param objectId			upon which object the event takes place
+     * @param correlationId		correlates events
+     * @param eventName			name of an event
      * @param generations		maximum depth in a tree to retrieve events
-     * @return					list of events with values matching params
+     * @return					list of event response objects with values matching params
      */
     @RequestMapping(value="/events", method = RequestMethod.GET)
     public EventResponse getEvents(
@@ -155,13 +171,15 @@ public class EventServiceController  {
     	String msg;
     	EventsRequest req = new EventsRequest(createdAfterVal, createdBeforeVal, source, objectId,
     			correlationId, eventName, generations);
+    	log.info("request received to retrieve multiple events with request parameters: " + req);
     	List<Event> eventsFromDb = new ArrayList<Event>();
     	List<String> eventIds = new ArrayList<String>();
+    	response.setRequest(req);
     	try{
     		EventsRequest.verifyRequestParameters(req, false);
     		eventsFromDb = dao.getEvents(req);
-    		for(Event e : eventsFromDb){
-    			eventIds.add(e.getEventId());
+    		for(Event event : eventsFromDb){
+    			eventIds.add(event.getEventId());
     		}
     		response.setEvents(eventsFromDb);
     		msg = String.format("Successfully retrieved event[s] - Event Id[s]: %s", eventIds.stream().collect(Collectors.joining("\n")));
@@ -176,10 +194,10 @@ public class EventServiceController  {
     /**
      * Gets information about the latest event with the requested params
      * 
-     * @param source			of an event
-     * @param objectId			of an event
-     * @param correlationId		of an event
-     * @param eventName			of an event
+     * @param source			where the event is derived from
+     * @param objectId			upon which object the event takes place
+     * @param correlationId		correlates events
+     * @param eventName			name of an event
      * @return					the event with values matching the params
      */
     @RequestMapping(value="/latest-event", method = RequestMethod.GET)
@@ -193,7 +211,9 @@ public class EventServiceController  {
     	String msg;
     	EventsRequest req = new EventsRequest(null, null, source, objectId,
     			correlationId, eventName, null);
+    	log.info("request received to retrieve latest event with request parameters: " + req);
     	Event event;
+    	response.setRequest(req);
 		try {
 			EventsRequest.verifyRequestParameters(req, true);
 			event = dao.getLatestEvent(req);
@@ -211,26 +231,55 @@ public class EventServiceController  {
 	/**
 	 * Replays a event
 	 * 
-	 * @param eventId - Id of event to replay
-	 * @return whether or not the replay was successful
+	 * @param eventId	Id of event to replay
+	 * @return 			whether or not the replay was successful
 	 */
 	@RequestMapping(value="/replay/{id}", method = RequestMethod.POST)
-	public EventResponse replayEvent(
-			@RequestParam(value="eventid", required=false) String eventId){
+	public EventResponse replayEvent(@PathVariable String id){
+		log.info("request received to replay event with id: " + id);
 		EventResponse response = new EventResponse();
 		String msg;
 		
 		try {
-			Event eventFromDb = dao.getEvent(eventId);
-			publisher.attemptPublishEvent(eventFromDb);
-			msg = String.format("Successfully replayed event - Event Id: %s", eventId);
+			Event eventFromDb = dao.getEvent(id);
+			Map<String,EventPublicationAudit> audits = new HashMap<String,EventPublicationAudit>();
+			EventPublicationAudit audit = dao.getPublicationAudit(id);
+			audits.put(id, audit);
+			publisher.attemptPublishEvent(eventFromDb, audits);
+			if(eventFromDb.getIsPublishable()){
+				dao.insertPublishTimestamp(audit, audits.get(id).getPublishTimestamps().get(0),audit.getPublishCount() + 1);
+			}
+			response.getEvents().add(eventFromDb);
+			msg = String.format("Successfully replayed event - Event Id: %s", id);
 		} catch (PeregrineException e) {
-			msg = String.format("Error replaying event - Event Id %s: %s", eventId, e.getMessage());
+			msg = String.format("Error replaying event - Event Id %s: %s", id, e.getMessage());
 		}
 		response.setMsg(msg);
 		log.info(msg);
 		return response;
 	}
+	
+	/**
+     * Gets publication audit information for an event
+     * 
+     * @param id	of the event to which the audit belongs
+     * @return		audit object
+     */
+    @RequestMapping(value="/audit/{id}", method = RequestMethod.GET)
+    public EventPublicationAuditResponse getAudit(@PathVariable String id){
+    	log.info("request received to retrieve event publication audit for event with event id: " + id);
+    	EventPublicationAuditResponse response = new EventPublicationAuditResponse();
+    	String msg;
+    	try {
+    		response.setAudit(dao.getPublicationAudit(id)); 
+    		msg = String.format("Successfully retrieved audit information for event - Event Id: %s", id);
+		} catch (PeregrineException e) {
+			msg = String.format("Error retrieving audit information for event - Event Id %s: %s", id, e.getMessage());
+		}
+    	response.setMsg(msg);
+    	log.info(msg);
+    	return response;
+    }
 
 	public PublisherRouter getPublisher() {
 		return publisher;
