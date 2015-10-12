@@ -196,6 +196,12 @@ public class JdbcTemplateDaoImpl implements IDAO {
 		String eventId = UUID.randomUUID().toString();
 		//TODO: log warn eventId is being set if it does not equal null
 		event.setEventId(eventId);
+		Long publish;
+		Long expiration;
+		if(event.getPublishTimeStamp() == null) publish = null;
+		else publish = event.getPublishTimeStamp().getMillis();
+		if(event.getExpirationTimeStamp() == null) expiration = null;
+		else expiration = event.getExpirationTimeStamp().getMillis();
 		event.setInsertTimeStamp(DateTime.now());
 		
 		jdbcTemplate.update(eventSql,
@@ -211,9 +217,9 @@ public class JdbcTemplateDaoImpl implements IDAO {
 				event.getDestination(),
 				event.getSubdestination(),
 				event.isReplayIndicator(),
-				event.getPublishTimeStamp().getMillis(),
+				publish,
 				event.getReceivedTimeStamp().getMillis(),
-				event.getExpirationTimeStamp().getMillis(),
+				expiration,
 				event.getPreEventState(),
 				event.getPostEventState(),
 				event.getIsPublishable(),
@@ -417,14 +423,14 @@ public class JdbcTemplateDaoImpl implements IDAO {
 			Long publish = rs.getLong("publishTimeStamp");
 			DateTime publishTimeStamp;
 			if (rs.wasNull()) publishTimeStamp = null;
-			else publishTimeStamp = new DateTime(publish,DateTimeZone.UTC);
+			else publishTimeStamp = new DateTime(publish);
 			event.setPublishTimeStamp(publishTimeStamp);
 			
 			//set expiration time stamp
 			Long expiration = rs.getLong("expirationTimeStamp");
 			DateTime expirationTimeStamp;
 			if (rs.wasNull()) expirationTimeStamp = null;
-			else expirationTimeStamp = new DateTime(expiration,DateTimeZone.UTC);
+			else expirationTimeStamp = new DateTime(expiration);
 			event.setExpirationTimeStamp(expirationTimeStamp);
 		}
 		
@@ -446,11 +452,11 @@ public class JdbcTemplateDaoImpl implements IDAO {
 			event.setDestination(rs.getString("destination"));
 			event.setSubdestination(rs.getString("subdestination"));
 			event.setReplayIndicator(rs.getBoolean("replayIndicator"));
-			event.setReceivedTimeStamp(new DateTime((rs.getLong("receivedTimeStamp")),DateTimeZone.UTC));
+			event.setReceivedTimeStamp(new DateTime((rs.getLong("receivedTimeStamp"))));
 			event.setPreEventState(rs.getString("preEventState"));
 			event.setPostEventState(rs.getString("postEventState"));
 			event.setIsPublishable(rs.getBoolean("isPublishable"));
-			event.setInsertTimeStamp(new DateTime(rs.getLong("insertTimeStamp"),DateTimeZone.UTC));
+			event.setInsertTimeStamp(new DateTime(rs.getLong("insertTimeStamp")));
 		}
 		
 		/**

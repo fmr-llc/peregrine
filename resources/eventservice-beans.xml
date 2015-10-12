@@ -59,21 +59,6 @@
 		<property name="brokerUrl" value="${activemq.url}" />
 	</bean>
 	
-	<bean id="activemqSubscriber1" class="com.alliancefoundry.tests.PublisherTests.ActiveMQTests.ActiveMQSubscriber">
-		<property name="brokerUrl" value="${activemq.url}" />
-		<property name="name" value="${activemq.name1}" />
-	</bean>
-	
-	<bean id="activemqSubscriber2" class="com.alliancefoundry.tests.PublisherTests.ActiveMQTests.ActiveMQSubscriber">
-		<property name="brokerUrl" value="${activemq.url}" />
-		<property name="name" value="${activemq.name2}" />
-	</bean>
-	
-	<bean id="activemqSubscriber3" class="com.alliancefoundry.tests.PublisherTests.ActiveMQTests.ActiveMQSubscriber">
-		<property name="brokerUrl" value="${activemq.url}" />
-		<property name="name" value="${activemq.name2}" />
-	</bean>
-	
 	<bean id="eventPublisherservice" class="com.alliancefoundry.publisher.PublisherRouter">
 		<property name="publishers">
 			<bean class="org.springframework.beans.factory.config.MapFactoryBean">

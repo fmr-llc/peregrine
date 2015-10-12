@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.Event;
@@ -18,6 +21,8 @@ import com.alliancefoundry.model.Event;
  */
 
 public class BrokerConfigImpl implements IBrokerConfig {
+	
+	static final Logger log = LoggerFactory.getLogger(BrokerConfigImpl.class);
 
 	@Override
 	public Map<String, String> getConfigForEvent(Event ev, String configFile) throws PeregrineException {
@@ -56,6 +61,11 @@ public class BrokerConfigImpl implements IBrokerConfig {
 		try {
 			properties.load(this.getClass().getClassLoader().getResourceAsStream(configFile));
 		} catch (IOException e) {
+			log.error("Error reading configuration file  with an error message of: " + e.getMessage());
+			PeregrineException exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error reading configuration file.", e);
+			throw exception;
+		}catch (NullPointerException e) {
+			log.error("Error reading configuration file with an error message of: " + e.getMessage());
 			PeregrineException exception = new PeregrineException(PeregrineErrorCodes.INPUT_SOURCE_ERROR, "Error reading configuration file.", e);
 			throw exception;
 		}

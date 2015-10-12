@@ -215,17 +215,16 @@ public class EventServiceController  {
 	 * @return whether or not the replay was successful
 	 */
 	@RequestMapping(value="/replay/{id}", method = RequestMethod.POST)
-	public EventResponse replayEvent(
-			@RequestParam(value="eventid", required=false) String eventId){
+	public EventResponse replayEvent(@PathVariable String id){
 		EventResponse response = new EventResponse();
 		String msg;
 		
 		try {
-			Event eventFromDb = dao.getEvent(eventId);
+			Event eventFromDb = dao.getEvent(id);
 			publisher.attemptPublishEvent(eventFromDb);
-			msg = String.format("Successfully replayed event - Event Id: %s", eventId);
+			msg = String.format("Successfully replayed event - Event Id: %s", id);
 		} catch (PeregrineException e) {
-			msg = String.format("Error replaying event - Event Id %s: %s", eventId, e.getMessage());
+			msg = String.format("Error replaying event - Event Id %s: %s", id, e.getMessage());
 		}
 		response.setMsg(msg);
 		log.info(msg);
