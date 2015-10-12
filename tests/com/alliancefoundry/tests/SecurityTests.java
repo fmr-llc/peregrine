@@ -19,6 +19,11 @@ import org.junit.Test;
 
 import junit.framework.Assert;
 
+/**
+ * 
+ * @author Curtis Robinson, Robert Coords
+ *
+ */
 public class SecurityTests {
 
 
@@ -27,9 +32,8 @@ public class SecurityTests {
 		
 		// access get event reest service
 		CloseableHttpClient httpclient = HttpClients.createDefault();
-		HttpGet httpGet = new HttpGet("http://localhost:8080/event-service/event/34578");
+		HttpGet httpGet = new HttpGet("http://user:password@localhost:8080/event-service/event/34578");
 		CloseableHttpResponse response1 = httpclient.execute(httpGet);
-		System.out.println(response1.getStatusLine().getStatusCode());
 
 		// Status code 401 - Unauthorized 401 
 		Assert.assertTrue((response1.getStatusLine().getStatusCode() == 401));
@@ -46,11 +50,9 @@ public class SecurityTests {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		HttpGet httpGet = new HttpGet("http://user:user@localhost:8080/event-service/event/34578");
 		CloseableHttpResponse response1 = httpclient.execute(httpGet);
-		
-		System.out.println(response1.getStatusLine().getStatusCode());
-		
+				
 		// Status code 401 - Unauthorized 401 
-		Assert.assertTrue((response1.getStatusLine().getStatusCode() != 401));
+		Assert.assertTrue((response1.getStatusLine().getStatusCode() == 200) || ((response1.getStatusLine().getStatusCode() == 201)));
 	}
 
 }

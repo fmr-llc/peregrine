@@ -133,13 +133,10 @@
 		<property name="destination" value="activemq" />
 		<property name="subdestination" value="test2" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime1" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime1" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="experiationDateTime1" /> <!-- DateTime -->
 		<property name="preEventState" value="pre" />
 		<property name="postEventState" value="post" />
 		<property name="isPublishable" value="true" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime1" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp1" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="mockEvent8" class="com.alliancefoundry.model.Event">
@@ -155,13 +152,10 @@
 		<property name="destination" value="ActiveMQ" />
 		<property name="subdestination" value="test" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime2" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime2" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="experiationDateTime2" /> <!-- DateTime -->
 		<property name="preEventState" value="preStateFor43" />
 		<property name="postEventState" value="postStateFor43" />
 		<property name="isPublishable" value="true" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime2" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp2" /> <!-- DateTime -->
 	</bean>
 	
   	<bean id="mockEvent9" class="com.alliancefoundry.model.Event">
@@ -177,13 +171,10 @@
 		<property name="destination" value="ActiveMQ" />
 		<property name="subdestination" value="test" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime1" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime1" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="experiationDateTime1" /> <!-- DateTime -->
 		<property name="preEventState"><null/></property>
 		<property name="postEventState"><null/></property>
 		<property name="isPublishable" value="true" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime1" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp1" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="mockEvent10" class="com.alliancefoundry.model.Event">
@@ -199,13 +190,10 @@
 		<property name="destination" value="ActiveMQ" />
 		<property name="subdestination" value="topic2" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime1" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime1" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="experiationDateTime1" /> <!-- DateTime -->
 		<property name="preEventState" value="preStateFor43" />
 		<property name="postEventState" value="postStateFor43" />
 		<property name="isPublishable" value="true" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime1" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp1" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="mockEvent11" class="com.alliancefoundry.model.Event">
@@ -220,13 +208,10 @@
 		<property name="destination" value="activemq" />
 		<property name="subdestination" value="test2" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime1" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime1" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="experiationDateTime1" /> <!-- DateTime -->
 		<property name="preEventState" value="pre" />
 		<property name="postEventState" value="post" />
 		<property name="isPublishable" value="true" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime1" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp1" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="nullMockEvent" class="com.alliancefoundry.model.Event">

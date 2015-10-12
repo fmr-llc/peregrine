@@ -202,13 +202,10 @@
 		<property name="destination" value="Kafka" />
 		<property name="subdestination" value="test2" />
 		<property name="replayIndicator" value="false" /> <!-- Boolean -->
-		<property name="publishTimeStamp" ref="publishDateTime1" /> <!-- DateTime -->
-		<property name="receivedTimeStamp" ref="receivedDateTime1" /> <!-- DateTime --> 
-		<property name="expirationTimeStamp" ref="experiationDateTime1" /> <!-- DateTime -->
 		<property name="preEventState" value="pre" />
 		<property name="postEventState" value="post" />
 		<property name="isPublishable" value="true" /> <!-- Boolean -->
-		<property name="insertTimeStamp" ref="insertDateTime1" /> <!-- DateTime -->
+		<property name="timestamp" ref="timestamp1" /> <!-- DateTime -->
 	</bean>
 	
 	<bean id="simpleEvent" class="com.alliancefoundry.model.Event">

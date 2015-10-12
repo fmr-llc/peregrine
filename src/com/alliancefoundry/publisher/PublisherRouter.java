@@ -84,8 +84,9 @@ public class PublisherRouter {
 				String eventId = event.getEventId();	
 				connectPublishers();
 				publishEventByMapper(event);
-
-				audits.get(eventId).addPublishTimestamp(DateTime.now());
+				if(audits.get(eventId) != null){
+					audits.get(eventId).addPublishTimestamp(DateTime.now());
+				}
 				log.info("Event with ID: " + event.getEventId()+ " was published");
 							
 			}

@@ -168,9 +168,9 @@ public class JDBC_broker_DAO_tests {
 		event.setCustomHeaders(headers);
 		event.setCustomPayload(payload);
 		
-		String eventId = dao.insertEvent(event);
+		String eventId = dao.insertEvent(event, new HashMap<String,EventPublicationAudit>());
 		
-		publisher.attemptPublishEvent(event);
+		publisher.attemptPublishEvent(event, new HashMap<String,EventPublicationAudit>());
 	
 		eventFromDb = dao.getEvent(eventId);
 	
