@@ -10,9 +10,14 @@ public class SqlQuery {
 	private String multipleEventsById;
 	private String header;
 	private String payload;
+	private String auditById;
+	private String publishTimestampsById;
+	private String updatePublishCount;
 	private String insertSingleEvent;
 	private String insertHeader;
 	private String insertPayload;
+	private String insertAudit;
+	private String insertPublishTimestamp;
 	private String latestEvent;
 	private String reqCreatedAfter;
 	private String reqCreatedBefore;
@@ -71,6 +76,42 @@ public class SqlQuery {
 		this.payload = payload;
 	}
 	/**
+	 * @return the auditById
+	 */
+	public String getAuditById() {
+		return auditById;
+	}
+	/**
+	 * @param auditById the auditById to set
+	 */
+	public void setAuditById(String auditById) {
+		this.auditById = auditById;
+	}
+	/**
+	 * @return the publishTimestampsById
+	 */
+	public String getPublishTimestampsById() {
+		return publishTimestampsById;
+	}
+	/**
+	 * @param publishTimestampsById the publishTimestampsById to set
+	 */
+	public void setPublishTimestampsById(String publishTimestampsById) {
+		this.publishTimestampsById = publishTimestampsById;
+	}
+	/**
+	 * @return the updatePublishCount
+	 */
+	public String getUpdatePublishCount() {
+		return updatePublishCount;
+	}
+	/**
+	 * @param updatePublishCount the updatePublishCount to set
+	 */
+	public void setUpdatePublishCount(String updatePublishCount) {
+		this.updatePublishCount = updatePublishCount;
+	}
+	/**
 	 * @return the insertSingleEvent
 	 */
 	public String getInsertSingleEvent() {
@@ -105,6 +146,30 @@ public class SqlQuery {
 	 */
 	public void setInsertPayload(String insertPayload) {
 		this.insertPayload = insertPayload;
+	}
+	/**
+	 * @return the insertAudit
+	 */
+	public String getInsertAudit() {
+		return insertAudit;
+	}
+	/**
+	 * @param insertAudit the insertAudit to set
+	 */
+	public void setInsertAudit(String insertAudit) {
+		this.insertAudit = insertAudit;
+	}
+	/**
+	 * @return the insertPublishTimestamp
+	 */
+	public String getInsertPublishTimestamp() {
+		return insertPublishTimestamp;
+	}
+	/**
+	 * @param insertPublishTimestamp the insertPublishTimestamp to set
+	 */
+	public void setInsertPublishTimestamp(String insertPublishTimestamp) {
+		this.insertPublishTimestamp = insertPublishTimestamp;
 	}
 	/**
 	 * @return the latestEvent

@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataAccessException;
@@ -25,6 +26,7 @@ import com.alliancefoundry.exceptions.PeregrineErrorCodes;
 import com.alliancefoundry.exceptions.PeregrineException;
 import com.alliancefoundry.model.DataItem;
 import com.alliancefoundry.model.Event;
+import com.alliancefoundry.model.EventPublicationAudit;
 import com.alliancefoundry.model.EventsRequest;
 import com.alliancefoundry.publisher.PublisherRouter;
 
@@ -34,6 +36,8 @@ import com.alliancefoundry.publisher.PublisherRouter;
  */
 @Component
 public class JdbcTemplateDaoImpl implements IDAO {
+	
+	static final Logger log = LoggerFactory.getLogger(JdbcTemplateDaoImpl.class);
 	
 	private JdbcTemplate jdbcTemplate;
 	private AbstractApplicationContext ctx;
@@ -52,11 +56,11 @@ public class JdbcTemplateDaoImpl implements IDAO {
 	 * @return			event id of the event that was inserted
 	 */
 	@Transactional
-	public String insertEvent(Event event) throws PeregrineException {
+	public String insertEvent(Event event, Map<String,EventPublicationAudit> audits) throws PeregrineException {
 		List<String> eventIds = new ArrayList<String>();
 		List<Event> events = new ArrayList<Event>();
 		events.add(event);
-		eventIds.add(insertEvents(events).get(0));
+		eventIds.add(insertEvents(events, audits).get(0));
 		return eventIds.get(0);
 	}
 	
@@ -65,13 +69,15 @@ public class JdbcTemplateDaoImpl implements IDAO {
 	 * @return			list of event ids of the events that were inserted
 	 */
 	@Transactional
-	public List<String> insertEvents(List<Event> events) throws PeregrineException {
+	public List<String> insertEvents(List<Event> events, Map<String,EventPublicationAudit> audits) throws PeregrineException {
 		List<String> eventIds = new ArrayList<String>();
 		String eventSql = sql.getInsertSingleEvent();
 		String headersSql = sql.getInsertHeader();
 		String payloadSql = sql.getInsertPayload();
+		Event errorEvent = new Event();
 		try{
 			for (Event event : events) {
+				errorEvent = event;
 				//check that all necessary values are initialized
 				Event.verifyNonNullables(event);
 				
@@ -84,11 +90,15 @@ public class JdbcTemplateDaoImpl implements IDAO {
 				//insert into event_payload
 				insertIntoEventPayloadTable(payloadSql, event);
 				
+				audits.put(eventId, new EventPublicationAudit(eventId, DateTime.now()));
+				
 				eventIds.add(eventId);
 			}	
 			return eventIds;
 		} catch(DataIntegrityViolationException e) {
-			throw new PeregrineException(PeregrineErrorCodes.EVENT_INSERTION_ERROR,e.getCause().getMessage(),e);
+			String msg = e.getCause().getMessage() + "Event causing problem: " + errorEvent;
+			log.error(msg);
+			throw new PeregrineException(PeregrineErrorCodes.EVENT_INSERTION_ERROR,msg,e);
 		}
 	}
 	
@@ -100,6 +110,7 @@ public class JdbcTemplateDaoImpl implements IDAO {
 	public Event getEvent(String eventId) throws PeregrineException {
 		String eventSql = sql.getSingleEventById();
 		List<Event> eventList = new ArrayList<Event>();
+		String msg;
 		try {
 			eventList = jdbcTemplate.query(eventSql, new PreparedStatementSetter() {
 				@Override
@@ -111,10 +122,14 @@ public class JdbcTemplateDaoImpl implements IDAO {
 			if (eventList.size() == 1) {
 				return eventList.get(0);
 			} else {
-				throw new PeregrineException(PeregrineErrorCodes.EVENT_NOT_FOUND_ERROR,"Event not found in database");
+				msg = "Event not found in database";
+				log.error(msg);
+				throw new PeregrineException(PeregrineErrorCodes.EVENT_NOT_FOUND_ERROR,msg);
 			}
 		} catch (DataAccessException e) {
-			throw new PeregrineException(PeregrineErrorCodes.EVENT_RETRIEVAL_ERROR,e.getCause().getMessage(),e);
+			msg = e.getCause().getMessage();
+			log.error(msg);
+			throw new PeregrineException(PeregrineErrorCodes.EVENT_RETRIEVAL_ERROR,msg,e);
 		}
 	}
 	
@@ -124,6 +139,7 @@ public class JdbcTemplateDaoImpl implements IDAO {
 	 * @throws PeregrineException 	if some problem related to an event occurs
 	 */
 	public List<Event> getEvents(EventsRequest req) throws PeregrineException {
+		String msg;
 		try {
 			//ensure valid request params
 			Integer genNum = EventsRequest.verifyRequestParameters(req, false);
@@ -136,7 +152,9 @@ public class JdbcTemplateDaoImpl implements IDAO {
 			
 			//verify some events were retrieved
 			if (eventList.size() == 0) {
-				throw new PeregrineException(PeregrineErrorCodes.EVENT_NOT_FOUND_ERROR,"No events matching the specified parameters were found in database");
+				msg = "No events matching the specified parameters were found in database";
+				log.error(msg);
+				throw new PeregrineException(PeregrineErrorCodes.EVENT_NOT_FOUND_ERROR,msg);
 			}
 			
 			//get the events based off of generation count if one is specified
@@ -151,7 +169,9 @@ public class JdbcTemplateDaoImpl implements IDAO {
 			}
 			return eventList;
 		} catch (DataAccessException e) {	
-			throw new PeregrineException(PeregrineErrorCodes.EVENT_RETRIEVAL_ERROR,e.getCause().getMessage(),e);
+			msg = e.getCause().getMessage();
+			log.error(msg);
+			throw new PeregrineException(PeregrineErrorCodes.EVENT_RETRIEVAL_ERROR,msg,e);
 		}
 	}
 	
@@ -164,6 +184,7 @@ public class JdbcTemplateDaoImpl implements IDAO {
 	 * @throws PeregrineException 	if some problem related to an event occurs
 	 */
 	public Event getLatestEvent(EventsRequest req) throws PeregrineException {
+		String msg;
 		try {
 			//ensure valid request params
 			EventsRequest.verifyRequestParameters(req, true);
@@ -176,13 +197,121 @@ public class JdbcTemplateDaoImpl implements IDAO {
 			
 			//verify some events were retrieved
 			if (eventList.size() == 0) {
-				throw new PeregrineException(PeregrineErrorCodes.EVENT_NOT_FOUND_ERROR,"No events matching the specified parameters were found in database");
+				msg = "No events matching the specified parameters were found in database";
+				log.error(msg);
+				throw new PeregrineException(PeregrineErrorCodes.EVENT_NOT_FOUND_ERROR,msg);
 			}
 			
 			//query limits to one result so there should only be one event in the list
 			return eventList.get(0);
 		} catch (DataAccessException e) {
-			throw new PeregrineException(PeregrineErrorCodes.EVENT_RETRIEVAL_ERROR,e.getCause().getMessage(),e);
+			msg = e.getCause().getMessage();
+			log.error(msg);
+			throw new PeregrineException(PeregrineErrorCodes.EVENT_RETRIEVAL_ERROR,msg,e);
+		}
+	}
+	
+	/**
+	 * @param audit					values of the event audit
+	 * @return							
+	 * @throws PeregrineException 	if some problem related to insertion occurs
+	 */
+	@Transactional
+	public void insertPublicationAudit(Map<String,EventPublicationAudit> audits) throws PeregrineException {
+		String auditSql = sql.getInsertAudit();
+		String msg;
+		try {
+			for(String key : audits.keySet()){
+				EventPublicationAudit audit = audits.get(key);
+				int publishCount = 0;
+				DateTime capture = audit.getCaptureTimestamp();
+				DateTime persist = audit.getPersistTimestamp();
+				if(capture == null){
+					msg = "Capture timestamp cannot be null";
+					log.error(msg);
+					throw new PeregrineException(PeregrineErrorCodes.AUDIT_INSERTION_ERROR,msg);
+				}
+				if(persist == null){
+					msg = "Persist timestamp cannot be null";
+					log.error(msg);
+					throw new PeregrineException(PeregrineErrorCodes.AUDIT_INSERTION_ERROR,msg);
+				}
+				jdbcTemplate.update(auditSql,
+					audit.getEventId(),
+					capture.getMillis(),
+					persist.getMillis(),
+					publishCount
+					);
+				insertPublishTimestamp(audit, audit.getPublishTimestamps().get(0), 1);
+			}
+		} catch (DataIntegrityViolationException e) {
+			msg = e.getCause().getMessage();
+			log.error(msg);
+			throw new PeregrineException(PeregrineErrorCodes.AUDIT_INSERTION_ERROR,msg,e);
+		}
+	}
+	
+	/**
+	 * @param audit					audit of the event being inserted
+	 * @param timestamp				timestamp of publishing time
+	 * @param publishId				unique id to identify publish instances for a particular event id
+	 * @return							
+	 * @throws PeregrineException 	if some problem related to insertion occurs
+	 */
+	public void insertPublishTimestamp(EventPublicationAudit audit, DateTime timestamp, int publishId) throws PeregrineException {
+		String msg;
+		if(timestamp == null){
+			msg = "Publication timestamp cannot be null";
+			log.error(msg);
+			throw new PeregrineException(PeregrineErrorCodes.AUDIT_INSERTION_ERROR,msg);
+		}
+		String publishSql = sql.getInsertPublishTimestamp();
+		String updatePublishCountSql = sql.getUpdatePublishCount();
+		String eventId = audit.getEventId();
+		try{
+			jdbcTemplate.update(publishSql,
+				eventId,
+				timestamp.getMillis(),
+				publishId
+				);
+			jdbcTemplate.update(updatePublishCountSql,
+				eventId
+				);
+		} catch (DataIntegrityViolationException e) {
+			msg = e.getCause().getMessage();
+			log.error(msg);
+			throw new PeregrineException(PeregrineErrorCodes.PUBLISH_TIMESTAMP_INSERTION_ERROR,msg,e);
+		}
+	}
+	
+	/**
+	 * @param eventId				of the event to be retrieved
+	 * @return						the event publication audit with the corresponding event id
+	 * @throws PeregrineException 	if some problem related to an event occurs
+	 */
+	public EventPublicationAudit getPublicationAudit(String eventId) throws PeregrineException {
+		String auditSql = sql.getAuditById();
+		List<EventPublicationAudit> audit = new ArrayList<EventPublicationAudit>();
+		String msg;
+		try {
+			audit = jdbcTemplate.query(auditSql, new PreparedStatementSetter() {
+				@Override
+				public void setValues(java.sql.PreparedStatement ps) throws SQLException {
+					ps.setString(1, eventId);
+				}
+			}, new AuditRowMapper(jdbcTemplate, sql));
+			//query limits to one result because event ids are unique so there should only be one event
+			if (audit.size() == 1) {
+				return audit.get(0);
+			} else {
+				msg = "Event not found in event store";
+				log.error(msg);
+				throw new PeregrineException(PeregrineErrorCodes.EVENT_NOT_FOUND_ERROR,msg);
+			}
+		} catch (DataAccessException e) {
+			msg = e.getCause().getMessage();
+			log.error(msg);
+			throw new PeregrineException(PeregrineErrorCodes.EVENT_RETRIEVAL_ERROR,msg,e);
 		}
 	}
 	
@@ -192,17 +321,18 @@ public class JdbcTemplateDaoImpl implements IDAO {
 	 * @param event		to be inserted into DB
 	 * @return			eventId of the Event being inserted
 	 */
-	private String insertIntoEventStoreTable(String eventSql, Event event){
+	private String insertIntoEventStoreTable(String eventSql, Event event) throws PeregrineException{
+		DateTime timestamp = event.getTimestamp();
+		if(timestamp == null){
+			String msg = "Timestamp cannot be null";
+			log.error(msg);
+			throw new PeregrineException(PeregrineErrorCodes.EVENT_INSERTION_ERROR,msg);
+		}
 		String eventId = UUID.randomUUID().toString();
-		//TODO: log warn eventId is being set if it does not equal null
+		if(event.getEventId() != null){
+			log.warn(String.format("Event Id of event with id %s set by producer is being changed to a unique value of: %s", event.getEventId(), eventId));
+		}
 		event.setEventId(eventId);
-		Long publish;
-		Long expiration;
-		if(event.getPublishTimeStamp() == null) publish = null;
-		else publish = event.getPublishTimeStamp().getMillis();
-		if(event.getExpirationTimeStamp() == null) expiration = null;
-		else expiration = event.getExpirationTimeStamp().getMillis();
-		event.setInsertTimeStamp(DateTime.now());
 		
 		jdbcTemplate.update(eventSql,
 				event.getEventId(),
@@ -217,13 +347,10 @@ public class JdbcTemplateDaoImpl implements IDAO {
 				event.getDestination(),
 				event.getSubdestination(),
 				event.isReplayIndicator(),
-				publish,
-				event.getReceivedTimeStamp().getMillis(),
-				expiration,
 				event.getPreEventState(),
 				event.getPostEventState(),
 				event.getIsPublishable(),
-				event.getInsertTimeStamp().getMillis());
+				timestamp.getMillis());
 		
 		return eventId;
 	}
@@ -418,20 +545,6 @@ public class JdbcTemplateDaoImpl implements IDAO {
 			Integer sequenceNumber = rs.getInt("sequenceNumber");
 			if (rs.wasNull()) sequenceNumber = null;
 			event.setSequenceNumber(sequenceNumber);
-			
-			//set publish time stamp
-			Long publish = rs.getLong("publishTimeStamp");
-			DateTime publishTimeStamp;
-			if (rs.wasNull()) publishTimeStamp = null;
-			else publishTimeStamp = new DateTime(publish);
-			event.setPublishTimeStamp(publishTimeStamp);
-			
-			//set expiration time stamp
-			Long expiration = rs.getLong("expirationTimeStamp");
-			DateTime expirationTimeStamp;
-			if (rs.wasNull()) expirationTimeStamp = null;
-			else expirationTimeStamp = new DateTime(expiration);
-			event.setExpirationTimeStamp(expirationTimeStamp);
 		}
 		
 		/**
@@ -452,11 +565,10 @@ public class JdbcTemplateDaoImpl implements IDAO {
 			event.setDestination(rs.getString("destination"));
 			event.setSubdestination(rs.getString("subdestination"));
 			event.setReplayIndicator(rs.getBoolean("replayIndicator"));
-			event.setReceivedTimeStamp(new DateTime((rs.getLong("receivedTimeStamp"))));
 			event.setPreEventState(rs.getString("preEventState"));
 			event.setPostEventState(rs.getString("postEventState"));
 			event.setIsPublishable(rs.getBoolean("isPublishable"));
-			event.setInsertTimeStamp(new DateTime(rs.getLong("insertTimeStamp")));
+			event.setTimestamp(new DateTime(rs.getLong("timestamp")));
 		}
 		
 		/**
@@ -519,6 +631,73 @@ public class JdbcTemplateDaoImpl implements IDAO {
 			payload[1] = rs.getString("dataType");
 			payload[2] = rs.getString("value");
 			return payload;
+		}
+	}
+	
+	/**
+	 * Class to map the designated rows from the publication_audit table into EventPublicationAudit objects
+	 */
+	private static class AuditRowMapper implements RowMapper<EventPublicationAudit> {
+		private JdbcTemplate jdbcTemplate;
+		private SqlQuery sql;
+		public AuditRowMapper(JdbcTemplate jdbcTemplate, SqlQuery sql) {
+			this.jdbcTemplate = jdbcTemplate;
+			this.sql = sql;
+		}
+		
+		/**
+		 * 
+		 * @param rs				that results from running query
+		 * @param index				not used, but part of interface declaration, so needed
+		 * @throws SQLException		if there is an issue running the query on the DB
+		 */
+		public EventPublicationAudit mapRow(ResultSet rs, int index) throws SQLException {
+			EventPublicationAudit audit = new EventPublicationAudit();
+			setPublicationAudit(rs, audit);
+			setPublishTimestamps(rs, audit);
+			return audit;
+		}
+		
+		/**
+		 * 
+		 * @param rs				that results from running query
+		 * @param audit				to be created from the values in the Result Set
+		 * @throws SQLException		if there is an issue running the query on the DB
+		 */
+		private void setPublicationAudit(ResultSet rs, EventPublicationAudit audit) throws SQLException{
+			audit.setEventId(rs.getString("eventId"));
+			audit.setCaptureTimestamp(new DateTime(rs.getLong("captureTimestamp")));
+			audit.setPersistTimestamp(new DateTime(rs.getLong("persistTimestamp")));
+		}
+		
+		/**
+		 * 
+		 * @param rs			that results from running query
+		 * @param audit			to be created from the values in the Result Set
+		 */
+		private void setPublishTimestamps(ResultSet rs, EventPublicationAudit audit){
+			String eventId = audit.getEventId();
+			String publishSql = sql.getPublishTimestampsById();
+			List<DateTime> publishTimestamps = jdbcTemplate.query(publishSql,
+				new PreparedStatementSetter() {
+					@Override
+					public void setValues(java.sql.PreparedStatement ps) throws SQLException {
+						ps.setString(1, eventId);	
+					}
+        		}, new PublishTimestampRowMapper() );
+			for(DateTime timestamp : publishTimestamps){
+				audit.addPublishTimestamp(timestamp);
+			}
+		}
+	}
+	
+	/**
+	 * Class to map the designated rows from the publish_timestamp table into DateTime objects
+	 */
+	private static class PublishTimestampRowMapper implements RowMapper<DateTime> {
+		public DateTime mapRow(ResultSet rs, int index) throws SQLException {
+			DateTime publishTimestamp = new DateTime(rs.getLong("publishTimestamp"));
+			return publishTimestamp;
 		}
 	}
 }

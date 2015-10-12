@@ -9,28 +9,14 @@ import java.util.List;
  */
 public class EventResponse {
 
-	private List<String> eventIds = new ArrayList<String>();
 	private List<Event> events = new ArrayList<Event>();
+	private EventsRequest request;
 	private String msg;
 	
 	/**
 	 * 
 	 */
 	public EventResponse() {}
-
-	/**
-	 * @return the eventIds
-	 */
-	public List<String> getEventIds() {
-		return eventIds;
-	}
-
-	/**
-	 * @param eventIds the eventIds to set
-	 */
-	public void setEventIds(List<String> eventIds) {
-		this.eventIds = eventIds;
-	}
 
 	/**
 	 * @return the events
@@ -44,6 +30,20 @@ public class EventResponse {
 	 */
 	public void setEvents(List<Event> events) {
 		this.events = events;
+	}
+
+	/**
+	 * @return the request
+	 */
+	public EventsRequest getRequest() {
+		return request;
+	}
+
+	/**
+	 * @param request the request to set
+	 */
+	public void setRequest(EventsRequest request) {
+		this.request = request;
 	}
 
 	/**
