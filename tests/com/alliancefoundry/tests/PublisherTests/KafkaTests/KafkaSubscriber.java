@@ -34,6 +34,7 @@ public class KafkaSubscriber {
 		    props.put("zookeeper.session.timeout.ms", "500");
 		    props.put("zookeeper.sync.time.ms", "250");
 		    props.put("auto.commit.interval.ms", "1000");
+		    props.put("auto.offset.reset", "smallest");
 
 		    return new ConsumerConfig(props);
 	}
