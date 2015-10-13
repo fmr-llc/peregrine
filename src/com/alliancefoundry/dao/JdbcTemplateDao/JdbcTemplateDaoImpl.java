@@ -242,7 +242,10 @@ public class JdbcTemplateDaoImpl implements IDAO {
 					persist.getMillis(),
 					publishCount
 					);
-				insertPublishTimestamp(audit, audit.getPublishTimestamps().get(0), 1);
+				List<DateTime> publishTimestamps = audit.getPublishTimestamps();
+				if(publishTimestamps.size() > 0){
+					insertPublishTimestamp(audit, publishTimestamps.get(0), 1);
+				}
 			}
 		} catch (DataIntegrityViolationException e) {
 			msg = e.getCause().getMessage();
