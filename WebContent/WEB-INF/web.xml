@@ -39,19 +39,17 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
-  
-<security-constraint>
-	<web-resource-collection>
-	<web-resource-name>Rest Calls</web-resource-name>
-		<url-pattern>/</url-pattern>
-		<http-method>GET</http-method>
-	</web-resource-collection>
-	<auth-constraint>
-		<role-name>user</role-name>
-	</auth-constraint>
-</security-constraint>
-<login-config>
-	<auth-method>BASIC</auth-method>
-</login-config>
-
+	  <security-constraint>
+		<web-resource-collection>
+		<web-resource-name>Rest Calls</web-resource-name>
+			<url-pattern>/</url-pattern>
+			<http-method>GET</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>user</role-name>
+		</auth-constraint>
+	</security-constraint>
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
 </web-app>
