@@ -11,38 +11,38 @@ import org.junit.Test;
 
 import junit.framework.Assert;
 
-	public class SecurityTests {
+/**
+ * 
+ * @author Curtis Robinson, Robert Coords
+ *
+ */
+public class SecurityTests {
 
 
-		@Test
-		public void testAccessRestServiceWithoutPassword() throws ClientProtocolException, IOException {
-			
-			// access get event reest service
-			CloseableHttpClient httpclient = HttpClients.createDefault();
-			HttpGet httpGet = new HttpGet("http://localhost:8080/event-service/event/34578");
-			CloseableHttpResponse response1 = httpclient.execute(httpGet);
-			System.out.println(response1.getStatusLine().getStatusCode());
+	@Test
+	public void testAccessRestServiceWithoutPassword() throws ClientProtocolException, IOException {
+		
+		// access get event reest service
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		HttpGet httpGet = new HttpGet("http://user:password@localhost:8080/event-service/event/34578");
+		CloseableHttpResponse response1 = httpclient.execute(httpGet);
 
-			// Status code 401 - Unauthorized 401 
-			Assert.assertTrue((response1.getStatusLine().getStatusCode() == 401));
-			
+		// Status code 401 - Unauthorized 401 
+		Assert.assertTrue((response1.getStatusLine().getStatusCode() == 401));
+	
+	}
 
-			
-		}
+	@Test
+	public void testAccessRestServiceWithPassword() throws ClientProtocolException, IOException {
+		
+		// access get event reest service
 
-		@Test
-		public void testAccessRestServiceWithPassword() throws ClientProtocolException, IOException {
-			
-			// access get event reest service
-
-			CloseableHttpClient httpclient = HttpClients.createDefault();
-			HttpGet httpGet = new HttpGet("http://user:user@localhost:8080/event-service/event/34578");
-			CloseableHttpResponse response1 = httpclient.execute(httpGet);
-			
-			System.out.println(response1.getStatusLine().getStatusCode());
-			
-			// Status code 401 - Unauthorized 401 
-			Assert.assertTrue((response1.getStatusLine().getStatusCode() != 401));
-		}
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		HttpGet httpGet = new HttpGet("http://user:user@localhost:8080/event-service/event/34578");
+		CloseableHttpResponse response1 = httpclient.execute(httpGet);
+				
+		// Status code 401 - Unauthorized 401 
+		Assert.assertTrue((response1.getStatusLine().getStatusCode() == 200) || ((response1.getStatusLine().getStatusCode() == 201)));
+	}
 
 }
