@@ -34,9 +34,6 @@ import com.alliancefoundry.publisher.PublisherRouter;
 public class EventServiceController  {
 	
 	static final Logger log = LoggerFactory.getLogger(EventServiceController.class);
-
-	Map<String,DateTime> persistTimes = new HashMap<String,DateTime>();
-	Map<String,DateTime> publishTimes = new HashMap<String,DateTime>();
 	
 	@Autowired
 	IDAO dao;
