@@ -8,7 +8,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>eventservice</servlet-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/eventservice/*</url-pattern>
   </servlet-mapping>
   <filter>
     <filter-name>instrumentedFilter</filter-name>
