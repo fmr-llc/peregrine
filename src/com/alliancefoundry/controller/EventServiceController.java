@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alliancefoundry.dao.JDBCDAOimpl;
+import com.alliancefoundry.dao.EventDAOimpl;
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventsRequest;
 
@@ -30,7 +30,7 @@ import com.alliancefoundry.model.EventsRequest;
 public class EventServiceController  {
 	
 	static final Logger log = LoggerFactory.getLogger(EventServiceController.class);
-	JDBCDAOimpl dao = new JDBCDAOimpl();
+	EventDAOimpl dao = new EventDAOimpl();
 
 	/**
 	 * Creates a new event
@@ -47,6 +47,8 @@ public class EventServiceController  {
 			log.debug("created event with event id " + eventId);
 		} catch (SQLException e) {
 			log.debug("Event could not be created.");
+		} catch (Exception e){
+			log.error(e.getMessage());
 		}
 		return eventId;
 	}
@@ -60,11 +62,13 @@ public class EventServiceController  {
 	@RequestMapping(value="/events", method = RequestMethod.POST)
 	public String setEvents(@RequestBody List<Event> evts){
 		List<String> eventIds = new ArrayList<String>();
-		for(Event e : evts){
+		for(Event ev : evts){
 			try {
-				eventIds.add(dao.insertEvent(e));
+				eventIds.add(dao.insertEvent(ev));
 			} catch (SQLException eSQL) {
 				log.debug("Event could not be created.");
+			} catch (Exception e){
+				log.error(e.getMessage());
 			}
 		}
 		String eventIdStr = "";
@@ -85,9 +89,17 @@ public class EventServiceController  {
 	 */
     @RequestMapping(value="/event/{id}", method = RequestMethod.GET)
     public Event getEvent(@PathVariable String id){
-    	Event eventFromDb = dao.getEvent(id);
-        log.debug("retrieved event with event id " + eventFromDb.getEventId());
-        return eventFromDb;
+
+		try {
+			Event eventFromDb = dao.getEvent(id);
+			log.debug("retrieved event with event id " + eventFromDb.getEventId());
+			return eventFromDb;
+		} catch (Exception e){
+			log.error(e.getMessage());
+		}
+
+		return null;
+
     }
     
     @RequestMapping(value="/events", method = RequestMethod.GET)
