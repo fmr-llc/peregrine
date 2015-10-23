@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans  xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+        <bean id="kafkaPublisher" class="com.alliancefoundry.publisher.KafkaPublisher">
+            <property name="brokerUrl" value="${kafka.url}" />
+            <property name="destType" value="kafka" />
+        </bean>
+
+        <bean id="activemqPublisher" class="com.alliancefoundry.publisher.ActiveMQPublisher">
+            <property name="brokerUrl" value="${activemq.url}" />
+            <property name="destType" value="activemq" />
+        </bean>
+
+
+        <bean id="serviceManager" class="com.alliancefoundry.publisher.EventServicePublisher">
+            <property name="publishers"  >
+                <list>
+                    <ref bean="kafkaPublisher"/>
+                    <ref bean="activemqPublisher"/>
+                </list>
+            </property>
+        </bean>
+
+</beans>

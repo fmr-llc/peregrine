@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans  xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+        <!-- database configurations -->
+
+        <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+            <property name="poolName" value="springHikariCP" />
+            <property name="connectionTestQuery" value="${db.dataSource.connectionTestQuery}" />
+            <property name="dataSourceClassName" value="${db.dataSourceClassName}" />
+            <property name="maximumPoolSize" value="${db.hikari.maximumPoolSize}" />
+            <property name="idleTimeout" value="${db.hikari.idleTimeout}" />
+            <property name="maxLifetime" value="${db.dataSource.maxLifetime}" />
+            <property name="dataSourceProperties">
+                <props>
+                    <prop key="url">${db.dataSource.url}</prop>
+                    <prop key="user">${db.dataSource.username}</prop>
+                    <prop key="password">${db.dataSource.password}</prop>
+                    <prop key="prepStmtCacheSize">${db.prepStmtCacheSize}</prop>
+                    <prop key="prepStmtCacheSqlLimit">${db.prepStmtCacheSqlLimit}</prop>
+                    <prop key="cachePrepStmts">${db.cachePrepStmts}</prop>
+                    <prop key="useServerPrepStmts">${db.useServerPrepStmts}</prop>
+                </props>
+            </property>
+        </bean>
+
+        <!-- HikariCP configuration -->
+        <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+            <constructor-arg ref="hikariConfig" />
+        </bean>
+
+
+        <bean id="eventDAO" class="com.alliancefoundry.dao.EventDAOimpl">
+            <property name="dataSource" ref="dataSource"/>
+        </bean>
+
+</beans>
