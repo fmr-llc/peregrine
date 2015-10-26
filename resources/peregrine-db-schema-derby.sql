@@ -1,4 +1,4 @@
-CREATE TABLE event_store (
+CREATE TABLE event.event_store (
   eventId varchar(45) NOT NULL,
   parentId varchar(45) DEFAULT NULL,
   eventName varchar(45) DEFAULT NULL,

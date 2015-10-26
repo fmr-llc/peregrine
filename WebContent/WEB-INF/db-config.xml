@@ -15,15 +15,19 @@
             <property name="maximumPoolSize" value="${db.hikari.maximumPoolSize}" />
             <property name="idleTimeout" value="${db.hikari.idleTimeout}" />
             <property name="maxLifetime" value="${db.dataSource.maxLifetime}" />
+            <property name="jdbcUrl" value="${db.dataSource.url}" />
             <property name="dataSourceProperties">
                 <props>
-                    <prop key="url">${db.dataSource.url}</prop>
+                    <prop key="databaseName">event</prop>
                     <prop key="user">${db.dataSource.username}</prop>
                     <prop key="password">${db.dataSource.password}</prop>
+                    <prop key="createDatabase">create</prop>
+                    <!--
                     <prop key="prepStmtCacheSize">${db.prepStmtCacheSize}</prop>
                     <prop key="prepStmtCacheSqlLimit">${db.prepStmtCacheSqlLimit}</prop>
                     <prop key="cachePrepStmts">${db.cachePrepStmts}</prop>
                     <prop key="useServerPrepStmts">${db.useServerPrepStmts}</prop>
+                    -->
                 </props>
             </property>
         </bean>
@@ -33,9 +37,18 @@
             <constructor-arg ref="hikariConfig" />
         </bean>
 
+        <bean id="daoFactory" class="com.alliancefoundry.dao.DAOFactory">
+            <property name="DAO" ref="derbyDAO"/>
+        </bean>
 
-        <bean id="eventDAO" class="com.alliancefoundry.dao.EventDAOimpl">
-            <property name="dataSource" ref="dataSource"/>
+        <bean id="derbyDAO" class="com.alliancefoundry.dao.impl.EmbeddedDerbyEventDAOImpl"
+              init-method="initialize" destroy-method="shutdown">
+            <constructor-arg ref="dataSource"/>
+        </bean>
+
+        <bean id="mysqlDAO" class="com.alliancefoundry.dao.impl.MySQLEventDAOImpl"
+              init-method="initialize" destroy-method="shutdown">
+            <constructor-arg ref="dataSource"/>
         </bean>
 
 </beans>

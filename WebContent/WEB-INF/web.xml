@@ -1,42 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
-  <display-name>event-service</display-name>
-  <servlet>
-    <servlet-name>eventservice</servlet-name>
-    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>eventservice</servlet-name>
-    <url-pattern>/eventservice/*</url-pattern>
-  </servlet-mapping>
-  <filter>
-    <filter-name>instrumentedFilter</filter-name>
-    <filter-class>com.codahale.metrics.servlet.InstrumentedFilter</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>instrumentedFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>/WEB-INF/*-context.xml</param-value>
-  </context-param>
-  <listener>
-    <listener-class>com.alliancefoundry.servlet.utils.ESFilterContextListener</listener-class>
-  </listener>
-  <listener>
-  	<listener-class>com.alliancefoundry.servlet.utils.LoggingContextListener</listener-class>
-  </listener>
-  <listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-  </listener>
-  <welcome-file-list>
-    <welcome-file>index.html</welcome-file>
-    <welcome-file>index.htm</welcome-file>
-    <welcome-file>index.jsp</welcome-file>
-    <welcome-file>default.html</welcome-file>
-    <welcome-file>default.htm</welcome-file>
-    <welcome-file>default.jsp</welcome-file>
-  </welcome-file-list>
+
+    <display-name>event-service</display-name>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/eventservice-servlet.xml</param-value>
+    </context-param>
+
+    <servlet>
+        <servlet-name>eventservice</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+      <servlet-name>eventservice</servlet-name>
+      <url-pattern>/eventservice/*</url-pattern>
+    </servlet-mapping>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+<!--
+    <filter>
+      <filter-name>instrumentedFilter</filter-name>
+      <filter-class>com.codahale.metrics.servlet.InstrumentedFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+      <filter-name>instrumentedFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <listener>
+      <listener-class>com.alliancefoundry.servlet.utils.ESFilterContextListener</listener-class>
+    </listener>
+
+    <listener>
+      <listener-class>com.alliancefoundry.servlet.utils.LoggingContextListener</listener-class>
+    </listener>
+-->
+
+
+
+
+    <welcome-file-list>
+      <welcome-file>index.html</welcome-file>
+      <welcome-file>index.htm</welcome-file>
+      <welcome-file>index.jsp</welcome-file>
+      <welcome-file>default.html</welcome-file>
+      <welcome-file>default.htm</welcome-file>
+      <welcome-file>default.jsp</welcome-file>
+    </welcome-file-list>
+
 </web-app>

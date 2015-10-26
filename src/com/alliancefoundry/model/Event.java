@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.joda.time.DateTime;
 
 import com.alliancefoundry.serializer.CustomJsonDateDeserializer;
@@ -15,13 +16,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
-
 /**
  * Created by Paul Bernard
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonTypeInfo(include= JsonTypeInfo.As.WRAPPER_OBJECT, use= JsonTypeInfo.Id.NAME)
 public class Event {
 
     // Headers
@@ -62,8 +63,8 @@ public class Event {
 		eventId = uuid.toString();
     	
     	receivedTimeStamp = DateTime.now();
-    	customHeaders = new HashMap<String, String>();
-    	customPayload = new HashMap<String, DataItem>();
+    	customHeaders = new HashMap<>();
+    	customPayload = new HashMap<>();
     	insertTimeStamp = DateTime.now();
     }
 	
