@@ -23,3 +23,22 @@ Changes in state are reflected as a series of new events.
 * Use case: https://lostechies.com/gabrielschenker/2015/05/26/event-sourcing-revisited/
 * Blog post: http://jeremydmiller.com/2014/10/22/building-an-eventstore-with-user-defined-projections-on-top-of-postgresql-and-node-js/
 * Building an event store: https://cqrs.files.wordpress.com/2010/11/cqrs_documents.pdf
+
+#### Implementation ####
+
+Peregrine is written in Java and targets JDK 8.  The POM is written to create an executable war (a war file that can
+be deployed to a web container such as Tomcat, et 'al or run "container-less" using an embedded Jetty instance.)
+The implementation language (java) and packaging structure (executable war) was chosen to facilitate the widest
+possible accessibility in terms of target platforms and potential project contributor community.
+
+The executable war, in addition to containing an embedded http server (Jetty) also embeds a DerbyDB instance, intended
+for demonstration purposes only.  This packaging supports the ability to "get up and running" with very little effort.
+Copy Peregrine to a local directory, install a messaging broker such as (ActiveMQ) and you're in business.
+
+After you get a feel for how Peregrine can be configured, you can change the persistence store to any number of
+supported databases: Derby (Embedded or Server), MySql/Maria DB, and PostgreSQL.  In addition to offering a variety of
+supported databases, Peregrine also supports any JMS compliance message broker as well as Kafka.
+
+
+
+
