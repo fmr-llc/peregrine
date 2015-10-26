@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 
 import com.alliancefoundry.model.Event;
 
@@ -61,17 +60,14 @@ public class EventServicePublisher {
 		KafkaPublisher kafkaPublshisher;
 		ActiveMQPublisher mqPublisher;
 
-		AbstractApplicationContext ctx;
-		ctx = new ClassPathXmlApplicationContext("eventservice-servlet.xml");
-		ctx.registerShutdownHook();
 
-		kafkaPublshisher = ctx.getBean("kafkaPublisher", KafkaPublisher.class);
-		mqPublisher = ctx.getBean("activemqPublisher", ActiveMQPublisher.class);
+
+		//kafkaPublshisher = ObjectDispenser.getContext().getBean("kafkaPublisher", KafkaPublisher.class);
+		//mqPublisher = ObjectDispenser.getContext().getBean("activemqPublisher", ActiveMQPublisher.class);
 		
-		publishers.add(mqPublisher);
-		publishers.add(kafkaPublshisher);
-		
-		ctx.close();
+		//publishers.add(mqPublisher);
+		//publishers.add(kafkaPublshisher);
+
 
 	}
 
