@@ -1,13 +1,12 @@
 # Peregrine #
 
 The "Peregrine" Event Service is a component which is used as part of a comprehensive "Event Sourcing" based
-architecture.
+architecture.  Event Sourcing is a very old idea that has become popular in recent years.
 
-Event Sourcing is a very old idea that has become popular over recent years. As we will see there are many
-interesting opportunities that present themselves when a problem is looked at through an Event Sourcing perspective.
+In general you'll find that Event Sourcing is based upon the idea of storing incremental changes in state, over time,
+in for form of "events" in contrast to persisting a transactional "current state".  Persisted events are immutable.
+Changes in state are reflected as a series of new events.
 
-In general you'll find that Event Sourcing is based upon the idea of storing incremental changes in state, over time, as
-opposed to maintaining a transactional "current state".
 
 #### References: ####
 
