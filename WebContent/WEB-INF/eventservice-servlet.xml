@@ -13,11 +13,13 @@
 
 
 
+
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <value>file://#{systemProperties.propsroot}dao.properties</value>
                 <value>file://#{systemProperties.propsroot}msgbroker.properties</value>
+                <value>file://#{systemProperties.propsroot}router-config.properties</value>
             </list>
         </property>
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
@@ -30,6 +32,7 @@
 
     <bean id="controller" class="com.alliancefoundry.controller.EventServiceController">
         <property name="DAOFactory" ref="daoFactory"/>
+        <property name="publisher" ref="serviceManager"/>
     </bean>
     
      <!-- bean configuration -->

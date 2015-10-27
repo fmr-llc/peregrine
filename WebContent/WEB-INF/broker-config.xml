@@ -6,23 +6,31 @@
             http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
-        <bean id="kafkaPublisher" class="com.alliancefoundry.publisher.KafkaPublisher">
+        <bean id="kafkapub" class="com.alliancefoundry.publisher.impl.KafkaPublisher">
             <property name="brokerUrl" value="${kafka.url}" />
-            <property name="destType" value="kafka" />
         </bean>
 
-        <bean id="activemqPublisher" class="com.alliancefoundry.publisher.ActiveMQPublisher">
+        <bean id="activemqpub" class="com.alliancefoundry.publisher.impl.ActiveMQPublisher">
             <property name="brokerUrl" value="${activemq.url}" />
-            <property name="destType" value="activemq" />
+        </bean>
+
+        <bean id="propertiesConfig" class="com.alliancefoundry.publisher.PropertiesRouter">
+            <property name="location" value="#{systemProperties.propsroot}router-config.properties"/>
         </bean>
 
 
         <bean id="serviceManager" class="com.alliancefoundry.publisher.EventServicePublisher">
-            <property name="publishers"  >
-                <list>
-                    <ref bean="kafkaPublisher"/>
-                    <ref bean="activemqPublisher"/>
-                </list>
+            <property name="publishers" >
+                <map>
+                    <entry key="kafkapub"  value-ref="kafkapub"/>
+                    <entry key="activemqpub" value-ref="activemqpub"/>
+                </map>
+            </property>
+            <property name="activeConfig" value="${publisher.configtype}"/>
+            <property name="routerConfig">
+                <map>
+                    <entry key="propertiesConfig" value-ref="propertiesConfig"/>
+                </map>
             </property>
         </bean>
 
