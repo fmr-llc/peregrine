@@ -95,8 +95,8 @@ ExpirationTimeStamp | Header | (Optional) Timestamp indicating when the event sh
 #### Service API ####
 The service implementation will be RESTful and below is the API:
 
-Method | Response | URL | HTTP Method | Description |
------- | -------- | --- | ----------- | ----------- |
+Method | Response | URL |
+------ | -------- | --- |
 SetEvent(event) | Result containing the event id | http://event-service/event/|
 SetEvents(events) | Result containing the event ids of the events that were created | http://event-service/events/|
 GetEvent(eventId) | Event object or null if no event exists | http://event-service/event/{id}|
