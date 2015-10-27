@@ -26,33 +26,26 @@ Changes in state are reflected as a series of new events.
 
 #### Implementation ####
 
-Peregrine is written in Java and targets JDK 8.  The POM is written to create an executable war (a war file that can
-be deployed to a web container such as Tomcat, et 'al or run "container-less" using an embedded Jetty instance.)
-The implementation language (java) and packaging structure (executable war) was chosen to facilitate the widest
-possible accessibility in terms of target platforms and potential project contributor community.
-
-The executable war, in addition to containing an embedded http server (Jetty) also embeds a DerbyDB instance, intended
-for demonstration purposes only.  This packaging supports the ability to "get up and running" with very little effort.
-Copy Peregrine to a local directory, install a messaging broker such as (ActiveMQ) and you're in business.
-
-After you get a feel for how Peregrine can be configured, you can change the persistence store to any number of
-supported databases: Derby (Embedded or Server), MySql/Maria DB, and PostgreSQL.  In addition to offering a variety of
-supported databases, Peregrine also supports any JMS compliance message broker as well as Kafka.
+Peregrine is written in Java (java/JDK 8) to facilitate the widest possible accessibility in terms of target platforms
+and potential project contributor community.
 
 
 #### Executable war ###
 
-A primary goal is to provide a package that is easy to get up and running quickly.  It is for this reason that
-Peregrine is packaged as an Executable war file.  Embedded within the war file when is a Jetty instance as
-well as Embedded Derby Database.  This configuration is good for getting this up and running quick as well as
-for development purposes but it is not a recommended configuration for production use cases.
+A primary goal is to provide a package that is easy to quickly get up and running.  It is for this reason that
+Peregrine is packaged as an Executable war file. The POM is designed to create an executable war (a war file that can
+be deployed to a web container such as Tomcat, et 'al or run "container-less" using an embedded Jetty instance.)
+
+Structurally this means that embedded within the war file is a Jetty instance as well as Embedded Derby Database.
+This configuration is  sufficient for getting this up and running quick as well as for development purposes but it is
+not a recommended configuration for production use cases.
 
 Production use cases should use one of the supported external message brokers and external databases.
 
 Embedded mode can be started as follows:
 
 java -cp -Dlog4j.configuration=/path to log config>/logback.xml
-        -Dpropsroot="<path to configuration files>/" -Dport=8082 -Dcontext="/eventservice"
+        -Dpropsroot="<path to configuration file>/" -Dport=8082 -Dcontext="/eventservice"
         -jar eventservice-<version>.war
 
         where
@@ -60,6 +53,9 @@ java -cp -Dlog4j.configuration=/path to log config>/logback.xml
         * -Dpropsroot points to the directory where you locate the application property files.
         * -Dport is set to the port that you want the embedded version of Jetty to listen on.
         * -Dcontext is set the context root of that you would like the application to run under.
+
+The application's configuration file: event-config.properties should be placed in the location specified in the
+jvm parameter propsroot.  A sample file can be found in the source repository under /resources.
 
 
 
