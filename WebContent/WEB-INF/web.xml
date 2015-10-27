@@ -16,7 +16,7 @@
 
     <servlet-mapping>
       <servlet-name>eventservice</servlet-name>
-      <url-pattern>/eventservice/*</url-pattern>
+      <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
     <listener>
