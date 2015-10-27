@@ -97,12 +97,12 @@ The service implementation will be RESTful and below is the API:
 
 Method | Response | URL | HTTP Method | Description
 ------ | -------- | --- | ----------- | -----------
-SetEvent(event) | Result containing the event id | http://event-service/event/ | POST | Creates a new event
-SetEvents(events) | Result containing the event ids of the events that were created | http://event-service/events/  | POST | Creates new events
-GetEvent(eventId) | Event object or null if no event exists | http://event-service/event/{id} | GET | Gets information about an event |
-GetEvents(eventParameters)*	 | List of events  |  http://event-service/events?[parameters] | GET | Gets a time sequence sorted list of events that exist for the specified parameters
-GetLatestEvent(eventParameters)** | Event object or null if no event exists  | http://event-service/latest-event?[parameters] | GET | Gets the most recent event according to the parameters
-ReplayEvent(eventId) | {NONE} | http://event-service/replay/{id} | POST | Replays the event for the specified id
+SetEvent(event) | Result containing the event id | http://event-service/event/
+SetEvents(events) | Result containing the event ids of the events that were created | http://event-service/events/
+GetEvent(eventId) | Event object or null if no event exists | http://event-service/event/{id}
+GetEvents(eventParameters)*	 | List of events  |  http://event-service/events?[parameters]
+GetLatestEvent(eventParameters)** | Event object or null if no event exists  | http://event-service/latest-event?[parameters]
+ReplayEvent(eventId) | {NONE} | http://event-service/replay/{id}
 
 GetEvents Parameters
 
