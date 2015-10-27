@@ -315,14 +315,17 @@ public class EmbeddedDerbyEventDAOImpl implements EventDAO {
 				payloadPs.executeUpdate();
 			}
 
+			EventResponse er = new EventResponse(event);
+			er.setPersistStatus("OK");
+			er.setPersistStatusMessage("Event persisted successfully.");
 
-			return new EventResponse(event);
+			return er;
 
 		} catch (SQLException e){
 			if (e.getErrorCode()==3000){
 				EventResponse er = new EventResponse();
-				er.setStatus("DUPLICATE_EVENT_ID");
-				er.setStatusMessage("An event with the event id specified already exists. Duplicate event id's are not permitted.");
+				er.setPersistStatus("DUPLICATE_EVENT_ID");
+				er.setPersistStatusMessage("An event with the event id specified already exists. Duplicate event id's are not permitted.");
 			}
 			log.error(e.getMessage() + ": " + e.getErrorCode(), e);
 			throw new DAOException(e);
@@ -592,8 +595,8 @@ public class EmbeddedDerbyEventDAOImpl implements EventDAO {
 
 			if (event==null){
 				es = new EventResponse();
-				es.setStatus("NOT_FOUND");
-				es.setStatusMessage("Event not found with event id: " + eventId);
+				es.setPersistStatus("NOT_FOUND");
+				es.setPersistStatusMessage("Event not found with event id: " + eventId);
 			} else {
 				es = new EventResponse(event);
 			}

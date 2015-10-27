@@ -6,6 +6,8 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
 
+import com.alliancefoundry.publisher.EventServicePublisher;
+import com.alliancefoundry.publisher.PublisherException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -37,7 +39,7 @@ import com.alliancefoundry.dao.DAOFactory;
 public class EventServiceController implements ApplicationContextAware, ServletContextAware, ServletConfigAware {
 	
 	private static final Logger log = LoggerFactory.getLogger(EventServiceController.class);
-	private com.alliancefoundry.dao.DAOFactory daoFactory;
+	private DAOFactory daoFactory;
 	private ApplicationContext ctx;
 
 	public DAOFactory getFactory(){
@@ -46,6 +48,7 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 	public void setDAOFactory(DAOFactory factory){
 		daoFactory = factory;
 	}
+	public EventServicePublisher esp = null;
 
 	@Autowired
 	private ServletContext context;
@@ -70,13 +73,31 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 		try {
 			er = daoFactory.geDAO().insertEvent(evt);
 
+			if (er.getPersistStatus().endsWith("OK")){
+				if (esp.publishEvent(evt)==false){
+					er.setPublishStatus("ERROR");
+					er.setPersistStatusMessage("Event was not published per destination.");
+					return er;
+				}
+				er.setPublishStatus("OK");
+				return er;
+			}
+
 		} catch (DAOException e) {
 
 			log.error(e.getMessage(), e);
 
 			er = new EventResponse();
-			er.setStatus("SYSTEM_ERROR");
-			er.setStatusMessage("request could not be processed: " + e.getCause());
+			er.setPersistStatus("SYSTEM_ERROR");
+			er.setPersistStatusMessage("request could not be processed: " + e.getCause());
+
+		} catch (PublisherException e){
+
+			log.error(e.getMessage(), e);
+
+			er = new EventResponse();
+			er.setPersistStatus("PUBLISH_ERROR");
+			er.setPersistStatusMessage("request could not be processed: " + e.getCause());
 		}
 
 		return er;
@@ -104,8 +125,8 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 			log.error(e.getMessage(), e);
 
 			er = new EventResponse();
-			er.setStatus("SYSTEM_ERROR");
-			er.setStatusMessage("request could not be processed: " + e.getCause());
+			er.setPersistStatus("SYSTEM_ERROR");
+			er.setPersistStatusMessage("request could not be processed: " + e.getCause());
 		}
 
 		return er;
@@ -166,5 +187,13 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 	public void setServletContext(final ServletContext servletContext) {
 		this.context = servletContext;
 
+	}
+
+	public EventServicePublisher getpublisher(){
+		return esp;
+	}
+
+	public void setPublisher(EventServicePublisher esp){
+		this.esp = esp;
 	}
 }
