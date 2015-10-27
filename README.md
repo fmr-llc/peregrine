@@ -97,12 +97,12 @@ The service implementation will be RESTful and below is the API:
 
 Method | Response | URL |
 ------ | -------- | --- |
-SetEvent(event) | Result containing the event id | http://event-service/event/|
-SetEvents(events) | Result containing the event ids of the events that were created | http://event-service/events/|
-GetEvent(eventId) | Event object or null if no event exists | http://event-service/event/{id}|
-GetEvents(eventParameters)*	 | List of events  |  http://event-service/events?[parameters]|
-GetLatestEvent(eventParameters)** | Event object or null if no event exists  | http://event-service/latest-event?[parameters]|
-ReplayEvent(eventId) | {NONE} | http://event-service/replay/{id}|
+SetEvent(event) | Result containing the event id | http://event-service/event/ |
+SetEvents(events) | Result containing the event ids of the events that were created | http://event-service/events/ |
+GetEvent(eventId) | Event object or null if no event exists | http://event-service/event/{id} |
+GetEvents(eventParameters)*	 | List of events  |  http://event-service/events?[parameters] |
+GetLatestEvent(eventParameters)** | Event object or null if no event exists  | http://event-service/latest-event?[parameters] |
+ReplayEvent(eventId) | {NONE} | http://event-service/replay/{id} |
 
 GetEvents Parameters
 
