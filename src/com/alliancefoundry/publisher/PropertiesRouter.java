@@ -81,7 +81,7 @@ public class PropertiesRouter implements RouterConfig {
 
         int delimiterPos = configStr.indexOf("|");
 
-        String destination = configStr.substring(delimiterPos+2);
+        String destination = configStr.substring(delimiterPos+1);
 
         return destination;
     }

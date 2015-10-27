@@ -69,6 +69,8 @@ public class ActiveMQPublisher implements PublisherInterface {
 		MessageProducer producer = null;
 		
 		String topicName = config.getDestination(event.getMessageType());
+
+		log.debug("publishing event to topic/queue with address: " + topicName);
 		
 		// turn java onject to json string
 		ObjectMapper mapper = new ObjectMapper(); 
@@ -99,7 +101,16 @@ public class ActiveMQPublisher implements PublisherInterface {
 		
 		Destination destination = null;
 		try {
-			destination = session.createTopic(topicName);
+
+			if (topicName.startsWith("queue://")){
+				destination = session.createQueue(topicName.substring(8));
+			} else if (topicName.startsWith("topic://")){
+				destination = session.createTopic(topicName.substring(8));
+			} else {
+				log.error("invalid configuration on topic or queue name");
+			}
+
+
 		} catch (JMSException e) {
 			log.error("An internal error occurred, preventing the "
 					+ "session from creating a topic.");
