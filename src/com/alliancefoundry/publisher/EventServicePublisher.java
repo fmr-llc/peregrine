@@ -1,82 +1,89 @@
 package com.alliancefoundry.publisher;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 
 import com.alliancefoundry.model.Event;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EventServicePublisher {
-	
-	public static final String TOPIC_KEY = "topic";
-	public static final String DESTINATION_KEY = "destination";
-	public static final String KAFKA_KEY = "kafka";
-	public static final String ACTIVEMQ_KEY = "activemq";
-	
-	
-	@Autowired
-	List<PublisherInterface> publishers;
 
-	public void publishEvent(Event event, Map<String, String> eventConfig) {
-		
-		String destination = eventConfig.get(DESTINATION_KEY);
-		
-		
-		for( PublisherInterface publisher : publishers){
-			if(destination.equals(publisher.getDestType())){
-				
-				publisher.publishEvent(event, eventConfig);
+	private static final Logger log = LoggerFactory.getLogger(EventServicePublisher.class);
+	private Map<String, PublisherInterface> publishers = new HashMap<>();
+	private Map<String, RouterConfig> router = new HashMap<>();
+	private String activeConfig;
+
+	public boolean publishEvent(Event event) throws PublisherException {
+
+		if (event==null) throw new PublisherException("Request to publish a null event was received.");
+
+		log.debug("router count: " + router.size());
+		log.debug("publisher count: " + publishers.size());
+		log.debug("active configuration bean name being used: " + activeConfig);
+
+
+		log.debug("Event Service Publisher has received an request to publish event: " + event.toString());
+
+		RouterConfig config = router.get(activeConfig);
+
+		if (config==null){
+
+			log.error("Router Config not found.  Configuration error.");
+
+			return false;
+
+		} else {
+
+			log.debug("router configuration being used: " + config.getClass().getCanonicalName());
+
+			String pubStr = config.getPublisher(event.getMessageType());
+
+			log.debug("publisher being used: " + pubStr);
+
+			PublisherInterface publisher = publishers.get(pubStr);
+
+			try {
+				publisher.publishEvent(event, config);
+				return true;
+
+			} catch (PublisherException e) {
+				log.error("publish of events failed. ", e);
+				return false;
 			}
 		}
-		
+
+
+
+
 	}
 	
-	public void publishEvent(List<Event> events, Map<String, String> eventConfig) {
-		
-		String destination = eventConfig.get(DESTINATION_KEY);
-		
-		
-		for( PublisherInterface publisher : publishers){
-			if(destination.equals(publisher.getDestType())){
-				
-				publisher.publishEvent(events, eventConfig);
-			}
-		}
-		
+	public boolean publishEvent(List<Event> events) throws PublisherException {
+			return false;
+
 	}
 	
 	public void connectPublishers(){
-		for( PublisherInterface publisher : publishers){
-			publisher.connect();
-		}
-	}
-	
-	public void setupPublishersViaAppContext(){
-		publishers = new ArrayList<>();
-		
-		KafkaPublisher kafkaPublshisher;
-		ActiveMQPublisher mqPublisher;
-
-
-
-		//kafkaPublshisher = ObjectDispenser.getContext().getBean("kafkaPublisher", KafkaPublisher.class);
-		//mqPublisher = ObjectDispenser.getContext().getBean("activemqPublisher", ActiveMQPublisher.class);
-		
-		//publishers.add(mqPublisher);
-		//publishers.add(kafkaPublshisher);
-
 
 	}
 
-	public List<PublisherInterface> getPublishers() {
+
+	public Map<String, PublisherInterface> getPublishers() {
 		return publishers;
 	}
 
-	public void setPublishers(List<PublisherInterface> publishers) {
+	public void setPublishers(Map<String, PublisherInterface> publishers) {
 		this.publishers = publishers;
 	}
+
+	public Map<String, RouterConfig> getRouterConfig(){ return router; }
+
+	public void setRouterConfig(Map<String, RouterConfig> config){ this.router = config; }
+
+	public String getActiveConfig(){ return activeConfig; }
+
+	public void setActiveConfig(String config) { this.activeConfig = config; }
 	
 }
