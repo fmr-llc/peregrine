@@ -7,10 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by Paul Bernard on 10/26/15.
@@ -87,5 +84,59 @@ public class PropertiesRouter implements RouterConfig {
         String destination = configStr.substring(delimiterPos+2);
 
         return destination;
+    }
+
+    @Override
+    public Map<String, PublisherInterface> getPublishers() {
+        // iterate through appropriate subset of properties
+        // instantiate publishers based upon class name
+        // set publisher properties and add to collection.
+
+        if (init==false){
+            init();
+            init = true;
+        }
+
+        Map<String, PublisherInterface> ret = new HashMap<>();
+
+        Iterator<String> iter = configParams.keySet().iterator();
+
+        // create all the object first to avoid sequencing issues
+        while(iter.hasNext()){
+            String key = iter.next();
+            if ((key.startsWith("broker.")) && (key.endsWith(".name"))){
+                int endPos = key.lastIndexOf(".name");
+                String name = key.substring(7, endPos);
+
+
+                String keyVal = configParams.get("broker." + name + ".name");
+                log.debug("extracted publisher instance named: " + keyVal);
+                String className = configParams.get("broker." + name + ".class");
+                log.debug("extracted publisher class name: " + className);
+                String url = configParams.get("broker." + name + ".url");
+                log.debug("extracted publisher url: " + url);
+
+                try {
+
+                    PublisherInterface obj = (PublisherInterface) Class.forName(className).newInstance();
+                    obj.setBrokerUrl(url);
+                    ret.put(keyVal, obj);
+
+                } catch (ClassNotFoundException e){
+                    log.error("configuration error publisher class not found.", e);
+                } catch (InstantiationException e){
+                    log.error("configuration error publisher cannot be instantiated.", e);
+                } catch (IllegalAccessException e){
+                    log.error("Illegal Access exception publisher cannot be instantiated.", e);
+                } catch (PublisherException e){
+                    log.error("publisher exception initializing.");
+                }
+
+            }
+
+        }
+
+        return ret;
+
     }
 }

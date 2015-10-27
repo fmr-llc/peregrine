@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class EventServicePublisher {
 
 	private static final Logger log = LoggerFactory.getLogger(EventServicePublisher.class);
-	private Map<String, PublisherInterface> publishers = new HashMap<>();
+	private Map<String, PublisherInterface> publishers;
 	private Map<String, RouterConfig> router = new HashMap<>();
 	private String activeConfig;
 
@@ -20,14 +20,18 @@ public class EventServicePublisher {
 
 		if (event==null) throw new PublisherException("Request to publish a null event was received.");
 
+		log.debug("Event Service Publisher has received an request to publish event: " + event.toString());
+
+		RouterConfig config = router.get(activeConfig);
+
+		if (publishers==null){
+			publishers = config.getPublishers();
+		}
+
 		log.debug("router count: " + router.size());
 		log.debug("publisher count: " + publishers.size());
 		log.debug("active configuration bean name being used: " + activeConfig);
 
-
-		log.debug("Event Service Publisher has received an request to publish event: " + event.toString());
-
-		RouterConfig config = router.get(activeConfig);
 
 		if (config==null){
 
