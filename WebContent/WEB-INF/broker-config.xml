@@ -6,26 +6,12 @@
             http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
-        <bean id="kafkapub" class="com.alliancefoundry.publisher.impl.KafkaPublisher">
-            <property name="brokerUrl" value="${kafka.url}" />
-        </bean>
-
-        <bean id="activemqpub" class="com.alliancefoundry.publisher.impl.ActiveMQPublisher">
-            <property name="brokerUrl" value="${activemq.url}" />
-        </bean>
-
         <bean id="propertiesConfig" class="com.alliancefoundry.publisher.PropertiesRouter">
             <property name="location" value="#{systemProperties.propsroot}event-config.properties"/>
         </bean>
 
 
         <bean id="serviceManager" class="com.alliancefoundry.publisher.EventServicePublisher">
-            <property name="publishers" >
-                <map>
-                    <entry key="kafkapub"  value-ref="kafkapub"/>
-                    <entry key="activemqpub" value-ref="activemqpub"/>
-                </map>
-            </property>
             <property name="activeConfig" value="${publisher.configtype}"/>
             <property name="routerConfig">
                 <map>
