@@ -77,7 +77,7 @@ SequenceNumber | Header	(Optional) An Id provided by the event producer that den
 MessageType | Header | A value that identifies the type of message being published.  This field will be used to look up configuration information about how to publish the event |
 DataType | Header | A value describing the type of data that will be stored in the event store (PreEventState and PostEventState) |
 Source | Header | A value indicating the source of the event (this may be pulled from the HTTP header of the caller to the event service) |
-Destination	Header	(Optional) A value indicating a "hint" to the destination for the message.  This field can be used by consumers for filtering. |
+Destination | Header | (Optional) A value indicating a "hint" to the destination for the message.  This field can be used by consumers for filtering. |
 Subdestination | Header | (Optional) A value indicating a "hint" to the sub destination for the message.  This field can be used by consumers for filtering. |
 CustomHeaders | Header | (Optional) A name/value pair collection of headers provided by the publisher to include on the message. |
 CustomPayload | Payload | (Optional) A name/value pair collection of values provided by the publisher to include on the message. |
