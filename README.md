@@ -58,10 +58,37 @@ The application's configuration file: event-config.properties should be placed i
 jvm parameter propsroot.  A sample file can be found in the source repository under /resources.
 
 
+#### Event Model, Persistence and Payload ####
+
+Event data persistence is intended to capture any and all information for consumers to be able to consume
+and process an event.  Event payload will be lightweight and be carried using a MapMessage format wherein both the header
+and payload will contain a collection of Name/Value pairs.  Publishers will be able to contribute custom data on both
+message headers and message payload.  The core message data will be as below:
 
 
-
-
+Attribute | Message Location | Description |
+--------- | ---------------- | ----------- |
+EventId | Header | An Id to uniquely identify the event being published |
+ParentId | Header | (Optional)An Id referencing the parent event of the current event |
+EventName | Header | The name of the event that occurred (Should be a past tense verb, ex:  TradeCreated) |
+ObjectId | Header | The Id that uniquely identifies the object for the event being published
+CorrelationId | Header | (Optional) An Id that can be used to tie events togeter |
+SequenceNumber | Header	(Optional) An Id provided by the event producer that denotes the sequence number for the event |
+MessageType | Header | A value that identifies the type of message being published.  This field will be used to look up configuration information about how to publish the event |
+DataType | Header | A value describing the type of data that will be stored in the event store (PreEventState and PostEventState) |
+Source | Header | A value indicating the source of the event (this may be pulled from the HTTP header of the caller to the event service) |
+Destination	Header	(Optional) A value indicating a "hint" to the destination for the message.  This field can be used by consumers for filtering. |
+Subdestination | Header | (Optional) A value indicating a "hint" to the sub destination for the message.  This field can be used by consumers for filtering. |
+CustomHeaders | Header | (Optional) A name/value pair collection of headers provided by the publisher to include on the message. |
+CustomPayload | Payload | (Optional) A name/value pair collection of values provided by the publisher to include on the message. |
+PreEventState | N/A | (Optional) A serialized representation of the object before the event was published.  This data will only be persisted in the database and will not be put on the message. |
+PostEventState | N/A | (Optional) A serialized representation of the object after the event was published.  This data will only be persisted in the database and will not be put on the message. |
+IsPublishable | N/A | A flag indicating whether the event can be published |
+ReplayIndicator | Header | A flag indicating whether an event is being replayed |
+PublishTimeStamp | Header | Timestamp provided by the event publisher.  This field will be used for ordering events. |
+ReceivedTimeStamp | Header | Timestamp indicating when the event was received by the event service |
+InsertTimeStamp | N/A | Timestamp indicating when the event was written to the database |
+ExpirationTimeStamp | Header | (Optional) Timestamp indicating when the event should expire |
 
 
 
