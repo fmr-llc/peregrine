@@ -19,6 +19,8 @@ public class EventResponse {
     private Event evt;
     private String status;
     private String statusMessage;
+    private String publishStatus;
+    private String publishStatusMessage;
 
     public EventResponse(){
 
@@ -36,19 +38,35 @@ public class EventResponse {
         this.evt = evt;
     }
 
-    public String getStatus(){
+    public String getPersistStatus(){
         return status;
     }
 
-    public void setStatus(String status){
+    public void setPersistStatus(String status){
         this.status = status;
     }
 
-    public String getStatusMessage(){
+    public String getPersistStatusMessage(){
         return statusMessage;
     }
 
-    public void setStatusMessage(String msg){
+    public void setPersistStatusMessage(String msg){
         statusMessage = msg;
+    }
+
+    public String getPublishStatus(){
+        return publishStatus;
+    }
+
+    public void setPublishStatus(String status){
+        this.publishStatus = status;
+    }
+
+    public String getPublishStatusMessage(){
+        return publishStatusMessage;
+    }
+
+    public void setPublishStatusMessage(String msg){
+        publishStatusMessage = msg;
     }
 }
