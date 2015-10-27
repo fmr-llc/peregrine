@@ -73,7 +73,7 @@ ParentId | Header | (Optional)An Id referencing the parent event of the current 
 EventName | Header | The name of the event that occurred (Should be a past tense verb, ex:  TradeCreated) |
 ObjectId | Header | The Id that uniquely identifies the object for the event being published
 CorrelationId | Header | (Optional) An Id that can be used to tie events togeter |
-SequenceNumber | Header	(Optional) An Id provided by the event producer that denotes the sequence number for the event |
+SequenceNumber | Header | (Optional) An Id provided by the event producer that denotes the sequence number for the event |
 MessageType | Header | A value that identifies the type of message being published.  This field will be used to look up configuration information about how to publish the event |
 DataType | Header | A value describing the type of data that will be stored in the event store (PreEventState and PostEventState) |
 Source | Header | A value indicating the source of the event (this may be pulled from the HTTP header of the caller to the event service) |
