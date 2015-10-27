@@ -14,23 +14,19 @@ public class Boot {
 
         final int port = Integer.parseInt(System.getProperty("port", "8080"));
         final String home = System.getProperty("home","");
+        final String contextPath = System.getProperty("context","/");
         Server server = new Server(port);
         ProtectionDomain domain = Boot.class.getProtectionDomain();
         URL location = domain.getCodeSource().getLocation();
         WebAppContext webapp = new WebAppContext();
-        //webapp.setInitParameter("contextConfigLocation", "classpath*:WEB-INF/eventservice-servlet.xml");
-        webapp.setContextPath("/");
 
-        //ServletContextHandler contextHandler = new ServletContextHandler();
-        //contextHandler.setErrorHandler(null);
-        //contextHandler.setContextPath("/");
+        webapp.setContextPath(contextPath);
 
         if (home.length() != 0) {
             webapp.setTempDirectory(new File(home));
         }
         webapp.setWar(location.toExternalForm());
         server.setHandler(webapp);
-        //server.setHandler(contextHandler);
         server.start();
         server.join();
 
