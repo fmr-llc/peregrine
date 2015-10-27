@@ -40,5 +40,32 @@ supported databases: Derby (Embedded or Server), MySql/Maria DB, and PostgreSQL.
 supported databases, Peregrine also supports any JMS compliance message broker as well as Kafka.
 
 
+#### Executable war ###
+
+A primary goal is to provide a package that is easy to get up and running quickly.  It is for this reason that
+Peregrine is packaged as an Executable war file.  Embedded within the war file when is a Jetty instance as
+well as Embedded Derby Database.  This configuration is good for getting this up and running quick as well as
+for development purposes but it is not a recommended configuration for production use cases.
+
+Production use cases should use one of the supported external message brokers and external databases.
+
+Embedded mode can be started as follows:
+
+java -cp -Dlog4j.configuration=/path to log config>/logback.xml
+        -Dpropsroot="<path to configuration files>/" -Dport=8082 -Dcontext="/eventservice"
+        -jar eventservice-<version>.war
+
+        where
+        * -Dlog4j.configuration points to your logback.xml configuration file.
+        * -Dpropsroot points to the directory where you locate the application property files.
+        * -Dport is set to the port that you want the embedded version of Jetty to listen on.
+        * -Dcontext is set the context root of that you would like the application to run under.
+
+
+
+
+
+
+
 
 
