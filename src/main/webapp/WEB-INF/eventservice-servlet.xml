@@ -21,8 +21,8 @@
     </bean>
 
 
-    <import resource="classpath:/WEB-INF/broker-config.xml" />
-    <import resource="classpath:/WEB-INF/db-config.xml" />
+    <import resource="broker-config.xml" />
+    <import resource="db-config.xml" />
 
 
     <bean id="controller" class="com.alliancefoundry.controller.EventServiceController">
