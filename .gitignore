@@ -1,3 +1,10 @@
+# Other Peregrine Content
+
+# Embedded DB content
+derby.log
+/event/
+
+## Below was auto-generated
 # Created by https://www.gitignore.io/api/intellij,java,maven,eclipse
 
 ### Intellij ###
