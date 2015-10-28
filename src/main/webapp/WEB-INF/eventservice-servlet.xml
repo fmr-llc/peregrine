@@ -14,7 +14,7 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>file://#{systemProperties.propsroot}event-config.properties</value>
+                <value>file:/#{systemProperties.propsroot}event-config.properties</value>
             </list>
         </property>
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
