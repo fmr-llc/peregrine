@@ -7,8 +7,8 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.joda.time.DateTime;
 
-import com.alliancefoundry.serializer.CustomJsonDateDeserializer;
-import com.alliancefoundry.serializer.MyDateTimeSerializer;
+import com.alliancefoundry.serializer.CustomJsonDateTimeDeserializer;
+import com.alliancefoundry.serializer.CustomJsonDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -38,14 +38,14 @@ public class Event {
     private String destination;
     private String subdestination;
     private Boolean replayIndicator;
-    @JsonSerialize(using = MyDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    @JsonSerialize(using = CustomJsonDateTimeSerializer.class)
+    @JsonDeserialize(using = CustomJsonDateTimeDeserializer.class)
     private DateTime publishTimeStamp;
-    @JsonSerialize(using = MyDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    @JsonSerialize(using = CustomJsonDateTimeSerializer.class)
+    @JsonDeserialize(using = CustomJsonDateTimeDeserializer.class)
     private DateTime receivedTimeStamp;
-    @JsonSerialize(using = MyDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    @JsonSerialize(using = CustomJsonDateTimeSerializer.class)
+    @JsonDeserialize(using = CustomJsonDateTimeDeserializer.class)
     private DateTime expirationTimeStamp;
 
     // other
@@ -54,8 +54,8 @@ public class Event {
     private String preEventState;
     private String postEventState;
     private Boolean isPublishable;
-    @JsonSerialize(using = MyDateTimeSerializer.class)
-    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    @JsonSerialize(using = CustomJsonDateTimeSerializer.class)
+    @JsonDeserialize(using = CustomJsonDateTimeDeserializer.class)
     private DateTime insertTimeStamp;
 
     public Event(){
