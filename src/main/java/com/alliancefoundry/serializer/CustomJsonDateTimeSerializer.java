@@ -11,11 +11,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
-public class MyDateTimeSerializer extends JsonSerializer<DateTime> {
+/**
+ * Serializer used to handle a particular Joda {@link DateTime} format. This class is intended to be
+ * used by the event service internal code. 
+ * 
+ * @author Paul Bernard
+ * @author Peter Mularien
+ */
+public class CustomJsonDateTimeSerializer extends JsonSerializer<DateTime> {
 
     private static DateTimeFormatter formatter = 
-            DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-
+            DateTimeFormat.forPattern(SerializerConstants.EVENT_SERVICE_DATE_TIME_FORMAT);
 	
 	public void serialize(DateTime value, JsonGenerator gen, SerializerProvider arg2) throws IOException, JsonProcessingException {
 	    gen.writeString(formatter.print(value));
