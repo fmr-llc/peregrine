@@ -13,7 +13,7 @@ public class EventServicePublisher {
 
 	private static final Logger log = LoggerFactory.getLogger(EventServicePublisher.class);
 	private Map<String, PublisherInterface> publishers;
-	private Map<String, RouterConfig> router = new HashMap<>();
+	private Map<String, RouterConfig> router = new HashMap<String, RouterConfig>();
 	private String activeConfig;
 
 	public boolean publishEvent(Event event) throws PublisherException {

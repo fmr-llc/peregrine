@@ -63,8 +63,8 @@ public class Event {
 		eventId = uuid.toString();
     	
     	receivedTimeStamp = DateTime.now();
-    	customHeaders = new HashMap<>();
-    	customPayload = new HashMap<>();
+    	customHeaders = new HashMap<String, String>();
+    	customPayload = new HashMap<String, DataItem>();
     	insertTimeStamp = DateTime.now();
     }
 	
