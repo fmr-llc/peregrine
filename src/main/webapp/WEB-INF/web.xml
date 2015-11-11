@@ -5,7 +5,7 @@
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>/WEB-INF/eventservice-servlet.xml</param-value>
+        <param-value>eventservice-servlet.xml</param-value>
     </context-param>
 
     <servlet>
