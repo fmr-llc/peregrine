@@ -1,4 +1,4 @@
-<configuration debug="true" scan="true" scanPeriod="30 seconds">
+<configuration debug="false" scan="true" scanPeriod="30 seconds">
 
   <contextName>Event Service</contextName>
   <jmxConfigurator/>
@@ -8,6 +8,12 @@
       <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n</pattern>
     </encoder>
   </appender>
+
+  <logger name="org.springframework" level="error"/>
+  <logger name="org.springframework.boot.autoconfigure" level="error"/>
+  <logger name="org.springframework.boot" level="error"/>
+  <logger name="org.springframework.web" level="error"/>
+  <logger name="com.zaxxer.hikari.pool" level="error"/>
 
   <root level="debug">
     <appender-ref ref="STDOUT" />

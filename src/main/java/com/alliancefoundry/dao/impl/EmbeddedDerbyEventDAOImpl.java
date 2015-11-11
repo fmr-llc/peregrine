@@ -467,7 +467,7 @@ public class EmbeddedDerbyEventDAOImpl implements EventDAO {
 
 
 			EventsResponse es = new EventsResponse();
-			List<EventResponse> ler = new ArrayList<>();
+			List<EventResponse> ler = new ArrayList<EventResponse>();
 
 			for (int i=0; i<eventCount; i++){
 				ler.add(new EventResponse(events.get(i)));
@@ -560,7 +560,7 @@ public class EmbeddedDerbyEventDAOImpl implements EventDAO {
 				psHeaders.setString(1, eventId);
 
 				ResultSet rsHeaders = psHeaders.executeQuery();
-				Map<String,String> customHeaders = new HashMap<>();
+				Map<String,String> customHeaders = new HashMap<String,String>();
 
 				//get header info from its table
 				while(rsHeaders.next()){
@@ -576,7 +576,7 @@ public class EmbeddedDerbyEventDAOImpl implements EventDAO {
 				psPayload.setString(1, eventId);
 
 				ResultSet rsPayload = psPayload.executeQuery();
-				Map<String,DataItem> customPayload = new HashMap<>();
+				Map<String,DataItem> customPayload = new HashMap<String,DataItem>();
 
 				//get payload info from its table
 				while(rsPayload.next()){
@@ -664,7 +664,7 @@ public class EmbeddedDerbyEventDAOImpl implements EventDAO {
 
 
 		EventsResponse er = new EventsResponse();
-		List<EventResponse> ler = new ArrayList<>();
+		List<EventResponse> ler = new ArrayList<EventResponse>();
 
 		try {
 
@@ -715,7 +715,7 @@ public class EmbeddedDerbyEventDAOImpl implements EventDAO {
 			PreparedStatement psHeaders = conn.prepareStatement(headerSql);
 
 			ResultSet rsHeaders = psHeaders.executeQuery();
-			Map<String,String> customHeaders = new HashMap<>();
+			Map<String,String> customHeaders = new HashMap<String,String>();
 
 			//get header info from its table
 			while(rsHeaders.next()){

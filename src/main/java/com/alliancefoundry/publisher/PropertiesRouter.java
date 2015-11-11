@@ -17,7 +17,7 @@ public class PropertiesRouter implements RouterConfig {
     private static final Logger log = LoggerFactory.getLogger(PropertiesRouter.class);
     private String propertiesFile;
     private boolean init = false;
-    private Map<String, String> configParams = new HashMap<>();
+    private Map<String, String> configParams = new HashMap<String, String>();
 
     private void init(){
 
@@ -97,7 +97,7 @@ public class PropertiesRouter implements RouterConfig {
             init = true;
         }
 
-        Map<String, PublisherInterface> ret = new HashMap<>();
+        Map<String, PublisherInterface> ret = new HashMap<String, PublisherInterface>();
 
         Iterator<String> iter = configParams.keySet().iterator();
 

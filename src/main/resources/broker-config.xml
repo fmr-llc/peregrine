@@ -7,7 +7,7 @@
 
 
         <bean id="propertiesConfig" class="com.alliancefoundry.publisher.PropertiesRouter">
-            <property name="location" value="#{systemProperties.propsroot}event-config.properties"/>
+            <property name="location" value="/#{systemProperties.propsroot}event-config.properties"/>
         </bean>
 
 

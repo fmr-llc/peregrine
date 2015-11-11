@@ -4,14 +4,17 @@ import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
-import javax.ws.rs.Consumes;
 
 import com.alliancefoundry.publisher.EventServicePublisher;
 import com.alliancefoundry.publisher.PublisherException;
+import io.swagger.annotations.Api;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,24 +39,34 @@ import com.alliancefoundry.dao.DAOFactory;
  *
  */
 @RestController
+@RequestMapping(value="/eventservice")
+@Api(value="/eventservice", description="Endpoint for interacting with an event store and the publishing of events.")
 public class EventServiceController implements ApplicationContextAware, ServletContextAware, ServletConfigAware {
 	
 	private static final Logger log = LoggerFactory.getLogger(EventServiceController.class);
+	@Autowired
 	private DAOFactory daoFactory;
 	private ApplicationContext ctx;
 
 	public DAOFactory getFactory(){
 		return daoFactory;
 	}
+
 	public void setDAOFactory(DAOFactory factory){
 		daoFactory = factory;
 	}
+	@Autowired
 	public EventServicePublisher esp = null;
 
 	@Autowired
 	private ServletContext context;
 	@Autowired
 	private ServletConfig config;
+
+
+
+	public EventServiceController(){}
+
 
 
 	/**
@@ -63,7 +76,6 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 	 * @return an EventResponse containing the status of the request
 	 */
 	@RequestMapping(value="/event", method = RequestMethod.POST)
-	@Consumes("application/json")
 	public EventResponse setEvent(@RequestBody Event evt){
 
 		log.debug("Attempting to persist an event with id: " + evt.toString());
