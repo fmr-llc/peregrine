@@ -68,7 +68,7 @@ public class MySQLEventDAOImpl implements EventDAO {
 			//set the value of each column for the row being inserted other
 			//than eventId
 			ps.setString(1, eventId);
-			ps.setString(2, event.getParentId());
+			ps.setString(2, event.getParentEventId());
 			ps.setString(3, event.getEventName());
 			ps.setString(4, event.getObjectId());
 			ps.setString(5, event.getCorrelationId());
@@ -141,7 +141,7 @@ public class MySQLEventDAOImpl implements EventDAO {
 				payloadPs.setString(1, eventId);
 				payloadPs.setString(2, key);
 				payloadPs.setString(3, event.getCustomPayload().get(key).getValue());
-				payloadPs.setString(4, event.getCustomPayload().get(key).getDataType());
+				payloadPs.setString(4, event.getCustomPayload().get(key).getDataType().name());
 				payloadPs.executeUpdate();
 			}
 
@@ -246,7 +246,21 @@ public class MySQLEventDAOImpl implements EventDAO {
 				String payName = rsPayload.getString("name");
 				String payType = rsPayload.getString("dataType");
 				String payVal = rsPayload.getString("value");
-				customPayload.put(payName, new DataItem(payType,payVal));
+
+				PrimitiveDatatype v = null;
+				if (payType.equalsIgnoreCase("boolean")) { v = PrimitiveDatatype.Boolean; }
+				if (payType.equalsIgnoreCase("byte")) { v = PrimitiveDatatype.Byte; }
+				if (payType.equalsIgnoreCase("double")) { v = PrimitiveDatatype.Double; }
+				if (payType.equalsIgnoreCase("float")) { v = PrimitiveDatatype.Float; }
+				if (payType.equalsIgnoreCase("integer")) { v = PrimitiveDatatype.Integer; }
+				if (payType.equalsIgnoreCase("long")) { v = PrimitiveDatatype.Long; }
+				if (payType.equalsIgnoreCase("short")) { v = PrimitiveDatatype.Short; }
+				if (payType.equalsIgnoreCase("string")) { v = PrimitiveDatatype.String; }
+				if (v==null) { v = PrimitiveDatatype.String; }
+
+
+
+				customPayload.put(payName, new DataItem(v,payVal));
 			}
 			
 			event.setCustomHeaders(customHeaders);

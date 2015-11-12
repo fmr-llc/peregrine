@@ -5,16 +5,15 @@ import java.util.List;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
+import com.alliancefoundry.model.EventRequest;
 import com.alliancefoundry.publisher.EventServicePublisher;
 import com.alliancefoundry.publisher.PublisherException;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,11 +32,7 @@ import com.alliancefoundry.model.Event;
 import com.alliancefoundry.dao.DAOFactory;
 
 
-/**
- * Created by: Paul Bernard
- * 
- *
- */
+
 @RestController
 @RequestMapping(value="/eventservice")
 @Api(value="/eventservice", description="Endpoint for interacting with an event store and the publishing of events.")
@@ -72,21 +67,22 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 	/**
 	 * Creates a new event for storage and publication.
 	 * 
-	 * @param evt the event to be persistent and or published.
+	 * @param request the request containing an event to be persistent and or published.
 	 * @return an EventResponse containing the status of the request
 	 */
 	@RequestMapping(value="/event", method = RequestMethod.POST)
-	public EventResponse setEvent(@RequestBody Event evt){
+	@ApiModelProperty(value="Submits an event to the Event Service")
+	public EventResponse setEvent(@RequestBody EventRequest request){
 
-		log.debug("Attempting to persist an event with id: " + evt.toString());
+		log.debug("Attempting to persist an event with id: " + request.toString());
 
 		EventResponse er;
 
 		try {
-			er = daoFactory.geDAO().insertEvent(evt);
+			er = daoFactory.geDAO().insertEvent(request.getEvent());
 
 			if (er.getPersistStatus().endsWith("OK")){
-				if (esp.publishEvent(evt)==false){
+				if (esp.publishEvent(request.getEvent())==false){
 					er.setPublishStatus("ERROR");
 					er.setPersistStatusMessage("Event was not published per destination.");
 					return er;
