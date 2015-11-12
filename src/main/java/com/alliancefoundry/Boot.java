@@ -1,6 +1,8 @@
 package com.alliancefoundry;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import com.fasterxml.classmate.TypeResolver;
@@ -64,6 +66,9 @@ public class Boot {
                                 "Alliance Foundry",
                                 "Apache 2.0",
                                 "http://www.apache.org/licenses/LICENSE-2.0.html"))
+                .consumes(new HashSet<String>(Arrays.asList("application/json")))
+                .produces(new HashSet<String>(Arrays.asList("application/json")))
+                .protocols(new HashSet<String>(Arrays.asList("http")))
                 .directModelSubstitute(LocalDate.class, String.class).genericModelSubstitutes(ResponseEntity.class)
                 .alternateTypeRules(newRule(typeResolver.resolve(DeferredResult.class, typeResolver.resolve(ResponseEntity.class, WildcardType.class)), typeResolver.resolve(WildcardType.class)))
                 .useDefaultResponseMessages(false)
