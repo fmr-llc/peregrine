@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.http.ResponseEntity;
@@ -46,10 +48,13 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
         org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class,
         org.springframework.boot.actuate.autoconfigure.ManagementSecurityAutoConfiguration.class,
         com.alliancefoundry.controller.EventServiceController.class})
-@ImportResource({"classpath*:eventservice-servlet.xml",
-                "classpath*:broker-config.xml",
-                "classpath*:db-config.xml"})
-public class Boot {
+@ImportResource({"classpath*:eventservice-servlet.xml"})
+public class Boot extends SpringBootServletInitializer {
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(Boot.class);
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(Boot.class, args);
