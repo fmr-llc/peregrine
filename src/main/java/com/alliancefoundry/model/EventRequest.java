@@ -9,11 +9,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModel;
 
-/**
- * Created by Paul Bernard on 11/11/15.
- */
+import javax.xml.bind.annotation.XmlRootElement;
 
-
+@XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)

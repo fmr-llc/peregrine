@@ -6,9 +6,9 @@ import com.alliancefoundry.model.Event;
 
 public interface PublisherInterface {
 	
-	void connect() throws PublisherException;
-	void publishEvent(Event event, RouterConfig config) throws PublisherException;
-	void publishEvent(List<Event> events, RouterConfig config) throws PublisherException;
+	void init() throws PublisherException;
+	boolean publishEvent(Event event, RouterConfig config) throws PublisherException;
+	boolean publishEvents(List<Event> events, RouterConfig config) throws PublisherException;
 	void setBrokerUrl(String url) throws PublisherException;
 
 }
