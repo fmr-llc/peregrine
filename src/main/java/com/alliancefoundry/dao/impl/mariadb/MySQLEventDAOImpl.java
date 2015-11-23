@@ -1,4 +1,4 @@
-package com.alliancefoundry.dao.impl;
+package com.alliancefoundry.dao.impl.mariadb;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -283,6 +283,31 @@ public class MySQLEventDAOImpl implements EventDAO {
 	@Override
 	public EventsResponse getEvents(List<String> req) throws DAOException {
 
+		return null;
+	}
+
+	@Override
+	public EventsResponse queryEvents(String source, String generations, String name, String objectId, String correlationId, String createdAfter, String createdBefore, String timestamp) throws DAOException {
+		return null;
+	}
+
+	@Override
+	public EventsResponse getEventSources() throws DAOException {
+		return null;
+	}
+
+	@Override
+	public EventsResponse getEventNames(String source) throws DAOException {
+		return null;
+	}
+
+	@Override
+	public EventResponse getLatestEvent(String source, String name, String objectId, String correlationId) throws DAOException {
+		return null;
+	}
+
+	@Override
+	public EventResponse replayEvent(EventRequest request) throws DAOException {
 		return null;
 	}
 }

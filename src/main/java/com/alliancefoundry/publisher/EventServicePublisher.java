@@ -24,22 +24,14 @@ public class EventServicePublisher {
 
 		RouterConfig config = router.get(activeConfig);
 
-		if (publishers==null){
+		if (config!=null){
+
 			publishers = config.getPublishers();
-		}
 
-		log.debug("router count: " + router.size());
-		log.debug("publisher count: " + publishers.size());
-		log.debug("active configuration bean name being used: " + activeConfig);
+			log.debug("router count: " + router.size());
+			log.debug("publisher count: " + publishers.size());
+			log.debug("active configuration bean name being used: " + activeConfig);
 
-
-		if (config==null){
-
-			log.error("Router Config not found.  Configuration error.");
-
-			return false;
-
-		} else {
 
 			log.debug("router configuration being used: " + config.getClass().getCanonicalName());
 
@@ -54,25 +46,27 @@ public class EventServicePublisher {
 				return true;
 
 			} catch (PublisherException e) {
-				log.error("publish of events failed. ", e);
+				log.error("publish of event failed. ", e);
 				return false;
 			}
+
+
+		} else {
+
+			log.error("Router Config not found.  Configuration error.");
+
+			return false;
 		}
-
-
 
 
 	}
 	
-	public boolean publishEvent(List<Event> events) throws PublisherException {
+	public boolean publishEvents(List<Event> events) throws PublisherException {
 			return false;
 
 	}
 	
-	public void connectPublishers(){
-
-	}
-
+	public void connectPublishers(){ }
 
 	public Map<String, PublisherInterface> getPublishers() {
 		return publishers;

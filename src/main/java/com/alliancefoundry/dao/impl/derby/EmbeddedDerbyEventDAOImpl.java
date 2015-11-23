@@ -1,22 +1,25 @@
-package com.alliancefoundry.dao.impl;
+package com.alliancefoundry.dao.impl.derby;
 
 import com.alliancefoundry.dao.DAOException;
 import com.alliancefoundry.dao.EventDAO;
 import com.alliancefoundry.model.*;
 import org.joda.time.DateTime;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectJoinStep;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class EmbeddedDerbyEventDAOImpl implements EventDAO {
+import static org.jooq.impl.DSL.*;
 
-	private boolean schemaInit = false;
+public class EmbeddedDerbyEventDAOImpl extends SchemaInit implements EventDAO {
+
 	private DataSource dataSource;
 	private static final Logger log = LoggerFactory.getLogger(EmbeddedDerbyEventDAOImpl.class);
 
@@ -39,7 +42,9 @@ public class EmbeddedDerbyEventDAOImpl implements EventDAO {
 		} finally{
 			if (conn != null) {
 				try {
-					conn.close();
+					if (conn!=null){
+						conn.close();
+					}
 				} catch (SQLException e) {
 					log.error("attempted to close connection. " + e.getMessage());
 				}
@@ -61,158 +66,7 @@ public class EmbeddedDerbyEventDAOImpl implements EventDAO {
 	}
 
 
-	private boolean schemaExists(Connection conn){
 
-		String sql = "SELECT * FROM SYS.SYSSCHEMAS";
-		try{
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
-			while(rs.next()){
-				log.debug("schema found with name: " + rs.getString(2));
-				if (rs.getString(1).equalsIgnoreCase("event")) return true;
-			}
-
-			log.debug("no schemas found with correct name.");
-			return false;
-
-		} catch (SQLException e){
-			log.debug("could not determine if schema exists.");
-			return false;
-		}
-
-	}
-
-
-	private boolean createSchema(Connection conn){
-
-		String sql = "CREATE SCHEMA event";
-
-		try {
-			// create table
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.execute();
-
-			schemaInit = true;
-			return true;
-
-		} catch (SQLException e){
-			log.debug("schema already exists. ");
-			return true;
-		}
-
-	}
-
-	private boolean createTables(Connection conn){
-
-		String tableSql1 = "CREATE TABLE event.event_store (\n" +
-				"  eventId varchar(45) NOT NULL,\n" +
-				"  parentId varchar(45) DEFAULT NULL,\n" +
-				"  eventName varchar(45) DEFAULT NULL,\n" +
-				"  objectId varchar(45) NOT NULL,\n" +
-				"  correlationId varchar(45) DEFAULT NULL,\n" +
-				"  sequenceNumber int DEFAULT NULL,\n" +
-				"  messageType varchar(45) NOT NULL,\n" +
-				"  dataType varchar(45) DEFAULT NULL,\n" +
-				"  source varchar(45) DEFAULT NULL,\n" +
-				"  destination varchar(45) DEFAULT NULL,\n" +
-				"  subdestination varchar(45) DEFAULT NULL,\n" +
-				"  replayIndicator boolean NOT NULL,\n" +
-				"  publishTimestamp bigint,\n" +
-				"  receivedTimestamp bigint,\n" +
-				"  expirationTimestamp bigint,\n" +
-				"  preEventState clob DEFAULT NULL,\n" +
-				"  postEventState clob DEFAULT NULL,\n" +
-				"  isPublishable boolean NOT NULL,\n" +
-				"  insertTimeStamp bigint NOT NULL,\n" +
-				"  PRIMARY KEY (eventId)\n" +
-				")";
-
-
-				String tableSql2 = "CREATE TABLE event.event_headers (\n" +
-				"  eventId varchar(45) NOT NULL,\n" +
-				"  name varchar(45) NOT NULL,\n" +
-				"  value varchar(45) NOT NULL,\n" +
-				"  PRIMARY KEY (eventId,name)\n" +
-				//"  CONSTRAINT headersEventId FOREIGN KEY (eventId) REFERENCES event_store (eventId) ON DELETE CASCADE\n" +
-				")";
-
-
-				String tableSql3 = "CREATE TABLE event.event_payload (\n" +
-				"  eventId varchar(45) NOT NULL,\n" +
-				"  name varchar(45) NOT NULL,\n" +
-				"  value varchar(45) NOT NULL,\n" +
-				"  dataType varchar(45) DEFAULT NULL,\n" +
-				"  PRIMARY KEY (eventId,name)\n" +
-				//"  CONSTRAINT payloadEventId FOREIGN KEY (eventId) REFERENCES event_store (eventId) ON DELETE CASCADE\n" +
-				")";
-
-				String tableSql4 = "CREATE TABLE event.publication_audit (\n" +
-				"  eventId varchar(45) NOT NULL,\n" +
-				"  captureTimestamp bigint NOT NULL,\n" +
-				"  persistTimestamp bigint NOT NULL,\n" +
-				"  publishCount int DEFAULT 0,\n" +
-				"  PRIMARY KEY (eventId)\n" +
-				//"  CONSTRAINT auditEventId FOREIGN KEY (eventId) REFERENCES event_store (eventId) ON DELETE CASCADE\n" +
-				")";
-
-				String tableSql5 = "CREATE TABLE event.publish_timestamp (\n" +
-				"  eventId varchar(45) NOT NULL,\n" +
-				"  publishTimestamp bigint NOT NULL,\n" +
-				"  publishId int DEFAULT 1,\n" +
-				"  PRIMARY KEY (eventId,publishId)\n" +
-				//"  CONSTRAINT publishEventId FOREIGN KEY (eventId) REFERENCES event_store (eventId) ON DELETE CASCADE\n" +
-				")";
-
-		try {
-			PreparedStatement ps2 = conn.prepareStatement(tableSql1);
-			ps2.execute();
-		} catch (SQLException e){
-			log.warn("table already exists");
-		}
-
-		try {
-			PreparedStatement ps2 = conn.prepareStatement(tableSql2);
-			ps2.execute();
-		} catch (SQLException e){
-			log.warn("table already exists");
-		}
-
-		try {
-			PreparedStatement ps2 = conn.prepareStatement(tableSql3);
-			ps2.execute();
-		} catch (SQLException e){
-			log.warn("table already exists");
-		}
-
-		try {
-			PreparedStatement ps2 = conn.prepareStatement(tableSql4);
-			ps2.execute();
-		} catch (SQLException e){
-			log.warn("table already exists");
-		}
-
-		try {
-			PreparedStatement ps2 = conn.prepareStatement(tableSql5);
-			ps2.execute();
-		} catch (SQLException e){
-			log.warn("table already exists");
-		}
-
-
-
-		return true;
-
-	}
-
-	private void validateDB(Connection conn){
-		if (schemaInit==false){
-			if (schemaExists(conn)==false){
-				createSchema(conn);
-				createTables(conn);
-			}
-		}
-
-	}
 
 
 
@@ -636,132 +490,65 @@ public class EmbeddedDerbyEventDAOImpl implements EventDAO {
 	public EventsResponse getEvents(List<String> req) throws DAOException {
 
 		log.debug("Derby DAO attempting to retrieve events");
-		Connection conn = null;
-
-		String sql = "SELECT * FROM event.event_store WHERE eventId IN (";
-		int listLen = req.size();
-		for (int i=0; i<listLen; i++){
-			sql = sql + req.get(i);
-			if (i!=listLen) {
-				sql = sql + ",";
-			}
-		}
-		sql = sql + ")";
-
-
-
-		String headerSql = "SELECT * FROM event.event_store WHERE eventId IN (";
-		for (int i=0; i<listLen; i++){
-			headerSql = headerSql + req.get(i);
-			if (i!=listLen) {
-				headerSql = headerSql + ",";
-			}
-		}
-		headerSql = headerSql + ")";
-
-
-		String payloadSql = "SELECT * FROM event.event_store WHERE eventId IN (";
-		for (int i=0; i<listLen; i++){
-			payloadSql = payloadSql + req.get(i);
-			if (i!=listLen) {
-				payloadSql = payloadSql + ",";
-			}
-		}
-		payloadSql = payloadSql + ")";
-
-
-
-
-
-
-
 
 		EventsResponse er = new EventsResponse();
-		List<EventResponse> ler = new ArrayList<EventResponse>();
+
+		List<Event> loe = fetchEvents(req);
+
+		if (loe!=null){
+			Iterator<Event> el = loe.iterator();
+			List<EventResponse> ers = new ArrayList<EventResponse>();
+			while(el.hasNext()){
+				Event evt = el.next();
+				EventResponse etr = new EventResponse();
+				etr.setEvent(evt);
+				ers.add(etr);
+			}
+
+			er.setEvents(ers);
+
+			return er;
+		} else {
+			er = new EventsResponse();
+			er.setStatus("NOT_FOUND");
+			er.setStatusMessage("Event with id/id's specified were not found: " + req.toString());
+			return er;
+		}
+
+	}
+
+	@Override
+	public EventsResponse queryEvents(String source, String generations, String name, String objectId, String correlationId, String createdAfter, String createdBefore, String timestamp) throws DAOException {
+		throw new DAOException("feature not implmented");
+	}
+
+	@Override
+	public EventsResponse getEventSources() throws DAOException {
+
+		DSLContext create = DSL.using(SQLDialect.DERBY);
+		String sql= create.selectDistinct(field("source"))
+				.from(table("event.event_store"))
+				.getSQL();
+
+		Connection conn = null;
+		EventsResponse er = new EventsResponse();
+		List<String> sources = new ArrayList<String>();
 
 		try {
-
 			conn = dataSource.getConnection();
+			log.debug("making request to database with sql: " + sql);
 			PreparedStatement ps = conn.prepareStatement(sql);
+
 			ResultSet rs = ps.executeQuery();
 
-
 			while(rs.next()){
-
-				DateTime publish = new DateTime(rs.getLong("publishTimeStamp"));
-				if (rs.wasNull()) publish = null;
-				DateTime expiration = new DateTime(rs.getLong("expirationTimeStamp"));
-				if (rs.wasNull()) expiration = null;
-
-				Event event = new Event(
-						rs.getString("parentId"),
-						rs.getString("eventName"),
-						rs.getString("objectId"),
-						rs.getString("correlationId"),
-						rs.getInt("sequenceNumber"),
-						rs.getString("messageType"),
-						rs.getString("dataType"),
-						rs.getString("source"),
-						rs.getString("destination"),
-						rs.getString("subdestination"),
-						rs.getBoolean("replayIndicator"),
-						publish,
-						new DateTime(rs.getLong("receivedTimeStamp")),
-						expiration,
-						rs.getString("preEventState"),
-						rs.getString("postEventState"),
-						rs.getBoolean("isPublishable"),
-						new DateTime(rs.getLong("insertTimeStamp"))
-				);
-				event.setEventId(rs.getString("eventId"));
-
-				EventResponse ers = new EventResponse(event);
-				ler.add(ers);
-
+				String source = rs.getString(1);
+				sources.add(source);
 			}
-
-			er.setEvents(ler);
-
-
-			// populate headers
-
-			PreparedStatement psHeaders = conn.prepareStatement(headerSql);
-
-			ResultSet rsHeaders = psHeaders.executeQuery();
-			Map<String,String> customHeaders = new HashMap<String,String>();
-
-			//get header info from its table
-			while(rsHeaders.next()){
-				customHeaders.put(rsHeaders.getString("name"), rsHeaders.getString("value"));
-			}
-
-			/*
-				// populate payload
-
-				PreparedStatement psPayload = conn.prepareStatement(payloadSql);
-
-				//set the value being checked for equality
-				psPayload.setString(1, eventId);
-
-				ResultSet rsPayload = psPayload.executeQuery();
-				Map<String,DataItem> customPayload = new HashMap<>();
-
-				//get payload info from its table
-				while(rsPayload.next()){
-					String payName = rsPayload.getString("name");
-					String payType = rsPayload.getString("dataType");
-					String payVal = rsPayload.getString("value");
-					customPayload.put(payName, new DataItem(payType,payVal));
-				}
-
-				event.setCustomHeaders(customHeaders);
-				event.setCustomPayload(customPayload);
-				*/
-
-
+			er.setEventSources(sources);
 
 		} catch (SQLException e) {
-				log.error("request for events resulted in: " + e.getMessage());
+				log.error("request for unique sources resulted in: " + e.getMessage() + " with sql = " + sql);
 				throw new DAOException(e);
 		} finally{
 			if (conn != null) {
@@ -775,4 +562,375 @@ public class EmbeddedDerbyEventDAOImpl implements EventDAO {
 
 		return er;
 	}
+
+	@Override
+	public EventsResponse getEventNames(String source) throws DAOException {
+
+		DSLContext create = DSL.using(SQLDialect.DERBY);
+
+		String sql = create.select(field("eventName"))
+				.from(table("event.event_store"))
+				.where("source = '" + source +"'")
+				.groupBy(field("eventName"))
+				.getSQL();
+
+
+		Connection conn = null;
+		EventsResponse er = new EventsResponse();
+		List<String> names = new ArrayList<String>();
+
+		try {
+			conn = dataSource.getConnection();
+			log.debug("making request to database with sql: " + sql);
+			PreparedStatement ps = conn.prepareStatement(sql);
+
+			ResultSet rs = ps.executeQuery();
+
+			while(rs.next()){
+				String name = rs.getString(1);
+				names.add(name);
+				log.debug("adding name : " + name);
+			}
+			er.setEventNames(names);
+
+		} catch (SQLException e) {
+			log.error("request for unique event names from source specified resulted in: " + e.getMessage() + " with sql = " + sql);
+			throw new DAOException(e);
+		} finally{
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					log.error("attempted to close connection failed. " + e.getMessage());
+				}
+			}
+		}
+
+		return er;
+	}
+
+
+	@Override
+	public EventResponse getLatestEvent(String source, String eventName, String objectId, String correlationId) throws DAOException {
+
+
+		log.debug("invoking getLatestEvent method with source = " + source);
+
+		DSLContext create = DSL.using(SQLDialect.DERBY);
+
+		String sql = "";
+		SelectJoinStep step = create.select(field("eventName")
+					,field("objectId")
+					,field("correlationId")
+					,field("source")
+					,max(field("insertTimestamp")).as(field("insertTimestamp")))
+					.from(table("event.event_store"));
+
+		boolean firstConjunction = true;
+		SelectConditionStep cs = null;
+
+		if (source!=null) {
+			cs = step.where("source = '" + source + "'");
+			firstConjunction = false;
+		}
+
+		if (eventName!=null && firstConjunction==true) {
+			cs = step.where("eventName = '" + eventName + "'");
+			firstConjunction = false;
+		}
+
+		if (objectId!=null && firstConjunction==true) {
+			cs = step.where("objectId = '" + objectId + "'");
+			firstConjunction = false;
+		}
+
+		if (correlationId!=null && firstConjunction==true) {
+			cs = step.where("correlationId = '" + correlationId + "'");
+			firstConjunction = false;
+		}
+
+		if (eventName!=null && firstConjunction==false) {
+			cs = cs.and("eventName = '" + eventName + "'");
+		}
+
+		if (objectId!=null && firstConjunction==false) {
+			cs = cs.and("objectId = '" + objectId + "'");
+		}
+
+		if (correlationId!=null && firstConjunction==false) {
+			cs = cs.and("correlationId = '" + correlationId + "'");
+		}
+
+
+		if (cs==null){
+			sql = step.groupBy(field("eventName")
+					,field("objectId")
+					,field("correlationId")
+					,field("source")).getSQL();
+		} else {
+			sql = cs.groupBy(field("eventName")
+					,field("objectId")
+					,field("correlationId")
+					,field("source")
+					).getSQL();
+		}
+
+
+
+		Connection conn = null;
+		EventResponse er = new EventResponse();
+
+		Event event = new Event();
+
+		try {
+			conn = dataSource.getConnection();
+			log.debug("making request to database with sql: " + sql);
+			PreparedStatement ps = conn.prepareStatement(sql);
+
+
+
+			ResultSet rs = ps.executeQuery();
+
+			while(rs.next()){
+
+				String id = rs.getString("objectId");
+				er = this.getEvent(id);
+			}
+
+
+		} catch (SQLException e) {
+			log.error("request for latest: " + e.getMessage() + " with sql = " + sql);
+			throw new DAOException(e);
+		} finally{
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					log.error("attempted to close connection failed. " + e.getMessage());
+				}
+			}
+		}
+
+		return er;
+	}
+
+
+	@Override
+	public EventResponse replayEvent(EventRequest request) throws DAOException {
+		return null;
+	}
+
+
+	private String getEventsSql(List<String> req){
+
+		// events
+
+
+		if (req.size()==1){
+			String sql = "SELECT * FROM event.event_store WHERE eventId = ?";
+			return sql;
+		} else {
+			String sql = "SELECT * FROM event.event_store WHERE eventId IN (";
+			int listLen = req.size();
+
+			for (int i=0; i<listLen; i++){
+				sql = sql + "'" +req.get(i) + "'";
+				if (i!=listLen-1) {
+					sql = sql + ",";
+				}
+			}
+			sql = sql + ")";
+
+			return sql;
+		}
+
+	}
+
+
+
+	private List<Event> fetchEvents(List<String> req) throws DAOException {
+
+		List<Event> ler = new ArrayList();
+		String eventSQL = getEventsSql(req);
+		Connection conn = null;
+
+
+		try {
+			conn = dataSource.getConnection();
+
+			PreparedStatement ps = conn.prepareStatement(eventSQL);
+
+			log.debug("request size = " + req.size());
+
+			if (req.size()==1){
+				String eventId = req.get(0);
+				ps.setString(1, eventId);
+			}
+
+			log.debug("making request to database with sql: " + eventSQL);
+
+			ResultSet rs = ps.executeQuery();
+
+
+
+			while(rs.next()){
+
+				log.debug("row found in result set");
+
+				DateTime timestamp = new DateTime(rs.getLong("insertTimeStamp"));
+				if (rs.wasNull()) timestamp = null;
+
+				Event event = new Event(
+						rs.getString("parentId"),
+						rs.getString("eventName"),
+						rs.getString("objectId"),
+						rs.getString("correlationId"),
+						rs.getInt("sequenceNumber"),
+						rs.getString("messageType"),
+						rs.getString("dataType"),
+						rs.getString("source"),
+						rs.getString("destination"),
+						rs.getString("subdestination"),
+						rs.getBoolean("replayIndicator"),
+						null,
+						null,
+						null,
+						rs.getString("preEventState"),
+						rs.getString("postEventState"),
+						rs.getBoolean("isPublishable"),
+						timestamp
+
+				);
+				String eventId = rs.getString("eventId");
+				event.setEventId(eventId);
+
+				event.setCustomHeaders(fetchHeaders(eventId));
+				event.setCustomPayload(fetchPayload(eventId));
+
+				ler.add(event);
+			}
+
+			if (ler.size()==0) {log.debug("no results in resultset"); }
+
+
+
+		} catch (SQLException e) {
+			log.error("request for events resulted in: " + e.getMessage() + " with sql = " + eventSQL);
+			throw new DAOException(e);
+		} finally{
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					log.error("attempted to close connection failed. " + e.getMessage());
+				}
+			}
+
+		}
+
+		return ler;
+	}
+
+
+
+	private Map<String, String> fetchHeaders(String eventId) throws DAOException {
+
+		String headerSQL = "SELECT name,value FROM event.event_headers WHERE eventId = ?";
+
+		Connection conn = null;
+		Map<String,String> customHeaders = new HashMap<String,String>();
+
+		try {
+			conn = dataSource.getConnection();
+			PreparedStatement ps = conn.prepareStatement(headerSQL);
+
+			ps.setString(1, eventId);
+
+			ResultSet rs = ps.executeQuery();
+
+
+			while(rs.next()){
+				customHeaders.put(rs.getString("name"), rs.getString("value"));
+			}
+
+
+		} catch (SQLException e) {
+			log.error("request for events resulted in: " + e.getMessage());
+			throw new DAOException(e);
+		} finally{
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					log.error("attempted to close connection failed. " + e.getMessage());
+				}
+			}
+
+		}
+
+		return customHeaders;
+
+	}
+
+
+	private Map<String, DataItem> fetchPayload(String eventId) throws DAOException {
+
+		String payloadSql = "SELECT name,value,dataType FROM event.event_payload WHERE eventId = ?";
+
+		Connection conn = null;
+		Map<String,DataItem> customPayload = new HashMap<String,DataItem>();
+
+		try {
+			conn = dataSource.getConnection();
+			PreparedStatement ps = conn.prepareStatement(payloadSql );
+
+			ps.setString(1, eventId);
+
+			ResultSet rsPayload = ps.executeQuery();
+
+
+
+			//get payload info from its table
+			while(rsPayload.next()){
+				String payName = rsPayload.getString("name");
+				String payType = rsPayload.getString("dataType");
+				String payVal = rsPayload.getString("value");
+
+
+				PrimitiveDatatype v = null;
+				if (payType.equalsIgnoreCase("boolean")) { v = PrimitiveDatatype.Boolean; }
+				if (payType.equalsIgnoreCase("byte")) { v = PrimitiveDatatype.Byte; }
+				if (payType.equalsIgnoreCase("double")) { v = PrimitiveDatatype.Double; }
+				if (payType.equalsIgnoreCase("float")) { v = PrimitiveDatatype.Float; }
+				if (payType.equalsIgnoreCase("integer")) { v = PrimitiveDatatype.Integer; }
+				if (payType.equalsIgnoreCase("long")) { v = PrimitiveDatatype.Long; }
+				if (payType.equalsIgnoreCase("short")) { v = PrimitiveDatatype.Short; }
+				if (payType.equalsIgnoreCase("string")) { v = PrimitiveDatatype.String; }
+				if (v==null) { v = PrimitiveDatatype.String; }
+
+				customPayload.put(payName, new DataItem(v,payVal));
+			}
+
+
+
+		} catch (SQLException e) {
+			log.error("request for events resulted in: " + e.getMessage());
+			throw new DAOException(e);
+		} finally{
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					log.error("attempted to close connection failed. " + e.getMessage());
+				}
+			}
+
+		}
+
+		return customPayload;
+
+	}
+
+
+
 }

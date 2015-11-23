@@ -1,4 +1,4 @@
-package com.alliancefoundry.publisher.impl;
+package com.alliancefoundry.publisher.impl.kafka;
 
 import java.util.List;
 import java.util.Map;
@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import com.alliancefoundry.model.Event;
 import com.alliancefoundry.publisher.EventServicePublisher;
+import com.alliancefoundry.publisher.PublisherException;
 import com.alliancefoundry.publisher.PublisherInterface;
 import com.alliancefoundry.publisher.RouterConfig;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -30,7 +31,7 @@ public class KafkaPublisher implements PublisherInterface {
 	}
 	
 	@Override
-	public void connect() {
+	public void init() {
 		Properties props = new Properties();
 
 		props.put("metadata.broker.list", brokerUrl);
@@ -41,17 +42,11 @@ public class KafkaPublisher implements PublisherInterface {
 		producer = new Producer<String, String>(config);
 	}
 	
-	public String getBrokerUrl() {
-		return brokerUrl;
-	}
 
-	public void setBrokerUrl(String brokerUrl) {
-		this.brokerUrl = brokerUrl;
-	}
 
 	
 	@Override
-	public void publishEvent(Event event, RouterConfig eventConfig) {
+	public boolean publishEvent(Event event, RouterConfig eventConfig) throws PublisherException {
 		
 		ObjectMapper mapper = new ObjectMapper();
 		  mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // no more null-valued properties
@@ -73,12 +68,23 @@ public class KafkaPublisher implements PublisherInterface {
 				
 		producer.close();
 
+		return true;
+
 	}
 	
 	@Override
-	public void publishEvent(List<Event> events, RouterConfig eventConfig) {
+	public boolean publishEvents(List<Event> events, RouterConfig eventConfig) throws PublisherException {
 
+		return false;
 		
+	}
+
+	public String getBrokerUrl() {
+		return brokerUrl;
+	}
+
+	public void setBrokerUrl(String brokerUrl) {
+		this.brokerUrl = brokerUrl;
 	}
 	
 
