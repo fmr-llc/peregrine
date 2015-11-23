@@ -107,6 +107,8 @@
 
 
 
+
+
 		<!-- database dependencies -->
 
 		<dependency>
@@ -126,7 +128,22 @@
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
 			<version>${hikaricp.version}</version>
+
 		</dependency>
+
+
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq</artifactId>
+			<version>3.7.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq-codegen</artifactId>
+			<version>3.7.1</version>
+		</dependency>
+
 
 		<!-- metrics and logging -->
 		<dependency>
