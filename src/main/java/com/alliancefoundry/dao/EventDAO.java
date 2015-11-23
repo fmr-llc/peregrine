@@ -1,6 +1,7 @@
 package com.alliancefoundry.dao;
 
 import com.alliancefoundry.model.Event;
+import com.alliancefoundry.model.EventRequest;
 import com.alliancefoundry.model.EventResponse;
 import com.alliancefoundry.model.EventsResponse;
 
@@ -57,6 +58,70 @@ public interface EventDAO {
 	 */
 	EventsResponse getEvents(List<String> eventIds) throws DAOException;
 
+
+	/**
+	 * Retrieves a set of events matching the criteria specified.
+	 * Result is wrapped in an EventsResponse
+	 *
+	 * @param source
+	 * @param generations
+	 * @param name
+	 * @param objectId
+	 * @param correlationId
+	 * @param createdAfter
+	 * @param createdBefore
+     * @param timestamp
+     * @return
+     */
+	EventsResponse queryEvents(String source,
+							   String generations,
+							   String name,
+							   String objectId,
+							   String correlationId,
+							   String createdAfter,
+							   String createdBefore,
+							   String timestamp) throws DAOException;
+
+	/**
+	 * Returns the list of all event sources in the event store
+	 *
+	 * @return
+     */
+	EventsResponse getEventSources() throws DAOException;
+
+
+	/**
+	 * Returns a list of event names associated with a given source;
+	 *
+	 * @param source
+	 * @return
+	 * @throws DAOException
+     */
+	EventsResponse getEventNames(String source) throws DAOException;
+
+
+	/**
+	 * Returns the lastest event given the criteria specified
+	 *
+	 * @param source
+	 * @param name
+	 * @param objectId
+	 * @param correlationId
+	 * @return
+     * @throws DAOException
+     */
+	EventResponse getLatestEvent(String source,
+								   String name,
+								   String objectId,
+								   String correlationId) throws DAOException;
+
+	/**
+	 * Given an EventRequest which specifies a
+	 * @param request
+	 * @return
+	 * @throws DAOException
+     */
+	EventResponse replayEvent(EventRequest request) throws DAOException;
 
 	/**
 	 * Initializes the DAO resources

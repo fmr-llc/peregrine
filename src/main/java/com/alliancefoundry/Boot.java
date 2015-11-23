@@ -68,7 +68,7 @@ public class Boot extends SpringBootServletInitializer {
                                 "Peregrine Event Service is a canonical implementation of the Event store pattern",
                                 "0.0.1",
                                 "",
-                                "Alliance Foundry",
+                                "Alliance Foundry, a Fidelity Investments Open Source Project",
                                 "Apache 2.0",
                                 "http://www.apache.org/licenses/LICENSE-2.0.html"))
                 .consumes(new HashSet<String>(Arrays.asList("application/json")))

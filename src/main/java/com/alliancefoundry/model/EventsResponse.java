@@ -5,21 +5,21 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Paul Bernard on 10/25/15.
- */
+@XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
-@JsonTypeInfo(include= JsonTypeInfo.As.WRAPPER_OBJECT, use= JsonTypeInfo.Id.NAME)
 public class EventsResponse {
 
     private List<EventResponse> evts;
     private String status;
     private String statusMessage;
+    private List<String> eventNames;
+    private List<String> eventSources;
 
     public EventsResponse(List<EventResponse> evts){
         this.evts = evts;
@@ -56,5 +56,13 @@ public class EventsResponse {
     public void setStatusMessage(String msg){
         statusMessage = msg;
     }
+
+    public List<String> getEventNames(){ return this.eventNames; }
+
+    public void setEventNames(List<String> names) { this.eventNames = names; }
+
+    public List<String> getEventSources(){ return this.eventSources; }
+
+    public void setEventSources(List<String> sources) { this.eventSources = sources; }
 
 }

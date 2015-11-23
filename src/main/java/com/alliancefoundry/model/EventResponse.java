@@ -8,9 +8,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import io.swagger.annotations.ApiModel;
 
-/**
- * Created by Paul Bernard on 10/24/15.
- */
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
+
+@XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
@@ -19,8 +20,12 @@ public class EventResponse {
     private Event evt;
     private String status;
     private String statusMessage;
+    private String persistStatus;
+    private String persistStatusMessage;
     private String publishStatus;
     private String publishStatusMessage;
+    private long processingDuration;
+
 
     public EventResponse(){
 
@@ -30,6 +35,7 @@ public class EventResponse {
         this.evt = evt;
     }
 
+
     public Event getEvent(){
         return evt;
     }
@@ -38,21 +44,42 @@ public class EventResponse {
         this.evt = evt;
     }
 
-    public String getPersistStatus(){
+
+    public String getStatus(){
         return status;
     }
 
-    public void setPersistStatus(String status){
+    public void setStatus(String status){
         this.status = status;
     }
 
-    public String getPersistStatusMessage(){
+
+    public String getStatusMessage(){
         return statusMessage;
     }
 
-    public void setPersistStatusMessage(String msg){
-        statusMessage = msg;
+    public void setStatusMessage(String status){
+        this.statusMessage = status;
     }
+
+
+    public String getPersistStatus(){
+        return persistStatus;
+    }
+
+    public void setPersistStatus(String status){
+        this.persistStatus = status;
+    }
+
+
+    public String getPersistStatusMessage(){
+        return persistStatusMessage;
+    }
+
+    public void setPersistStatusMessage(String msg){
+        persistStatusMessage = msg;
+    }
+
 
     public String getPublishStatus(){
         return publishStatus;
@@ -62,6 +89,7 @@ public class EventResponse {
         this.publishStatus = status;
     }
 
+
     public String getPublishStatusMessage(){
         return publishStatusMessage;
     }
@@ -69,4 +97,14 @@ public class EventResponse {
     public void setPublishStatusMessage(String msg){
         publishStatusMessage = msg;
     }
+
+    public long getProcessingDuration(){
+        return processingDuration;
+    }
+
+    public void setProcessingDuration(long duration){
+        this.processingDuration = duration;
+    }
+
+
 }

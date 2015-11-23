@@ -73,6 +73,10 @@ public class Event {
     	customPayload = new HashMap<String, DataItem>();
     	insertTimeStamp = DateTime.now();
     }
+
+	public Event(String eventId){
+		this.eventId = eventId;
+	}
 	
     public Event(Map<String, Object> map){
 		this();

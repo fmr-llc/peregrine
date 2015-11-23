@@ -9,7 +9,7 @@ public class DAOFactory {
     private EventDAO dao;
 
 
-    public EventDAO geDAO(){
+    public EventDAO getDAO(){
        return dao;
     }
 
