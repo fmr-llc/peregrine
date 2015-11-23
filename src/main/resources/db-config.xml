@@ -41,12 +41,12 @@
             <property name="DAO" ref="derbyDAO"/>
         </bean>
 
-        <bean id="derbyDAO" class="com.alliancefoundry.dao.impl.EmbeddedDerbyEventDAOImpl"
+        <bean id="derbyDAO" class="com.alliancefoundry.dao.impl.derby.EmbeddedDerbyEventDAOImpl"
               init-method="initialize" destroy-method="shutdown">
             <constructor-arg ref="dataSource"/>
         </bean>
 
-        <bean id="mysqlDAO" class="com.alliancefoundry.dao.impl.MySQLEventDAOImpl"
+        <bean id="mysqlDAO" class="com.alliancefoundry.dao.impl.mariadb.MySQLEventDAOImpl"
               init-method="initialize" destroy-method="shutdown">
             <constructor-arg ref="dataSource"/>
         </bean>
