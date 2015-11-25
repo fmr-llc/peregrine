@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.fasterxml.classmate.TypeResolver;
 import io.swagger.annotations.*;
+
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -74,7 +76,9 @@ public class Boot extends SpringBootServletInitializer {
                 .consumes(new HashSet<String>(Arrays.asList("application/json")))
                 .produces(new HashSet<String>(Arrays.asList("application/json")))
                 .protocols(new HashSet<String>(Arrays.asList("http")))
-                .directModelSubstitute(LocalDate.class, String.class).genericModelSubstitutes(ResponseEntity.class)
+                .directModelSubstitute(LocalDate.class, String.class)
+                .directModelSubstitute(DateTime.class, String.class)
+                .genericModelSubstitutes(ResponseEntity.class)
                 .alternateTypeRules(newRule(typeResolver.resolve(DeferredResult.class, typeResolver.resolve(ResponseEntity.class, WildcardType.class)), typeResolver.resolve(WildcardType.class)))
                 .useDefaultResponseMessages(false)
                 .globalResponseMessage(RequestMethod.GET, newArrayList(new ResponseMessageBuilder().code(500).message("500 message").responseModel(new ModelRef("Error")).build()));
