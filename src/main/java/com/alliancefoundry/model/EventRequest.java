@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModel;
 
@@ -32,5 +34,19 @@ public class EventRequest {
     public void setEvent(Event evt){
         this.event = evt;
     }
+
+	@Override
+	public String toString() {
+
+		ObjectMapper mapper = new ObjectMapper();
+		try{
+			String objectAsString = mapper.writeValueAsString(this);
+			return objectAsString;
+
+		} catch (JsonProcessingException e){
+			return "{}";
+		}
+
+	}
 
 }
