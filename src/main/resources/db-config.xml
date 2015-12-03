@@ -6,8 +6,8 @@
             http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
-        <!-- database configurations -->
 
+        <!-- HikariCP configuration -->
         <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
             <property name="poolName" value="springHikariCP" />
             <property name="connectionTestQuery" value="${db.dataSource.connectionTestQuery}" />
@@ -32,7 +32,7 @@
             </property>
         </bean>
 
-        <!-- HikariCP configuration -->
+        <!-- database configurations -->
         <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
             <constructor-arg ref="hikariConfig" />
         </bean>
@@ -41,14 +41,12 @@
             <property name="DAO" ref="derbyDAO"/>
         </bean>
 
-        <bean id="derbyDAO" class="com.alliancefoundry.dao.impl.derby.EmbeddedDerbyEventDAOImpl"
-              init-method="initialize" destroy-method="shutdown">
-            <constructor-arg ref="dataSource"/>
+        <bean id="derbyDAO" class="com.alliancefoundry.dao.impl.derby.EmbeddedDerbyEventDAOImpl">
+            <property name="dataSource" ref="dataSource"/>
         </bean>
 
-        <bean id="mysqlDAO" class="com.alliancefoundry.dao.impl.mariadb.MySQLEventDAOImpl"
-              init-method="initialize" destroy-method="shutdown">
-            <constructor-arg ref="dataSource"/>
+        <bean id="mysqlDAO" class="com.alliancefoundry.dao.impl.mysql.MySQLEventDAOImpl">
+            <property name="dataSource" ref="dataSource"/>
         </bean>
 
 </beans>
