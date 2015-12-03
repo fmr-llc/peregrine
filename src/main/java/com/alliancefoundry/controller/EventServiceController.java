@@ -13,6 +13,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -100,6 +101,8 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 		try {
 			er = daoFactory.getDAO().insertEvent(request.getEvent());
 
+			log.debug("insertEvent returned: " + er);
+
 			if (er==null) {
 
 				er = new EventResponse();
@@ -161,7 +164,7 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 
 			}
 
-		} catch (DAOException e) {
+		} catch (DataAccessException e) {
 
 			log.error(e.getMessage(), e);
 
@@ -214,7 +217,7 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 
 				er = daoFactory.getDAO().getEvent(id);
 
-			} catch (DAOException e) {
+			} catch (DataAccessException e) {
 
 				log.error(e.getMessage(), e);
 				er = new EventResponse();
@@ -259,7 +262,7 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 			EventsResponse er =  daoFactory.getDAO().insertEvents(request.getEvents());
 			return er;
 
-		} catch (DAOException e){
+		} catch (DataAccessException e){
 
 			log.error(e.getMessage(), e);
 
@@ -293,7 +296,7 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 			EventsResponse er = daoFactory.getDAO().getEvents(ls);
 			return er;
 
-		} catch (DAOException e){
+		} catch (DataAccessException e){
 
 			log.error(e.getMessage(), e);
 			EventsResponse er = new EventsResponse();
@@ -330,7 +333,7 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 		try {
 			EventsResponse er = daoFactory.getDAO().getEventSources();
 			return er;
-		} catch (DAOException e) {
+		} catch (DataAccessException e) {
 
 			log.error(e.getMessage(), e);
 			EventsResponse er = new EventsResponse();
@@ -354,7 +357,7 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 			EventsResponse er = daoFactory.getDAO().getEventNames(source);
 
 			return er;
-		} catch (DAOException e) {
+		} catch (DataAccessException e) {
 
 			log.error(e.getMessage(), e);
 			EventsResponse er = new EventsResponse();
@@ -383,7 +386,7 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 
 			return er;
 
-		} catch (DAOException e) {
+		} catch (DataAccessException e) {
 
 			log.error(e.getMessage(), e);
 			EventResponse er = new EventResponse();

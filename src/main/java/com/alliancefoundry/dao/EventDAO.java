@@ -4,6 +4,7 @@ import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventRequest;
 import com.alliancefoundry.model.EventResponse;
 import com.alliancefoundry.model.EventsResponse;
+import org.springframework.dao.DataAccessException;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public interface EventDAO {
 	 * @return an EventResponse that contains the status of the invocation
 	 * @throws DAOException
 	 */
-	EventResponse insertEvent(Event event) throws DAOException;
+	EventResponse insertEvent(Event event) throws DataAccessException;
 
 
 	/**
@@ -34,7 +35,7 @@ public interface EventDAO {
 	 * @return an EventsResponse that contains the status of each invocation.
 	 * @throws DAOException
 	 */
-	EventsResponse insertEvents(List<Event> events) throws DAOException;
+	EventsResponse insertEvents(List<Event> events) throws DataAccessException;
 
 
 	/**
@@ -45,7 +46,7 @@ public interface EventDAO {
 	 * @return an event if found or null if not.
 	 * @throws DAOException
 	 */
-	EventResponse getEvent(String eventId) throws DAOException;
+	EventResponse getEvent(String eventId) throws DataAccessException;
 
 
 	/**
@@ -56,7 +57,7 @@ public interface EventDAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	EventsResponse getEvents(List<String> eventIds) throws DAOException;
+	EventsResponse getEvents(List<String> eventIds) throws DataAccessException;
 
 
 	/**
@@ -87,7 +88,7 @@ public interface EventDAO {
 	 *
 	 * @return
      */
-	EventsResponse getEventSources() throws DAOException;
+	EventsResponse getEventSources() throws DataAccessException;
 
 
 	/**
@@ -97,7 +98,7 @@ public interface EventDAO {
 	 * @return
 	 * @throws DAOException
      */
-	EventsResponse getEventNames(String source) throws DAOException;
+	EventsResponse getEventNames(String source) throws DataAccessException;
 
 
 	/**
@@ -113,7 +114,7 @@ public interface EventDAO {
 	EventResponse getLatestEvent(String source,
 								   String name,
 								   String objectId,
-								   String correlationId) throws DAOException;
+								   String correlationId) throws DataAccessException;
 
 	/**
 	 * Given an EventRequest which specifies a
@@ -121,22 +122,7 @@ public interface EventDAO {
 	 * @return
 	 * @throws DAOException
      */
-	EventResponse replayEvent(EventRequest request) throws DAOException;
-
-	/**
-	 * Initializes the DAO resources
-	 *
-	 * @return true if initialization is successful otherwise false
-	 * @throws DAOException
-	 */
-	boolean initialize() throws DAOException;
+	EventResponse replayEvent(EventRequest request) throws DataAccessException;
 
 
-	/**
-	 * Deallocate the DAO resources.
-	 *
-	 * @return true if resources are releases successfully
-	 * @throws DAOException
-	 */
-	boolean shutdown() throws DAOException;
 }
