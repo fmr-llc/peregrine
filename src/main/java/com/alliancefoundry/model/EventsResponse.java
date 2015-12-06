@@ -11,8 +11,8 @@ import java.util.List;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_EMPTY)
 public class EventsResponse {
 
     private List<EventResponse> evts;
@@ -20,6 +20,7 @@ public class EventsResponse {
     private String statusMessage;
     private List<String> eventNames;
     private List<String> eventSources;
+    private long processingDuration;
 
     public EventsResponse(List<EventResponse> evts){
         this.evts = evts;
@@ -64,5 +65,14 @@ public class EventsResponse {
     public List<String> getEventSources(){ return this.eventSources; }
 
     public void setEventSources(List<String> sources) { this.eventSources = sources; }
+
+    public long getProcessingDuration(){
+        return processingDuration;
+    }
+
+    public void setProcessingDuration(long duration){
+        this.processingDuration = duration;
+    }
+
 
 }

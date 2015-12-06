@@ -20,7 +20,11 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  */
 public class CustomJsonDateTimeSerializer extends JsonSerializer<DateTime> {
 
-    private static DateTimeFormatter formatter = 
+	private final static DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd");
+	private final static DateTimeFormatter TIME_FORMAT = DateTimeFormat.forPattern("HH:mm:ss");
+
+
+	private static DateTimeFormatter formatter =
             DateTimeFormat.forPattern(SerializerConstants.EVENT_SERVICE_DATE_TIME_FORMAT);
 	
 	public void serialize(DateTime value, JsonGenerator gen, SerializerProvider arg2) throws IOException, JsonProcessingException {

@@ -9,21 +9,18 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.*;
 
 import static org.jooq.conf.ParamType.INLINED;
-import static org.jooq.conf.ParamType.NAMED;
 import static org.jooq.impl.DSL.*;
+import static com.alliancefoundry.dao.impl.dbms.DBConstants.*;
 
 /**
  * This implementation leverages JOOQ to build SQL without using String
@@ -47,36 +44,22 @@ import static org.jooq.impl.DSL.*;
  *  JOOQ can be extended to support whatever database is required
  *  as an alternatives to paid licence options.
  */
-public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
+public class OpenRDBMSDAOImpl extends DaoProvider implements EventDAO {
+
+	private static final Logger log = LoggerFactory.getLogger(OpenRDBMSDAOImpl.class);
+
+	protected org.jooq.SQLDialect dialect = SQLDialect.DERBY;
 
 	/**
 	 * Override this method in subclasses if you wish to use other dialects.
 	 * @return
      */
 	public SQLDialect getDialect(){
-		return SQLDialect.DERBY;
-	} // derby is the default
-
-	private static final Logger log = LoggerFactory.getLogger(OpenRDBMSDAOImpl.class);
-	private JdbcTemplate jdbcTemplate;
-
-	public OpenRDBMSDAOImpl(){
-
-		// default constructor
+		return dialect;
 	}
 
-	public void setDataSource(DataSource dataSource) {
-
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
-		org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator
-				tr = new org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator();
-		this.jdbcTemplate.setExceptionTranslator(tr);
-
-		try {
-			validateDB(jdbcTemplate.getDataSource().getConnection());
-		} catch (Exception e){
-			log.error("connection not available");
-		}
+	public void setDialect(org.jooq.SQLDialect dialect){
+		this.dialect = dialect;
 	}
 
 
@@ -85,28 +68,21 @@ public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
 	@Transactional(rollbackFor = Exception.class)
 	public EventResponse insertEvent(Event event) throws DataAccessException {
 
+		log.debug("serialized state of attempted event insert: " + event.toString());
+
 		// Setup Defaults
 		Integer pSequenceNumber = event.getSequenceNumber() == null ?
 				null : event.getSequenceNumber();
 		event.setSequenceNumber(pSequenceNumber);
 
-		Long pPublishingTimestamp = event.getPublishTimeStamp() == null ?
-				null : event.getPublishTimeStamp().getMillis();
-		if (pPublishingTimestamp!=null){
-			event.setPublishTimeStamp(new DateTime(pPublishingTimestamp));
-		}
+		long pPublishingTimestamp = event.getPublishTimeStamp() == null ?
+				0 : event.getPublishTimeStamp().getMillis();
 
-		Long pReceivedTimestamp = event.getReceivedTimeStamp() == null ?
+		long pReceivedTimestamp = event.getReceivedTimeStamp() == null ?
 				System.currentTimeMillis() : event.getReceivedTimeStamp().getMillis();
-		if (pReceivedTimestamp!=null){
-			event.setReceivedTimeStamp(new DateTime(pReceivedTimestamp));
-		}
 
-		Long pExpirationTimestamp = event.getExpirationTimeStamp() == null ?
-				null : event.getExpirationTimeStamp().getMillis();
-		if (pExpirationTimestamp!=null){
-			event.setExpirationTimeStamp(new DateTime(pExpirationTimestamp));
-		}
+		long pExpirationTimestamp = event.getExpirationTimeStamp() == null ?
+				0 : event.getExpirationTimeStamp().getMillis();
 
 		Boolean pPublishable = event.isPublishable() == null ?
 				false : event.isPublishable();
@@ -114,11 +90,8 @@ public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
 			event.setPublishable(pPublishable);
 		}
 
-		Long pInsertTimestamp = event.getInsertTimeStamp() == null ?
-				null : event.getInsertTimeStamp().getMillis();
-		if (pInsertTimestamp!=null){
-			event.setInsertTimeStamp(new DateTime(pInsertTimestamp));
-		}
+		long pInsertTimestamp = event.getInsertTimeStamp() == null ?
+				0 : event.getInsertTimeStamp().getMillis();
 
 
 		// process inserts
@@ -156,13 +129,13 @@ public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
 				event.getDestination(),
 				event.getSubdestination(),
 				event.isReplayIndicator(),
-				cast(pPublishingTimestamp, Integer.class),
-				cast(pReceivedTimestamp, Integer.class),
-				cast(pExpirationTimestamp, Integer.class),
+				pPublishingTimestamp == 0 ? null : pPublishingTimestamp,
+				pReceivedTimestamp == 0 ? null : pReceivedTimestamp,
+				pExpirationTimestamp == 0 ? null : pExpirationTimestamp,
 				event.getPreEventState(),
 				event.getPostEventState(),
 				cast(pPublishable, Boolean.class),
-				cast(pInsertTimestamp, Integer.class)
+				pInsertTimestamp == 0 ? null : pInsertTimestamp
 				)
 				.getSQL(INLINED);
 
@@ -189,7 +162,6 @@ public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
 			String headersSQL = headersValuesStep.getSQL(INLINED);
 			log.debug("insert headers using SQL: " + headersSQL);
 			jdbcTemplate.update(headersSQL);
-
 		}
 
 
@@ -197,19 +169,25 @@ public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
 
 			DSLContext createPayloadSql = DSL.using(getDialect());
 
-			InsertValuesStep4 payloadHeadersStep = createPayloadSql.insertInto(table(EVENT_PAYLOAD_TBL),
+			InsertValuesStep4 payloadHeadersStep = createPayloadSql.
+					insertInto(table(EVENT_PAYLOAD_TBL),
 					field(EVENT_ID),
 					field(NAME),
 					field(VALUE),
 					field(DATA_TYPE));
 
-			for(String key : event.getCustomPayload().keySet()){
+			Iterator<Triplet> payloadEntry = event.getCustomPayload().iterator();
+
+			while(payloadEntry.hasNext()){
+				Triplet dataItem = payloadEntry.next();
 				payloadHeadersStep.values(
 						event.getEventId(),
-						key,
-						event.getCustomPayload().get(key).getValue(),
-						event.getCustomPayload().get(key).getDataType().name());
+						dataItem != null ? dataItem.getName() : null,
+						dataItem != null ? dataItem.getValue() : null,
+						dataItem != null ? dataItem.getType(): null);
+
 			}
+
 			String payLoadSQL = payloadHeadersStep.getSQL(INLINED);
 			log.debug("insert payload using SQL: " + payLoadSQL);
 			jdbcTemplate.update(payLoadSQL);
@@ -349,17 +327,20 @@ public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
 		jdbcTemplate.update(payloadSql, new PreparedStatementSetter() {
 
 			public void setValues(PreparedStatement payloadPs) throws SQLException {
-				//insert payload info into its table
 				for (int i=0; i<eventCount; i++) {
 					Event event = events.get(i);
-					for (String key : event.getCustomPayload().keySet()) {
-						String eventId = event.getEventId();
-						payloadPs.setString(1, eventId);
-						payloadPs.setString(2, key);
-						payloadPs.setString(3, event.getCustomPayload().get(key).getValue());
-						payloadPs.setString(4, event.getCustomPayload().get(key).getDataType().name());
+
+					Iterator<Triplet> payloadEntries = event.getCustomPayload().iterator();
+
+					while(payloadEntries.hasNext()){
+						Triplet entry = payloadEntries.next();
+						payloadPs.setString(1, event.getEventId());
+						payloadPs.setString(2, entry.getName());
+						payloadPs.setString(3, entry.getValue());
+						payloadPs.setString(4, entry.getType());
 						payloadPs.addBatch();
 					}
+
 				}
 
 			}});
@@ -388,175 +369,132 @@ public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
 	@Override
 	public EventResponse getEvent(String eventId) throws DataAccessException {
 
-		log.debug("DAO attempting to retrieve event with id: " + eventId);
-
 		DSLContext create = DSL.using(getDialect());
-
 
 		Select<?> select  = create.select()
 				.from(table(EVENT_STORE_TBL))
 				.where(EVENT_ID + " = '" + eventId + "'");
 		String sql = select.getSQL();
 
-		log.debug("fetching event with sql: " + sql);
 
 		Event event = (Event)jdbcTemplate
 				.queryForObject(
 						sql, new Object[] { },
 				new EventRowMapper());
 
-		// add headers
-
-
 		if (event!=null){
 
-			/*
-			Map<String,String> customHeaders = new HashMap<String,String>();
-			Map<String, String> hResult = fetchHeaders(event.getEventId());
+			event.setCustomHeaders(fetchHeaders(event.getEventId()));
+			event.setCustomPayload(fetchPayload(eventId));
 
-			Iterator<String> keys = hResult.keySet().iterator();
+			EventResponse es = new EventResponse(event);
 
-			while(keys.hasNext()){
-				String key = keys.next();
-				String currentHeader = hResult.get(key);
-				customHeaders.put(key, currentHeader);
-			}
+			return es;
 
-			List<NDIPair> payloadResult = fetchPayload(eventId);
-			Map<String,DataItem> customPayload = new HashMap<String,DataItem>();
-
-			Iterator<NDIPair> iterPayload = payloadResult.iterator();
-
-			while(iterPayload.hasNext()){
-				NDIPair ndi = iterPayload.next();
-				customPayload.put(ndi.getName(), ndi.getValue());
-			}
-
-			event.setCustomHeaders(customHeaders);
-			event.setCustomPayload(customPayload);
-			*/
-		}
-
-		EventResponse es = null;
-
-		if (event==null){
-			es = new EventResponse();
-			es.setPersistStatus("NOT_FOUND");
-			es.setPersistStatusMessage("Event not found with event id: " + eventId);
-		} else {
-			es = new EventResponse(event);
 		}
 
 
-		return es;
-
+		throw new EmptyResultDataAccessException(1);
 
 	}
 
 	@Override
 	public EventsResponse getEvents(List<String> req) throws DataAccessException {
 
-		log.debug("DAO attempting to retrieve events");
 
 		EventsResponse er = new EventsResponse();
+		List<EventResponse> responses = new ArrayList<EventResponse>();
 
-		List<Event> loe = fetchEvents(req);
+		Iterator<String> strIter = req.iterator();
+		boolean errInd = false;
+		while(strIter.hasNext()){
 
-		if (loe!=null){
-			Iterator<Event> el = loe.iterator();
-			List<EventResponse> ers = new ArrayList<EventResponse>();
-			while(el.hasNext()){
-				Event evt = el.next();
-				EventResponse etr = new EventResponse();
-				etr.setEvent(evt);
-				ers.add(etr);
+			long start = System.currentTimeMillis();
+
+			String eventId = strIter.next();
+			try {
+
+				EventResponse res = this.getEvent(eventId);
+				long end = System.currentTimeMillis();
+				res.setProcessingDuration(end-start);
+				responses.add(res);
+
+			} catch (EmptyResultDataAccessException e){
+
+				EventResponse res = new EventResponse();
+				res.setStatus("ERROR");
+				res.setStatusMessage("Record not Found: " + eventId);
+				long end = System.currentTimeMillis();
+				res.setProcessingDuration(end-start);
+				responses.add(res);
+				errInd = true;
+
+			} catch (DataAccessException e){
+				throw e;
 			}
 
-			er.setEvents(ers);
-
-			return er;
-		} else {
-			er = new EventsResponse();
-			er.setStatus("NOT_FOUND");
-			er.setStatusMessage("Event with id/id's specified were not found: " + req.toString());
-			return er;
 		}
+
+		er.setEvents(responses);
+
+		if (errInd){
+			er.setStatus("ERROR");
+			er.setStatusMessage("One or more request for an event failed.");
+		} else {
+			er.setStatus("OK");
+		}
+
+		return er;
+
 
 	}
 
 	@Override
 	public EventsResponse queryEvents(String source, String generations, String name, String objectId, String correlationId, String createdAfter, String createdBefore, String timestamp) throws DAOException {
-		throw new DAOException("feature not implmented");
+
+
+		throw new DAOException("feature not implemented");
 	}
 
 	@Override
 	public EventsResponse getEventSources() throws DataAccessException {
 
+		validateDB();
+
 		DSLContext create = DSL.using(getDialect());
-		String sql= create.selectDistinct(field("source"))
-				.from(table("event.event_store"))
+		String sql= create.selectDistinct(field(SOURCE))
+				.from(table(EVENT_STORE_TBL))
 				.getSQL();
 
-		log.debug("making request to database with sql: " + sql);
-
 		EventsResponse er = new EventsResponse();
-		List<String> sources = new ArrayList<String>();
+		List<String> sources= jdbcTemplate.query(sql, new StringRowMapper());
 
-		List<String> result = jdbcTemplate.query(new PreparedStatementCreator() {
-			@Override
-			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-				PreparedStatement psPayload=connection.prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS);
-				return psPayload;
-			}
-		}, new StringRowMapper());
+		if (sources==null || sources.isEmpty()) { throw new EmptyResultDataAccessException(1); };
 
 
-		Iterator<String> iStr = result.iterator();
-
-		while(iStr.hasNext()){
-			String currentSource = iStr.next();
-			sources.add(currentSource);
-		}
-
+		sources.removeAll(Collections.singleton(null));
 		er.setEventSources(sources);
-
+		er.setEvents(null);
 		return er;
 	}
 
 	@Override
 	public EventsResponse getEventNames(String source) throws DataAccessException {
 
-		DSLContext create = DSL.using(getDialect());
 
-		String sql = create.select(field("eventName"))
-				.from(table("event.event_store"))
+		DSLContext create = DSL.using(getDialect());
+		String sql = create.select(field(EVENT_NAME))
+				.from(table(EVENT_STORE_TBL))
 				.where("source = '" + source +"'")
-				.groupBy(field("eventName"))
+				.groupBy(field(EVENT_NAME))
 				.getSQL(INLINED);
 
-		log.debug("making request to database with sql: " + sql);
+		List<String> names = jdbcTemplate.query(sql, new StringRowMapper());
 
-		List<String> result = jdbcTemplate.query(new PreparedStatementCreator() {
-				 @Override
-				 public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-					 PreparedStatement psPayload=connection.prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS);
-					 return psPayload;
-				 }
-			 }, new StringRowMapper());
+		if (names==null || names.isEmpty()) { throw new EmptyResultDataAccessException(1); };
 
-
-
+		names.removeAll(Collections.singleton(null));
 		EventsResponse er = new EventsResponse();
-		List<String> names = new ArrayList<String>();
-
-
-		Iterator<String> iStr = result.iterator();
-
-		while(iStr.hasNext()){
-			String currentName = iStr.next();
-			names.add(currentName);
-		}
-
 		er.setEventNames(names);
 
 		return er;
@@ -573,13 +511,13 @@ public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
 
 		String sql = "";
 		SelectJoinStep step = create.select(
-					field("eventName")
-					,field("eventId")
-					,field("objectId")
-					,field("correlationId")
-					,field("source")
-					,max(field("insertTimeStamp")).as(field("insertTimeStamp")))
-					.from(table("event.event_store"));
+					field(EVENT_NAME)
+					,field(EVENT_ID)
+					,field(OBJECT_ID)
+					,field(CORRELATION_ID)
+					,field(SOURCE)
+					,max(field(INSERT_TIMESTAMP)).as(field(INSERT_TIMESTAMP)))
+					.from(table(EVENT_STORE_TBL));
 
 		boolean firstConjunction = true;
 		SelectConditionStep cs = null;
@@ -624,32 +562,22 @@ public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
 
 
 		if (cs==null){
-			sql = step.groupBy(field("eventName")
-					,field("objectId")
-					,field("correlationId")
-					,field("source")).getSQL();
+			sql = step.groupBy(field(EVENT_NAME)
+					,field(OBJECT_ID)
+					,field(CORRELATION_ID)
+					,field(SOURCE)).getSQL();
 		} else {
-			sql = cs.groupBy(field("eventName")
-					,field("objectId")
-					,field("correlationId")
-					,field("source")
+			sql = cs.groupBy(field(EVENT_NAME)
+					,field(OBJECT_ID)
+					,field(CORRELATION_ID)
+					,field(SOURCE)
 					).getSQL(INLINED);
 		}
-
-
 
 		Event event = new Event();
 		final String cSql = sql;
 
-		log.debug("invoking get latest events with sql: " + cSql);
-
-
-		List<Event> result = jdbcTemplate.query(new PreparedStatementCreator() {
-			@Override
-			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-				PreparedStatement psPayload=connection.prepareStatement(cSql, PreparedStatement.RETURN_GENERATED_KEYS);
-				return psPayload;
-			}}, new EventRowMapper());
+		List<Event> result = jdbcTemplate.query(cSql, new EventRowMapper());
 
 		return this.getEvent(result.get(0).getEventId());
 	}
@@ -657,6 +585,8 @@ public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
 
 	@Override
 	public EventResponse replayEvent(EventRequest request) throws DataAccessException {
+
+
 		return null;
 	}
 
@@ -687,7 +617,6 @@ public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
 	private List<Event> fetchEvents(List<String> req) throws DataAccessException {
 
 		List<Event> ler = new ArrayList();
-		String eventSQL = getEventsSql(req);
 
 		Iterator<String> iter = req.iterator();
 		while(iter.hasNext()){
@@ -703,18 +632,22 @@ public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
 
 		Map<String,String> customHeaders = new HashMap<String,String>();
 
+		if (eventId == null) { return customHeaders; }
+
 		DSLContext create = DSL.using(getDialect());
 
 		String sql = create.select(field(NAME), field(VALUE))
 				.from(table(EVENT_HEADERS_TBL))
-				.where(field(EVENT_ID).equal(inline(eventId)))
+				.where(EVENT_ID + " = '" + eventId + "'")
 				.getSQL();
 
-		List<NVPair> headerResult = jdbcTemplate.query(sql, new HeaderRowMapper());
+		log.debug("fetching headers for event id: " + eventId + " with sql: " + sql);
 
-		Iterator<NVPair> iterHeader = headerResult.iterator();
+		List<Triplet> headerResult = jdbcTemplate.query(sql, new HeaderRowMapper());
+
+		Iterator<Triplet> iterHeader = headerResult.iterator();
 		while(iterHeader.hasNext()){
-			NVPair currentHeader = iterHeader.next();
+			Triplet currentHeader = iterHeader.next();
 			customHeaders.put(currentHeader.getName(), currentHeader.getValue());
 		}
 
@@ -723,16 +656,20 @@ public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
 	}
 
 
-	private List<NDIPair> fetchPayload(String eventId) throws DataAccessException {
+	private List<Triplet> fetchPayload(String eventId) throws DataAccessException {
+
+		if (eventId == null) { return null; }
 
 		DSLContext create = DSL.using(getDialect());
 
 		String sql = create.select(field(NAME), field(VALUE), field(DATA_TYPE))
 				.from(table(EVENT_PAYLOAD_TBL))
-				.where(field(EVENT_ID).equal(inline(eventId)))
+				.where(EVENT_ID + " = '" + eventId + "'")
 				.getSQL();
 
-		List<NDIPair> payloadResult = jdbcTemplate.query(sql, new PayloadRowMapper());
+		log.debug("fetching payload for event id: " + eventId + " with sql: " + sql);
+
+		List<Triplet> payloadResult = jdbcTemplate.query(sql, new PayloadRowMapper());
 
 		return payloadResult;
 
@@ -740,4 +677,8 @@ public class OpenRDBMSDAOImpl extends SchemaInit implements EventDAO {
 
 
 
+
 }
+
+
+

@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,11 +29,9 @@ import org.springframework.web.context.ServletContextAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alliancefoundry.dao.DAOException;
 import com.alliancefoundry.dao.DAOFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -71,6 +71,9 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 	public static final String REQUEST_STATUS_OK = "OK";
 	public static final String REQUEST_STATUS_ERROR = "ERROR";
 
+	public static final String QUERY_STATUS_OK = "OK";
+	public static final String QUERY_STATUS_ERROR = "ERROR";
+
 
 	public EventServiceController(){
 		// default constructor
@@ -109,7 +112,8 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 				er.setPersistStatus(PERSISTENT_STATUS_ERROR);
 				er.setPersistStatusMessage("Request to persist event did not return status");
 				er.setPublishStatus(PUBLISH_STATUS_NO_ATTEMPT);
-				er.setPublishStatusMessage("Attempt to persist failed. Publish attempt was not made, even if requested.");
+				er.setPublishStatusMessage
+						("Attempt to persist failed. Publish attempt was not made, even if requested.");
 				er.setStatus(REQUEST_STATUS_ERROR);
 				er.setStatusMessage("The request was not successful.");
 
@@ -118,7 +122,8 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 
 				return er;
 
-			} else if (request.getEvent().isPublishable()==null || request.getEvent().isPublishable().booleanValue()==false){
+			} else if (request.getEvent().isPublishable()==null ||
+					request.getEvent().isPublishable().booleanValue()==false){
 
 				er.setPublishStatus(PUBLISH_STATUS_NO_ATTEMPT);
 				er.setPublishStatusMessage("Publishing indicator not specified or set to false.");
@@ -164,14 +169,17 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 
 			}
 
-		} catch (DataAccessException e) {
-
-			log.error(e.getMessage(), e);
+		} catch (DuplicateKeyException e){
 
 			er = new EventResponse();
 			er.setPersistStatus(PERSISTENT_STATUS_ERROR);
-			er.setPersistStatusMessage("request could not be processed: " + e.getCause());
+			er.setPersistStatusMessage("Could not process request. eventId must be unique.");
 
+		} catch (DataAccessException e) {
+
+			er = new EventResponse();
+			er.setPersistStatus(PERSISTENT_STATUS_ERROR);
+			er.setPersistStatusMessage("request could not be processed: " + e.getMessage() +  e.getCause());
 
 		} catch (PublisherException e){
 
@@ -203,6 +211,7 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 			method = RequestMethod.GET,
 			produces={MediaType.APPLICATION_JSON_VALUE,
 					MediaType.APPLICATION_XML_VALUE})
+	@ApiModelProperty(value="Retrieves an Event from the Event Service")
 	public EventResponse getEvent(@PathVariable String id){
 
 		long start = System.currentTimeMillis();
@@ -217,11 +226,17 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 
 				er = daoFactory.getDAO().getEvent(id);
 
+			} catch (EmptyResultDataAccessException e){
+
+				er = new EventResponse();
+				er.setPersistStatus(QUERY_STATUS_ERROR);
+				er.setPersistStatusMessage("Record not found" + id);
+
 			} catch (DataAccessException e) {
 
 				log.error(e.getMessage(), e);
 				er = new EventResponse();
-				er.setPersistStatus("SYSTEM_ERROR");
+				er.setPersistStatus(QUERY_STATUS_ERROR);
 				er.setPersistStatusMessage("request could not be processed: " + e.getCause());
 			}
 
@@ -229,7 +244,7 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 
 			er = new EventResponse();
 			er.setPersistStatus("SYSTEM_ERROR");
-			er.setPersistStatusMessage("request could not be processed: " + "invalid characters present in parameter");
+			er.setPersistStatusMessage("request could not be processed invalid characters present in parameter");
 
 		}
 
@@ -279,13 +294,12 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 					MediaType.APPLICATION_XML_VALUE})
 	public EventsResponse getEvents(@PathVariable String objectIds){
 
-		log.debug("Attempting to retrieve a list of events with id's =" + objectIds);
+		long start = System.currentTimeMillis();
 
 		// parse and clean up the delimited string containing a list of id's
 		StringTokenizer st = new StringTokenizer(objectIds, ",");
 
 		List<String> ls = new ArrayList<String>();
-		int c = 0;
 		while(st.hasMoreTokens()){
 			String token = st.nextToken().trim();
 			ls.add(token);
@@ -294,13 +308,24 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 		try {
 
 			EventsResponse er = daoFactory.getDAO().getEvents(ls);
+			long end = System.currentTimeMillis();
+			er.setProcessingDuration(end-start);
+
+			return er;
+
+		} catch (EmptyResultDataAccessException e) {
+
+			EventsResponse er = new EventsResponse();
+			er.setStatus(QUERY_STATUS_ERROR);
+			er.setStatusMessage("Record not found.");
+
 			return er;
 
 		} catch (DataAccessException e){
 
 			log.error(e.getMessage(), e);
 			EventsResponse er = new EventsResponse();
-			er.setStatus("QUERY_ERROR");
+			er.setStatus(QUERY_STATUS_ERROR);
 			er.setStatusMessage("request could not be processed: " + e.getCause());
 			return er;
 
@@ -330,15 +355,35 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 					MediaType.APPLICATION_XML_VALUE})
 	public EventsResponse getEventSources()  {
 
+		long start = System.currentTimeMillis();
+
 		try {
+
 			EventsResponse er = daoFactory.getDAO().getEventSources();
+			er.setStatus(QUERY_STATUS_OK);
+			long end = System.currentTimeMillis();
+			er.setProcessingDuration(end-start);
 			return er;
+
+
+		} catch (EmptyResultDataAccessException e){
+
+			EventsResponse er = new EventsResponse();
+			er.setStatus(QUERY_STATUS_OK);
+			er.setStatusMessage("No Records Found.");
+			long end = System.currentTimeMillis();
+			er.setProcessingDuration(end-start);
+			return er;
+
 		} catch (DataAccessException e) {
 
 			log.error(e.getMessage(), e);
+
 			EventsResponse er = new EventsResponse();
-			er.setStatus("QUERY_ERROR");
+			er.setStatus(QUERY_STATUS_ERROR);
 			er.setStatusMessage("request could not be processed: " + e.getCause());
+			long end = System.currentTimeMillis();
+			er.setProcessingDuration(end-start);
 			return er;
 		}
 
@@ -351,18 +396,34 @@ public class EventServiceController implements ApplicationContextAware, ServletC
 					MediaType.APPLICATION_XML_VALUE})
 	public EventsResponse getEventNames(@PathVariable String source) {
 
+		long start = System.currentTimeMillis();
+
 		log.debug("Attempting to retrieve a list of event names with source = " + source);
 
 		try {
-			EventsResponse er = daoFactory.getDAO().getEventNames(source);
 
+			EventsResponse er = daoFactory.getDAO().getEventNames(source);
+			er.setStatus(QUERY_STATUS_OK);
+			long end = System.currentTimeMillis();
+			er.setProcessingDuration(end - start);
 			return er;
+
+		} catch (EmptyResultDataAccessException e) {
+
+			EventsResponse er = new EventsResponse();
+			er.setStatus(QUERY_STATUS_OK);
+			er.setStatusMessage("No records found");
+			return er;
+
 		} catch (DataAccessException e) {
 
 			log.error(e.getMessage(), e);
 			EventsResponse er = new EventsResponse();
-			er.setStatus("QUERY_ERROR");
+			er.setStatus(QUERY_STATUS_ERROR);
 			er.setStatusMessage("request could not be processed: " + e.getCause());
+			long end = System.currentTimeMillis();
+			er.setProcessingDuration(end-start);
+
 			return er;
 		}
 
