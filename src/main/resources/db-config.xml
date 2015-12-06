@@ -41,12 +41,20 @@
             <property name="DAO" ref="derbyDAO"/>
         </bean>
 
-        <bean id="derbyDAO" class="com.alliancefoundry.dao.impl.derby.EmbeddedDerbyEventDAOImpl">
+        <bean id="derbyDAO" class="com.alliancefoundry.dao.impl.dbms.OpenRDBMSDAOImpl">
             <property name="dataSource" ref="dataSource"/>
+            <property name="dialect">
+                <value type="org.jooq.SQLDialect">DERBY</value>
+            </property>
         </bean>
 
-        <bean id="mysqlDAO" class="com.alliancefoundry.dao.impl.mysql.MySQLEventDAOImpl">
+        <bean id="mysqlDAO" class="com.alliancefoundry.dao.impl.dbms.OpenRDBMSDAOImpl">
             <property name="dataSource" ref="dataSource"/>
+            <property name="dialect">
+                <value type="org.jooq.SQLDialect">MYSQL</value>
+            </property>
         </bean>
+
+        <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
 
 </beans>
