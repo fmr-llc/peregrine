@@ -3,17 +3,17 @@ package com.alliancefoundry.model;
 /**
  * Created by Paul Bernard on 11/23/15.
  */
-public class NVPair {
+public class Pair {
 
     private String name;
     private String value;
 
-    public NVPair(String name, String value){
+    public Pair(String name, String value){
         this.name = name;
         this.value = value;
     }
 
-    public NVPair(){
+    public Pair(){
         // Default Constructor
     }
 
@@ -32,5 +32,6 @@ public class NVPair {
     public void setValue(String value){
         this.value = value;
     }
+
 
 }

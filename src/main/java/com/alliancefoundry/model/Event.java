@@ -1,8 +1,6 @@
 package com.alliancefoundry.model;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +36,7 @@ public class Event {
 	private String subDestination;
     private String eventName;
 	private Map<String, String> customHeaders;
-	private Map<String, DataItem> customPayload;
+	private List<Triplet> customPayload;
 	private String preEventState;
 	private String postEventState;
 	private Boolean isPublishable;
@@ -70,7 +68,7 @@ public class Event {
     	
     	receivedTimeStamp = DateTime.now();
     	customHeaders = new HashMap<String, String>();
-    	customPayload = new HashMap<String, DataItem>();
+    	customPayload = new ArrayList<Triplet>();
     	insertTimeStamp = DateTime.now();
     }
 
@@ -183,9 +181,9 @@ public class Event {
 
 	public void setCustomHeaders(Map<String, String> customHeaders) { this.customHeaders = customHeaders; }
 
-	public Map<String, DataItem> getCustomPayload() { return customPayload; }
+	public List<Triplet> getCustomPayload() { return customPayload; }
 
-	public void setCustomPayload(Map<String, DataItem> customPayload) { this.customPayload = customPayload; }
+	public void setCustomPayload(List<Triplet> customPayload) { this.customPayload = customPayload; }
 
 	public void setParentEventId(String parentId) { this.parentEventId = parentId; }
 

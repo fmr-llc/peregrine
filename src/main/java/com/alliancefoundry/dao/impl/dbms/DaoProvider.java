@@ -2,77 +2,103 @@ package com.alliancefoundry.dao.impl.dbms;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.sql.Connection;
+import javax.sql.DataSource;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by Paul Bernard on 11/22/15.
+ * Created by Paul Bernard on 12/6/15.
  */
-public class SchemaInit {
+public class DaoProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(SchemaInit.class);
+    private static final Logger log = LoggerFactory.getLogger(DaoProvider.class);
+
+    protected JdbcTemplate jdbcTemplate;
 
     protected boolean schemaInit = false;
 
-    public final static String SCHEMA = "event";
+    public void setDataSource(DataSource dataSource) {
 
-    public final static String EVENT_STORE_TBL = SCHEMA + ".event_store";
-    public final static String EVENT_HEADERS_TBL = SCHEMA + ".event_headers";
-    public final static String EVENT_PAYLOAD_TBL = SCHEMA + ".event_payload";
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+        org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator
+                tr = new org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator();
+        this.jdbcTemplate.setExceptionTranslator(tr);
 
-    public final static String EVENT_ID = "eventId";
-    public final static String NAME = "name";
-    public final static String VALUE = "value";
-    public final static String DATA_TYPE = "dataType";
-    public final static String PARENT_EVENT_ID = "parentId";
-    public final static String EVENT_NAME = "eventName";
-    public final static String OBJECT_ID = "objectId";
-    public final static String CORRELATION_ID = "correlationId";
-    public final static String SEQUENCE_NUMBER = "sequenceNumber";
-    public final static String MESSAGE_TYPE = "messageType";
-    public final static String SOURCE = "source";
-    public final static String DESTINATION = "destination";
-    public final static String SUBDESTINATION = "subdestination";
-    public final static String REPLAY_INDICATOR = "replayIndicator";
-    public final static String PUBLISH_TIMESTAMP = "publishTimestamp";
-    public final static String RECEIVED_TIMESTAMP = "receivedTimestamp";
-    public final static String EXPIRATION_TIMESTAMP = "expirationTimestamp";
-    public final static String PREEVENT_STATE = "preEventState";
-    public final static String POSTEVENT_STATE = "postEventState";
-    public final static String IS_PUBLISHABLE = "isPublishable";
-    public final static String INSERT_TIMESTAMP = "insertTimestamp";
+        try {
+            if (validateDB()){
+                schemaInit = true;
+            } else {
+                log.error("problem with schema, table or connection.");
+            }
+        } catch (Exception e){
+            log.error("connection not available");
+        }
+    }
 
-    private boolean schemaExists(Connection conn){
+    protected boolean validateDB(){
 
-        String sql = "SELECT * FROM SYS.SYSSCHEMAS";
-        try{
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-            while(rs.next()){
-                log.debug("schema found with name: " + rs.getString(2));
-                if (rs.getString(1).equalsIgnoreCase("event")) return true;
+        try {
+            if (schemaInit == false) {
+                if (schemaExists() == false) {
+                    boolean schemaOK = createSchema();
+                    boolean tablesOK = createTables();
+                    if (schemaOK && tablesOK) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
             }
 
-            log.debug("no schemas found with correct name.");
-            return false;
+            return true;
 
-        } catch (SQLException e){
-            log.debug("could not determine if schema exists.");
+        } catch (Exception e){
+            log.error(e.getMessage());
             return false;
         }
 
+
     }
 
-    private boolean createSchema(Connection conn){
+    private boolean schemaExists() {
+
+        String sql = "SELECT * FROM SYS.SYSSCHEMAS WHERE SCHEMANAME = 'EVENT'";
+
+        try {
+            String schema = (String)jdbcTemplate
+                    .queryForObject(
+                            sql, new Object[] { },
+                            new StringRowMapperPos(2));
+
+            if (schema!=null){
+                log.debug("schema found with name: " + schema);
+                return true;
+            } else {
+
+                log.debug("could not determine if schema exists.");
+                return false;
+            }
+        } catch (Exception e){
+            return false;
+        }
+
+
+    }
+
+    private boolean createSchema(){
 
         String sql = "CREATE SCHEMA event";
 
         try {
             // create table
-            PreparedStatement ps = conn.prepareStatement(sql);
+            PreparedStatement ps = jdbcTemplate
+                    .getDataSource()
+                    .getConnection()
+                    .prepareStatement(sql);
             ps.execute();
 
             schemaInit = true;
@@ -85,7 +111,7 @@ public class SchemaInit {
 
     }
 
-    private boolean createTables(Connection conn){
+    private boolean createTables(){
 
         String tableSql1 = "CREATE TABLE event.event_store (\n" +
                 "  eventId varchar(45) NOT NULL,\n" +
@@ -147,35 +173,45 @@ public class SchemaInit {
                 ")";
 
         try {
-            PreparedStatement ps2 = conn.prepareStatement(tableSql1);
+            PreparedStatement ps2 = jdbcTemplate
+                    .getDataSource()
+                    .getConnection().prepareStatement(tableSql1);
             ps2.execute();
         } catch (SQLException e){
             log.warn("table already exists");
         }
 
         try {
-            PreparedStatement ps2 = conn.prepareStatement(tableSql2);
+            PreparedStatement ps2 = jdbcTemplate
+                    .getDataSource()
+                    .getConnection().prepareStatement(tableSql2);
             ps2.execute();
         } catch (SQLException e){
             log.warn("table already exists");
         }
 
         try {
-            PreparedStatement ps2 = conn.prepareStatement(tableSql3);
+            PreparedStatement ps2 = jdbcTemplate
+                    .getDataSource()
+                    .getConnection().prepareStatement(tableSql3);
             ps2.execute();
         } catch (SQLException e){
             log.warn("table already exists");
         }
 
         try {
-            PreparedStatement ps2 = conn.prepareStatement(tableSql4);
+            PreparedStatement ps2 = jdbcTemplate
+                    .getDataSource()
+                    .getConnection().prepareStatement(tableSql4);
             ps2.execute();
         } catch (SQLException e){
             log.warn("table already exists");
         }
 
         try {
-            PreparedStatement ps2 = conn.prepareStatement(tableSql5);
+            PreparedStatement ps2 = jdbcTemplate
+                    .getDataSource()
+                    .getConnection().prepareStatement(tableSql5);
             ps2.execute();
         } catch (SQLException e){
             log.warn("table already exists");
@@ -184,16 +220,6 @@ public class SchemaInit {
 
 
         return true;
-
-    }
-
-    protected void validateDB(Connection conn){
-        if (schemaInit==false){
-            if (schemaExists(conn)==false){
-                createSchema(conn);
-                createTables(conn);
-            }
-        }
 
     }
 }

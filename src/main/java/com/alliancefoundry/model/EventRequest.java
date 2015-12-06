@@ -13,8 +13,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(Include.NON_NULL)
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(Include.NON_EMPTY)
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_EMPTY)
 public class EventRequest {
 
     private Event event;

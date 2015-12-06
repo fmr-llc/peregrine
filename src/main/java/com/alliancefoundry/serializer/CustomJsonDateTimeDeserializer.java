@@ -26,6 +26,11 @@ public class CustomJsonDateTimeDeserializer extends JsonDeserializer<DateTime>
 
         SimpleDateFormat format = new SimpleDateFormat(SerializerConstants.EVENT_SERVICE_DATE_TIME_FORMAT);
         String date = jsonParser.getText();
+
+        if (date==null || date.length()<1){
+            return null;
+        }
+
         try {
             return new DateTime(format.parse(date));
         } catch (ParseException e) {

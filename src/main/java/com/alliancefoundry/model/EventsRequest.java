@@ -9,8 +9,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_EMPTY)
 public class EventsRequest {
 
     private List<Event> events;

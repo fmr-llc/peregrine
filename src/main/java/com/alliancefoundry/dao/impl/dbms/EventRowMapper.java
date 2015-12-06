@@ -2,6 +2,8 @@ package com.alliancefoundry.dao.impl.dbms;
 
 import com.alliancefoundry.model.Event;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -9,6 +11,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import static com.alliancefoundry.dao.impl.dbms.DBConstants.*;
 
 /**
  * Created by:
@@ -20,7 +23,9 @@ import java.util.List;
  * before calling a named column retrieval if we are to avoid exceptions.
  *
  */
-public class EventRowMapper implements RowMapper {
+public class EventRowMapper extends EventDBRowMapper implements RowMapper  {
+
+    private static final Logger log = LoggerFactory.getLogger(EventRowMapper.class);
 
     public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
@@ -30,64 +35,36 @@ public class EventRowMapper implements RowMapper {
         int columnCount = rsmd.getColumnCount();
 
         for (int i = 1; i < columnCount + 1; i++ ) {
-            columnNames.add(rsmd.getColumnName(i));
+            String name = rsmd.getColumnName(i);
+            columnNames.add(name);
         }
 
         Event event = new Event(
-                getString(columnNames, rs, "parentId"),
-                getString(columnNames, rs, "eventName"),
-                getString(columnNames, rs, "objectId"),
-                getString(columnNames, rs, "correlationId"),
-                getInteger(columnNames, rs, "sequenceNumber"),
-                getString(columnNames, rs, "messageType"),
-                getString(columnNames, rs, "dataType"),
-                getString(columnNames, rs, "source"),
-                getString(columnNames, rs, "destination"),
-                getString(columnNames, rs, "subdestination"),
-                getBoolean(columnNames, rs, "replayIndicator"),
-                getDateTime(columnNames, rs, "publishTimestamp"),
-                getDateTime(columnNames, rs, "receivedTimestamp"),
-                getDateTime(columnNames, rs, "expirationTimestamp"),
-                getString(columnNames, rs, "preEventState"),
-                getString(columnNames, rs, "postEventState"),
-                getBoolean(columnNames, rs, "isPublishable"),
-                getDateTime(columnNames, rs, "insertTimestamp")
+                getString(columnNames, rs, PARENT_EVENT_ID.toUpperCase()),
+                getString(columnNames, rs, EVENT_NAME.toUpperCase()),
+                getString(columnNames, rs, OBJECT_ID.toUpperCase()),
+                getString(columnNames, rs, CORRELATION_ID.toUpperCase()),
+                getInteger(columnNames, rs, SEQUENCE_NUMBER.toUpperCase()),
+                getString(columnNames, rs, MESSAGE_TYPE.toUpperCase()),
+                getString(columnNames, rs, DATA_TYPE.toUpperCase()),
+                getString(columnNames, rs, SOURCE.toUpperCase()),
+                getString(columnNames, rs, DESTINATION.toUpperCase()),
+                getString(columnNames, rs, SUBDESTINATION),
+                getBoolean(columnNames, rs, REPLAY_INDICATOR.toUpperCase()),
+                getDateTime(columnNames, rs, PUBLISH_TIMESTAMP.toUpperCase()),
+                getDateTime(columnNames, rs, RECEIVED_TIMESTAMP.toUpperCase()),
+                getDateTime(columnNames, rs, EXPIRATION_TIMESTAMP.toUpperCase()),
+                getString(columnNames, rs, PREEVENT_STATE.toUpperCase()),
+                getString(columnNames, rs, POSTEVENT_STATE.toUpperCase()),
+                getBoolean(columnNames, rs, IS_PUBLISHABLE.toUpperCase()),
+                getDateTime(columnNames, rs, INSERT_TIMESTAMP.toUpperCase())
         );
-        event.setEventId(getString(columnNames, rs, "eventId"));
+        event.setEventId(getString(columnNames, rs, EVENT_ID.toUpperCase()));
 
         return event;
     }
 
-    private static String getString(List<String> columnNames, ResultSet rs, String fieldName) throws SQLException {
-        if (columnNames.contains(fieldName)) {
-            return rs.getString(fieldName);
-        }
-        return null;
-    }
 
-    private static Integer getInteger(List<String> columnNames, ResultSet rs, String fieldName) throws SQLException {
-        if (columnNames.contains(fieldName)) {
-            return rs.getInt(fieldName);
-        }
-        return null;
-    }
-
-    private static Boolean getBoolean(List<String> columnNames, ResultSet rs, String fieldName) throws SQLException {
-        if (columnNames.contains(fieldName)) {
-            return rs.getBoolean(fieldName);
-        }
-        return false;
-    }
-
-    private static DateTime getDateTime(List<String> columnNames, ResultSet rs, String fieldName) throws SQLException {
-        if (columnNames.contains(fieldName)) {
-            Long dt = rs.getLong(fieldName);
-            if (dt!=null){
-                return new DateTime(dt);
-            };
-        }
-        return null;
-    }
 
 
 }
