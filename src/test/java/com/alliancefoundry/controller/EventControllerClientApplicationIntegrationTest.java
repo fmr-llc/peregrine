@@ -54,6 +54,7 @@ public class EventControllerClientApplicationIntegrationTest {
 		e.setEventId(UUID.randomUUID().toString());
 		e.setMessageType("test-message");
 		e.setSource("Yahoo");
+		e.setReplayIndicator(Boolean.FALSE);
 		EventRequest req = new EventRequest(e);
 		
 		MvcResult postResult = mockMvc.perform(post("/eventservice/event")
