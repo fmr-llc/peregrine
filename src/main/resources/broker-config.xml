@@ -7,7 +7,8 @@
 
 
         <bean id="propertiesConfig" class="com.alliancefoundry.publisher.PropertiesRouter">
-            <property name="location" value="/#{systemProperties.propsroot}event-config.properties"/>
+            <property name="brokers" ref="brokersConfiguration"/>
+            <property name="messageTypes" ref="messageTypeConfiguration"/>
         </bean>
 
 
