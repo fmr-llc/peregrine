@@ -40,6 +40,9 @@ public class EventServicePublisher {
 			log.debug("publisher being used: " + pubStr);
 
 			PublisherInterface publisher = publishers.get(pubStr);
+			if(publisher == null) {
+				throw new PublisherException("No publisher configured: "+pubStr);
+			}
 
 			try {
 				publisher.publishEvent(event, config);
