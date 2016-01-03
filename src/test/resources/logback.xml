@@ -9,7 +9,7 @@
     </encoder>
   </appender>
 
-  <logger name="org.springframework" level="debug"/>
+  <logger name="org.springframework" level="info"/>
   <logger name="com.zaxxer.hikari.pool" level="error"/>
 
   <root level="debug">

@@ -1,7 +1,9 @@
 package com.alliancefoundry.publisher;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
@@ -17,13 +19,13 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties
 @Component
 public class BrokersConfiguration {
-	List<BrokerConfiguration> brokers = new ArrayList<>();
+	Map<String,BrokerConfiguration> brokers = new HashMap<>();
 
-	public List<BrokerConfiguration> getBrokers() {
+	public Map<String,BrokerConfiguration> getBrokers() {
 		return brokers;
 	}
 
-	public void setBrokers(List<BrokerConfiguration> brokers) {
+	public void setBrokers(Map<String,BrokerConfiguration> brokers) {
 		this.brokers = brokers;
 	}
 

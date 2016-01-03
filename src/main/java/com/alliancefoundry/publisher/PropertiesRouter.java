@@ -62,7 +62,7 @@ public class PropertiesRouter implements RouterConfig {
     @Override
     public Map<String, PublisherInterface> getPublishers() {
         Map<String, PublisherInterface> ret = new HashMap<String, PublisherInterface>();
-        for (BrokerConfiguration brokerConfiguration : brokers.getBrokers()) {
+        for (BrokerConfiguration brokerConfiguration : brokers.getBrokers().values()) {
         	try {
         		// TODO: push this down into the BrokerConfiguration implementation class?
                 PublisherInterface obj = (PublisherInterface) Class.forName(brokerConfiguration.getClassName()).newInstance();

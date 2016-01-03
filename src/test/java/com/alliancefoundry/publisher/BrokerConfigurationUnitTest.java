@@ -18,26 +18,27 @@ public class BrokerConfigurationUnitTest {
 	@Test
 	public void setTestBrokerProperties() {
 		EnvironmentTestUtils.addEnvironment(context, 
-				"brokers[0].name=kafka");
+				"brokers.kafka.name=kafka");
 		context.register(PropertyPlaceholderAutoConfiguration.class, TestConfiguration.class);
 		context.refresh();
 		
 		BrokersConfiguration brokersConfiguration = context.getBean(BrokersConfiguration.class);
 		assertNotNull(brokersConfiguration);
 		assertEquals(1, brokersConfiguration.brokers.size());
-		assertEquals("kafka", brokersConfiguration.getBrokers().get(0).getName());
+		assertEquals("kafka", brokersConfiguration.getBrokers().get("kafka").getName());
 	}
 	
 	@Test
 	public void setTestMultipleFullBrokerProperties() {
+		// either style of populating the broker map will work
 		EnvironmentTestUtils.addEnvironment(context, 
-				"brokers[0].name=kafka",
-				"brokers[0].className=com.alliancefoundry.publisher.impl.kafka.KafkaPublisher",
-				"brokers[0].url=localhost:9092",
+				"brokers.kafka.name=kafka",
+				"brokers.kafka.className=com.alliancefoundry.publisher.impl.kafka.KafkaPublisher",
+				"brokers.kafka.url=localhost:9092",
 
-				"brokers[1].name=activemqpub",
-				"brokers[1].className=com.alliancefoundry.publisher.impl.amq.ActiveMQPublisher",
-				"brokers[1].url=tcp://localhost:61616"
+				"brokers[amq].name=activemqpub",
+				"brokers[amq].className=com.alliancefoundry.publisher.impl.amq.ActiveMQPublisher",
+				"brokers[amq].url=tcp://localhost:61616"
 				);
 		
 		context.register(PropertyPlaceholderAutoConfiguration.class, TestConfiguration.class);
@@ -47,12 +48,12 @@ public class BrokerConfigurationUnitTest {
 		assertNotNull(brokersConfiguration);
 		assertEquals(2, brokersConfiguration.brokers.size());
 		
-		BrokerConfiguration broker0 = brokersConfiguration.getBrokers().get(0);
+		BrokerConfiguration broker0 = brokersConfiguration.getBrokers().get("kafka");
 		assertEquals("kafka", broker0.getName());
 		assertEquals("com.alliancefoundry.publisher.impl.kafka.KafkaPublisher", broker0.getClassName());
 		assertEquals("localhost:9092", broker0.getUrl());
 
-		BrokerConfiguration broker1 = brokersConfiguration.getBrokers().get(1);
+		BrokerConfiguration broker1 = brokersConfiguration.getBrokers().get("amq");
 		assertEquals("activemqpub", broker1.getName());
 		assertEquals("com.alliancefoundry.publisher.impl.amq.ActiveMQPublisher", broker1.getClassName());
 		assertEquals("tcp://localhost:61616", broker1.getUrl());

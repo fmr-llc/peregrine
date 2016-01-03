@@ -45,7 +45,7 @@ public class EventControllerClientApplicationIntegrationTest {
     }
 
 	@Test
-	public void testPostNewEvent() throws Exception {
+	public void testPostNewUnpublishableEvent() throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 		
 		Event e = new Event();
