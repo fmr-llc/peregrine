@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -28,11 +31,14 @@ import com.alliancefoundry.model.Event;
 import com.alliancefoundry.model.EventRequest;
 import com.alliancefoundry.model.EventResponse;
 import com.alliancefoundry.model.EventsResponse;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes={Boot.class})
 @WebIntegrationTest(randomPort = true)
+@ActiveProfiles("publish-activemq")
 public class EventControllerClientApplicationIntegrationTest {
 	@Autowired
     private WebApplicationContext wac;
@@ -46,6 +52,20 @@ public class EventControllerClientApplicationIntegrationTest {
 
 	@Test
 	public void testPostNewUnpublishableEvent() throws Exception {
+		Boolean isPublishable = Boolean.FALSE;
+		EventResponse eventResponse = publishEvent(isPublishable);
+		assertEquals("EventReponse: "+eventResponse, "OK", eventResponse.getPersistStatus());
+	}
+
+	@Test
+	public void testPostNewPublishableEvent() throws Exception {
+		Boolean isPublishable = Boolean.TRUE;
+		EventResponse eventResponse = publishEvent(isPublishable);
+		assertEquals("EventReponse: "+eventResponse, "OK", eventResponse.getPersistStatus());
+	}
+
+	private EventResponse publishEvent(Boolean isPublishable)
+			throws Exception, IOException, JsonParseException, JsonMappingException, UnsupportedEncodingException {
 		ObjectMapper mapper = new ObjectMapper();
 		
 		Event e = new Event();
@@ -56,6 +76,7 @@ public class EventControllerClientApplicationIntegrationTest {
 		e.setMessageType("test-message");
 		e.setSource("Yahoo");
 		e.setReplayIndicator(Boolean.FALSE);
+		e.setPublishable(isPublishable);
 		EventRequest req = new EventRequest(e);
 		
 		MvcResult postResult = mockMvc.perform(post("/eventservice/event")
@@ -68,9 +89,12 @@ public class EventControllerClientApplicationIntegrationTest {
 				postResult.getResponse().getContentAsString(),
 				EventResponse.class
 				);
-		
-		assertEquals("EventReponse: "+eventResponse, "OK", eventResponse.getPersistStatus());
-				
+		return eventResponse;
+	}
+	
+	@Test
+	public void testGetEventSources() throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
 		MvcResult result = mockMvc.perform(get("/eventservice/event-sources").accept(MediaType.APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isOk())
@@ -80,4 +104,5 @@ public class EventControllerClientApplicationIntegrationTest {
 		EventsResponse eventsResponse = mapper.readValue(result.getResponse().getContentAsString(), EventsResponse.class);
 		assertTrue(eventsResponse.getEventSources().contains("Yahoo"));
 	}
+
 }
