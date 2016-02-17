@@ -55,7 +55,9 @@ public class Boot extends SpringBootServletInitializer {
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(Boot.class);
+        return application
+        			.sources(Boot.class)
+        			.profiles("publish-activemq", "publish-kafka");
     }
 
     public static void main(String[] args) {
